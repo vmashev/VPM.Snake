@@ -2,7 +2,7 @@ package vpm.client;
 
 import javax.swing.SwingUtilities;
 
-import vpm.UI.MainFrame;
+import vpm.ui.MainFrame;
 
 public class ClientOld {
 

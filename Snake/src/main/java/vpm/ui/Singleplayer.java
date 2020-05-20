@@ -1,9 +1,11 @@
-package vpm.UI;
+package vpm.ui;
 
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.net.UnknownHostException;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -82,7 +84,11 @@ public class Singleplayer extends JDialog implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		switch (e.getActionCommand()) {
 		case "Start":
-			startGame();
+			try {
+				startGame();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
 			dispose();
 			break;
 		case "Cancel":
@@ -91,14 +97,12 @@ public class Singleplayer extends JDialog implements ActionListener {
 		}
 	}
 
-	private void startGame() {
+	private void startGame() throws UnknownHostException, IOException {
 		int height = Integer.valueOf(heightFld.getText());
 		int width = Integer.valueOf(widthFld.getText());
 		int speed = Integer.valueOf(speedFld.getText());
 		
-		Board board = new Board(width, height);
-		board.setSpeed(speed);
-		board.setNumberOfPlayers(1);
+		Board board = new Board(width, height , speed);
 		
 		JFrame frame = new JFrame("Singleplayer");
 		frame.setContentPane(board);

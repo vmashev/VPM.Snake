@@ -28,7 +28,6 @@ public class Server {
 		while (true) {
 			System.out.println("Server is running on port " + Constants.PORT);
 			Socket socket = serverSocket.accept(); //Keeps the program running!
-			System.out.println("Connected to client!");		
 			
 			ClientHandler clientThread = new ClientHandler(socket, clients);
 			clients.add(clientThread);

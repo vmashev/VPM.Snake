@@ -28,14 +28,11 @@ public class ClientHandler implements Runnable{
 			while(true) {
 				String request = in.readLine();
 				
-				if(request.contains("name")) {
-					out.println("Valentin");
-				} else if(request.startsWith("all")) {
-					outToAll(request);
-				} else {
-					out.println("tell me name");
-				}
+				//Update GameMove and return GameInfo
+				
+				
 			}
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
@@ -54,6 +51,9 @@ public class ClientHandler implements Runnable{
 			clientHandler.out.println(message);
 		}
 	}
+	
+	
+	
 }
 
 	

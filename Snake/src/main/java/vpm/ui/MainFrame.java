@@ -1,4 +1,4 @@
-package vpm.UI;
+package vpm.ui;
 
 import java.awt.Dialog.ModalExclusionType;
 import java.awt.GridLayout;

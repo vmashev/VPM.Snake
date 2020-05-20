@@ -1,4 +1,4 @@
-package vpm.UI;
+package vpm.ui;
 
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -10,13 +10,11 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-public class Pause extends JDialog implements ActionListener{
+public class PauseMenu extends JDialog implements ActionListener{
 
 	private JPanel contentPane;
-	private Board board;
 	
-	public Pause(Board board) {
-		this.board = board;
+	public PauseMenu(Board board) {
 		
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 220, 80);
@@ -46,7 +44,6 @@ public class Pause extends JDialog implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		switch (e.getActionCommand()) {
 		case "Resume":
-			board.setStart(true);
 			dispose();
 			break;
 		case "Quit":

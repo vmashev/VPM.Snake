@@ -1,4 +1,4 @@
-package vpm.UI;
+package vpm.ui;
 
 import java.awt.Font;
 import java.awt.event.ActionEvent;

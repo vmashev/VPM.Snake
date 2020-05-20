@@ -1,4 +1,4 @@
-package vpm.UI;
+package vpm.ui;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
