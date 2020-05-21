@@ -5,6 +5,7 @@ import java.awt.Dialog.ModalExclusionType;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Window;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
@@ -15,17 +16,19 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import vpm.client.ServerConnection;
 import vpm.helper.ClientSetup;
 import vpm.helper.Command;
 import vpm.helper.Constants;
 import vpm.helper.Direction;
-import vpm.helper.Dot;
 import vpm.helper.GameStatus;
 import vpm.helper.JsonParser;
+import vpm.model.Dot;
 import vpm.model.GameInfo;
 import vpm.model.UserEntity;
 
@@ -44,11 +47,11 @@ public class Board extends JPanel implements Runnable, KeyListener {
 	private Socket server;
 	private ServerConnection serverConnection;
 	private ObjectOutputStream objectOutput;
+	private Thread serverConnectionThread;
 	
 	public Board(int width, int height, int speed) throws UnknownHostException, IOException {
 		
 		this.gameInfo = new GameInfo(clientSetup.getUserName(), width , height , speed);
-		
 		this.server = new Socket(Constants.SERVER_IP , Constants.PORT);
 		this.objectOutput = new ObjectOutputStream(server.getOutputStream());
 		
@@ -61,7 +64,6 @@ public class Board extends JPanel implements Runnable, KeyListener {
 	
 	public Board(GameInfo gameInfo) throws IOException {
 		this.gameInfo = gameInfo;
-		
 		this.server = new Socket(Constants.SERVER_IP , Constants.PORT);
 		this.objectOutput = new ObjectOutputStream(server.getOutputStream());
 		
@@ -106,22 +108,14 @@ public class Board extends JPanel implements Runnable, KeyListener {
 		if( k == KeyEvent.VK_D) {
 			gameInfo.setDirection(Direction.RIGHT);
 		}
-		if( k == KeyEvent.VK_ENTER) {
-			gameInfo.setStatus(GameStatus.Run);
-		}
 		if( k == KeyEvent.VK_ESCAPE) {
 			gameInfo.setStatus(GameStatus.SetPause);
 		}
+		
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e) {
-		int k = e.getKeyCode();
-
-		if( k == KeyEvent.VK_ENTER) {
-			//start = false;
-			//pause = false;
-		}
 	}
 
 	@Override
@@ -129,6 +123,7 @@ public class Board extends JPanel implements Runnable, KeyListener {
 		long startTime;
 		long elapsed;
 		long wait;
+		Window win = SwingUtilities.getWindowAncestor(this);
 		
 		if(running) {
 			return;
@@ -142,21 +137,10 @@ public class Board extends JPanel implements Runnable, KeyListener {
 				
 				if((gameInfo.getDirection() != null) && (gameInfo.getStatus() != GameStatus.Pause)) {
 					
-					if(gameInfo.getStatus() == null) {
-						gameInfo.setStatus(GameStatus.Run);
-					}
-
 					String message = JsonParser.parseFromGameInfo(gameInfo);
 					Command sendCommand = new Command(11, message);
 					objectOutput.writeObject(sendCommand);
 					
-					if(gameInfo.getStatus() == GameStatus.SetPause) {
-						pauseGame();
-					}
-				}
-				
-				if(gameInfo.getStatus() == GameStatus.GameOver) {
-					break;
 				}
 				
 				elapsed = System.nanoTime() - startTime;
@@ -168,37 +152,61 @@ public class Board extends JPanel implements Runnable, KeyListener {
 						e.printStackTrace();
 					}
 				}
+				
+				switch (gameInfo.getStatus()) {
+				case SetPause:
+					pauseGame();
+					break;
+
+				case GameOver:
+					JOptionPane.showMessageDialog(this, "GameOver! Max Score: " + gameInfo.getScore());
+					win.dispose();
+					thread.interrupt();
+					break;
+					
+				case Save:
+					win.dispose();
+					thread.interrupt();
+					break;
+				}
 			}
 			
-			
 		} catch (IOException e) {
-			JOptionPane.showMessageDialog(this, e.getMessage());
-			
+			e.printStackTrace();
 		} finally {
 			try {
-				objectOutput.close();
-				server.close();
-			} catch (IOException e) {
+				if(	objectOutput != null) {
+					objectOutput.close();
+				}
+				if(server != null) {
+					server.close();
+				}	
+				thread.join();
+			} catch (IOException | InterruptedException e) {
 				e.printStackTrace();
 			}	
-		}	
-		
+		}
 		
 	}
 
 	private void init() throws IOException {
 		serverConnection = new ServerConnection(server, this);
-		new Thread(serverConnection).start();
-		
-		String message = JsonParser.parseFromGameInfo(gameInfo);
-		Command sendCommand = new Command(10, message);
-		objectOutput.writeObject(sendCommand);
+		serverConnectionThread = new Thread(serverConnection);
+		serverConnectionThread.start();
 		
 		targetTime = 1000 / gameInfo.getSpeed();
 		image= new BufferedImage(gameInfo.getWidth(), gameInfo.getHeight(), BufferedImage.TYPE_INT_ARGB);
 		graphics2D = image.createGraphics();
 		running = true;
 		targetTime = 1000 / gameInfo.getSpeed();
+
+		if(gameInfo.getId() == null) {
+			String message = JsonParser.parseFromGameInfo(gameInfo);
+			Command sendCommand = new Command(10, message);
+			objectOutput.writeObject(sendCommand);
+		} else {
+			requestRender();
+		}
 	}
 	
 	public void requestRender() {
@@ -218,10 +226,6 @@ public class Board extends JPanel implements Runnable, KeyListener {
 		graphics2D.setColor(Color.GREEN);
 		gameInfo.getApple().render(graphics2D);
 		
-		if(gameInfo.getStatus() == GameStatus.GameOver) {
-			graphics2D.drawString("GameOver! Max Score: " + gameInfo.getScore() , (gameInfo.getWidth() / 2) -30,  (gameInfo.getHeight() / 2));
-		}
-		
 		if(gameInfo.getStatus() == GameStatus.Pause) {
 			graphics2D.drawString("PAUSE", (gameInfo.getWidth() / 2) -10, (gameInfo.getHeight() / 2));
 		}
@@ -238,7 +242,7 @@ public class Board extends JPanel implements Runnable, KeyListener {
 		}
 	}
 	
-	private void pauseGame() {
+	private void pauseGame() throws IOException {
 		PauseMenu pauseMenu = new PauseMenu(this);
 		pauseMenu.setModalExclusionType(ModalExclusionType.NO_EXCLUDE);
 		pauseMenu.setVisible(true);

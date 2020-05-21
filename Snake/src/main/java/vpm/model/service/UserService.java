@@ -9,7 +9,7 @@ import vpm.model.UserEntity;
 public interface UserService {
 
 	List<UserEntity> findAll();
-	UserEntity findByNickname(String nickname);
+	UserEntity findByUsername(String username);
 	
 	void create(UserEntity user) throws ValidationException;
 	void remove(UserEntity user) ;	

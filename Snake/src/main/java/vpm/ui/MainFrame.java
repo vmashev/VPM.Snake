@@ -3,9 +3,11 @@ package vpm.ui;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 import vpm.helper.ClientSetup;
 
@@ -102,10 +104,17 @@ public class MainFrame extends JFrame implements ActionListener{
 			
 			break;			
 		case "Singleplayer": 
-			Singleplayer singleplayer = new Singleplayer();
-			singleplayer.setVisible(true);
+			SingleplayerMenu singleplayerMenu;
+			try {
+				singleplayerMenu = new SingleplayerMenu();
+				singleplayerMenu.setVisible(true);
+			} catch (IOException e1) {
+				JOptionPane.showMessageDialog(this, e1.getMessage());
+			}
+			
 			break;
 		case "Multiplayer":
+
 			break;
 		case "User Information": 
 			UserInformation userInformation = new UserInformation();

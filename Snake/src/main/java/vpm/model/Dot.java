@@ -1,10 +1,18 @@
-package vpm.helper;
+package vpm.model;
 
 import java.awt.Graphics2D;
 
+import javax.persistence.Embeddable;
+
+import vpm.helper.Constants;
+
+@Embeddable
 public class Dot {
+	
 	private int row;
 	private int col;
+	
+	public Dot() {}
 	
 	public Dot(int row, int col) {
 		this.row = row ;

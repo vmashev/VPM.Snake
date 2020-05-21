@@ -1,10 +1,16 @@
 package vpm.helper;
 
+import java.util.List;
+
 import javax.validation.ValidationException;
+
+import org.jboss.logging.Message;
 
 import vpm.model.GameInfo;
 import vpm.model.UserEntity;
+import vpm.model.service.GameInfoService;
 import vpm.model.service.UserService;
+import vpm.model.service.impl.GameInfoServiceImpl;
 import vpm.model.service.impl.UserServiceImpl;
 
 public class CommandUtils {
@@ -23,9 +29,15 @@ public class CommandUtils {
 		case 2: // Insert User
 			inserUserEntity();
 			break;
-		case 3: // Insert User
+		case 3: // Update User
 			updateUserEntity();
 			break;
+		case 4: // Get saved games to list
+			getSavedGames();
+			break;
+		case 5: // Get selected game to resume
+			getGameByDateTime();
+			break;			
 		case 10: // New Game
 			newGame();
 			break;
@@ -44,7 +56,7 @@ public class CommandUtils {
 		UserEntity requestUserEntity = JsonParser.parseToUserEntity(requestCommand.getMessage());
 		
 		UserService userService = new UserServiceImpl();
-		requestUserEntity = userService.findByNickname(requestUserEntity.getUsername());
+		requestUserEntity = userService.findByUsername(requestUserEntity.getUsername());
 		
 		String jsonMessage = JsonParser.parseFromUserEntity(requestUserEntity);	
 		responseCommand = new Command(requestCommand.getNumber(), jsonMessage);
@@ -86,7 +98,8 @@ public class CommandUtils {
 		GameInfo requestGameInfo = JsonParser.parseToGameInfo(requestCommand.getMessage());
 		requestGameInfo.setSnake(requestGameInfo.createSnake());
 		requestGameInfo.setApple(requestGameInfo.generateApple());
-
+		requestGameInfo.setStatus(GameStatus.Run);
+		
 		String jsonMessage = JsonParser.parseFromGameInfo(requestGameInfo);	
 		responseCommand = new Command(requestCommand.getNumber(), jsonMessage);
 	}
@@ -99,24 +112,55 @@ public class CommandUtils {
 			responseCommand = requestCommand;
 			return;
 		}
-		
+
 		switch (requestGameInfo.getStatus()) {
 		case Run:
 			if(requestGameInfo.getDirection() != null) {
-				requestGameInfo.update(0);
+				if(!requestGameInfo.update(0)) {
+					requestGameInfo.setStatus(GameStatus.GameOver);
+					saveGame(requestGameInfo);	
+				}
 			}
 			break;
 		case SetPause:
 			requestGameInfo.setStatus(GameStatus.Pause);
 			break;
 		case Save:
-			//Save open game for SP
+			saveGame(requestGameInfo);
+			requestGameInfo.setStatus(GameStatus.GameOver);
 			break;	
 		default:
 			break;
 		}
 		
 		String jsonMessage = JsonParser.parseFromGameInfo(requestGameInfo);	
+		responseCommand = new Command(requestCommand.getNumber(), jsonMessage);
+		
+	}
+	
+	private static void saveGame(GameInfo gameInfo) {
+		GameInfoService gameInfoService = new GameInfoServiceImpl();
+		gameInfoService.create(gameInfo);
+	}
+	
+	private static void getSavedGames() {
+		UserEntity requestUserEntity = JsonParser.parseToUserEntity(requestCommand.getMessage());
+
+		GameInfoService gameInfoService = new GameInfoServiceImpl();
+		List<GameInfo> games = gameInfoService.findSavedGamesByUsername(requestUserEntity.getUsername());
+        
+		String jsonMessage = JsonParser.parseFromGameInfoList(games);	
+		responseCommand = new Command(requestCommand.getNumber(), jsonMessage);
+		
+	}
+	
+	private static void getGameByDateTime() {
+		GameInfo requestGameInfo = JsonParser.parseToGameInfo(requestCommand.getMessage());
+
+		GameInfoService gameInfoService = new GameInfoServiceImpl();
+		GameInfo gameInfo = gameInfoService.findByDateTime(requestGameInfo.getDateTime());
+        
+		String jsonMessage = JsonParser.parseFromGameInfo(gameInfo);	
 		responseCommand = new Command(requestCommand.getNumber(), jsonMessage);
 		
 	}

@@ -9,7 +9,7 @@ import javax.persistence.Query;
 import vpm.model.UserEntity;
 import vpm.model.dao.UserDao;
 
-public class UserDaoPostgres extends GenericDAOPostgreSQL<UserEntity, String> implements UserDao{
+public class UserDaoPostgres extends GenericDAOPostgreSQL<UserEntity, Long> implements UserDao{
 
 	public UserDaoPostgres(EntityManager entityManager) {
 		super(UserEntity.class, entityManager);
@@ -29,7 +29,7 @@ public class UserDaoPostgres extends GenericDAOPostgreSQL<UserEntity, String> im
 
 	@Override
 	public UserEntity findByNickname(String username) {
-		Query query = getEntityManager().createNamedQuery("findUserByNickname");
+		Query query = getEntityManager().createNamedQuery("findUserByUsername");
 		query.setParameter("username", username);
 		
 		try {

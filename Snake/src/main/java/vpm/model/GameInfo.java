@@ -1,38 +1,82 @@
 package vpm.model;
 
+import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.concurrent.ThreadLocalRandom;
+
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 import vpm.helper.Constants;
 import vpm.helper.Direction;
-import vpm.helper.Dot;
 import vpm.helper.GameStatus;
-import vpm.helper.Snake;
 
-public class GameInfo {
+@Entity
+public class GameInfo implements Serializable{
 	
-	private final String userName;
-	private final int width;
-	private final int height;
-	private final int speed;
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Long id;
+	
+	private String username;
+	private LocalDateTime dateTime;
+	private int width;
+	private int height;
+	private int speed;
 	
 	private int score;
 	private int rowChange;
 	private int colChange;
 	
 	private Snake snake ;
+	
+	@AttributeOverrides({
+		@AttributeOverride(name = "row" , column = @Column(name = "apple_row")),
+		@AttributeOverride(name = "col" , column = @Column(name = "apple_col"))
+	})
 	private Dot apple;
+	@Enumerated(EnumType.STRING)
 	private Direction direction = null;
+	@Enumerated(EnumType.STRING)
 	private GameStatus status = null;
 	
+	public GameInfo() {	}
+	
 	public GameInfo(String username, int width, int height, int speed) {
-		this.userName = username;
+		this.username = username;
 		this.width = width;
 		this.height = height;
 		this.speed = speed;
+		this.dateTime = LocalDateTime.now();
 	}
 	
+	
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	
+	public LocalDateTime getDateTime() {
+		return dateTime;
+	}
+
+	public void setDateTime(LocalDateTime dateTime) {
+		this.dateTime = dateTime;
+	}
+
 	public String getUserName() {
-		return userName;
+		return username;
 	}
 	public int getWidth() {
 		return width;
@@ -154,10 +198,7 @@ public class GameInfo {
 		return false;
 	}
 	
-	public void update(int player) {
-		//if(pause) {
-		//	return;
-		//}
+	public boolean update(int player) {
 		
 		if(getDirection() == Direction.UP && rowChange == 0) {
 			rowChange = -Constants.SIZE;
@@ -182,8 +223,7 @@ public class GameInfo {
 			Dot nextDot = new Dot(getSnake().getHead().getRow() + rowChange, getSnake().getHead().getCol() + colChange);
 			
 			if(hasCollison(nextDot)) {
-				setStatus(GameStatus.GameOver);;
-				return;
+				return false;
 			}
 				
 			if(nextDot.equals(getApple())) {
@@ -195,5 +235,6 @@ public class GameInfo {
 			}
 		}
 		
+		return true;
 	}
 }

@@ -38,9 +38,6 @@ public class Server {
 			pool.execute(clientThread);
 		}
 		
-
-		
-		
 	}
 	
 }

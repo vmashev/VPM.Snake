@@ -1,6 +1,16 @@
 package vpm.helper;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.lang.reflect.Type;
+import java.util.List;
+
+import org.hibernate.Hibernate;
+
 import com.google.gson.Gson;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 
 import vpm.model.GameInfo;
 import vpm.model.UserEntity;
@@ -41,6 +51,19 @@ public class JsonParser {
 		return gameInfo;
 	}
 	
+	public static List<GameInfo> parseToGameInfoList(String jsonString) throws JsonSyntaxException, JsonIOException, FileNotFoundException {
+		if(jsonString == null) {
+			return null;
+		}
+		
+		Gson gson = new Gson();
+		Type type = new TypeToken<List<GameInfo>>(){}.getType();
+	    
+		List<GameInfo> games = gson.fromJson(jsonString, type);
+		
+		return games;
+	}
+	
 	public static String parseFromGameInfo(GameInfo gameInfo) {
 		
 		if(gameInfo == null) {
@@ -49,6 +72,20 @@ public class JsonParser {
 		
 		Gson gson = new Gson();
 		String jsonString = gson.toJson(gameInfo);
+		
+		return jsonString;
+	}
+	
+	public static String parseFromGameInfoList(List<GameInfo> games) {
+		
+		if(games == null) {
+			return null;
+		}
+		
+		Hibernate.initialize(games);
+		
+		Gson gson = new Gson();
+		String jsonString = gson.toJson(games);
 		
 		return jsonString;
 	}

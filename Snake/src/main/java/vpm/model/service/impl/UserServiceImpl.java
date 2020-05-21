@@ -71,20 +71,18 @@ public class UserServiceImpl implements UserService {
 		entityManager = serverSetup.getEntityManager();
 		userDao = new UserDaoPostgres(entityManager);
 		
+		List<UserEntity> result = userDao.findAll();
 		entityManager.close();
 		
-		return userDao.findAll();	
+		return result;	
 	}
 
 	@Override
-	public UserEntity findByNickname(String nickname) {
+	public UserEntity findByUsername(String username) {
 		entityManager = serverSetup.getEntityManager();
 		userDao = new UserDaoPostgres(entityManager);
 		
-		UserEntity resultUserEntity ;
-		
-		resultUserEntity = userDao.findByNickname(nickname);
-		
+		UserEntity resultUserEntity = userDao.findByNickname(username);
 		entityManager.close();
 		
 		return resultUserEntity;

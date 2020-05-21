@@ -13,6 +13,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
 public class Singleplayer extends JDialog implements ActionListener {
@@ -105,6 +106,7 @@ public class Singleplayer extends JDialog implements ActionListener {
 		Board board = new Board(width, height , speed);
 		
 		JFrame frame = new JFrame("Singleplayer");
+		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		frame.setContentPane(board);
 		frame.setResizable(false);
 		frame.pack();

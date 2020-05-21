@@ -5,17 +5,27 @@
 	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence/orm
 		http://xmlns.jcp.org/xml/ns/persistence/orm_2_1.xsd">
 		
-	<named-query name="findUserByNickname">
+	<named-query name="findUserByUsername">
 		<query><![CDATA[ select u from UserEntity u 
 			where u.username = :username ]]></query>
 	</named-query>
 	<named-query name="findUserByNicknameAndPassword">
 		<query><![CDATA[ select u from UserEntity u 
-			where u.username = :nickname and 
+			where u.username = :username and 
 				u.encryptedPassword = :password]]></query>
 	</named-query>
 	<named-query name="findTopUserByWins">
 		<query><![CDATA[ select u from UserEntity u 
 			where u.username like :username ]]></query>
 	</named-query>
+	
+	<named-query name="findSavedGameInfoByUsername">
+		<query><![CDATA[ select g from GameInfo g 
+			where g.username = :username and 
+				g.status = :status]]></query>
+	</named-query>
+	<named-query name="findGameInfoByDateTime">
+		<query><![CDATA[ select g from GameInfo g 
+			where g.dateTime = :dateTime ]]></query>
+	</named-query>	
 </entity-mappings>

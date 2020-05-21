@@ -44,6 +44,7 @@ public class ServerConnection implements Runnable{
 		} finally {
 			try {
 				objectInput.close();
+				server.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
