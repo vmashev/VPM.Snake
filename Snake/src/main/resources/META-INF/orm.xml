@@ -7,15 +7,15 @@
 		
 	<named-query name="findUserByNickname">
 		<query><![CDATA[ select u from UserEntity u 
-			where u.nickname = :nickname ]]></query>
+			where u.username = :username ]]></query>
 	</named-query>
 	<named-query name="findUserByNicknameAndPassword">
 		<query><![CDATA[ select u from UserEntity u 
-			where u.nickname = :nickname and 
+			where u.username = :nickname and 
 				u.encryptedPassword = :password]]></query>
 	</named-query>
 	<named-query name="findTopUserByWins">
 		<query><![CDATA[ select u from UserEntity u 
-			where u.nickname like :nickname ]]></query>
+			where u.username like :username ]]></query>
 	</named-query>
 </entity-mappings>

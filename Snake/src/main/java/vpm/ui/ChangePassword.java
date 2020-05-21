@@ -75,7 +75,7 @@ public class ChangePassword extends JDialog implements ActionListener {
 			String rePassword = new String(passwordField2.getPassword());
 			
 			if(password == "") {
-				showErrorMessage("Password is empty.");
+				JOptionPane.showMessageDialog (	this , "Password is empty." , "Error", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 			
@@ -96,12 +96,12 @@ public class ChangePassword extends JDialog implements ActionListener {
 
 	private boolean passwordIsValid(String password, String rePassword) {
 		if(password == "") {
-			showErrorMessage("Password is empty.");
+			JOptionPane.showMessageDialog (	this , "Password is empty." , "Error", JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
 		
 		if( !password.equals(rePassword)) {
-			showErrorMessage("Wrong re-entered password.");
+			JOptionPane.showMessageDialog (	this , "Wrong re-entered password." , "Error", JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
 		
@@ -113,9 +113,4 @@ public class ChangePassword extends JDialog implements ActionListener {
 		userInformation.setNewPassword(password);
 	}
 	
-	private void showErrorMessage(String msg) {
-		JOptionPane.showMessageDialog (
-				this , msg ,
-				"Error", JOptionPane.ERROR_MESSAGE);
-	}
 }

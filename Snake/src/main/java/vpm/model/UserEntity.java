@@ -9,7 +9,7 @@ import javax.persistence.GenerationType;
 
 import javax.persistence.Id;
 
-@Entity(name="UserEntity")
+@Entity
 public class UserEntity implements Serializable{
 
 	@Id
@@ -17,7 +17,7 @@ public class UserEntity implements Serializable{
 	private long id;
 	
 	@Column(nullable = false,length = 30)
-	private String nickname;
+	private String username;
 	
 	@Column(length = 50)
 	private String firstName;
@@ -30,17 +30,23 @@ public class UserEntity implements Serializable{
 	
 	private String encryptedPassword;
 	
+	public UserEntity() {}
+	
+	public UserEntity(String username) {
+		this.username = username;
+	}
+	
 	public long getId() {
 		return id;
 	}
 	public void setId(long id) {
 		this.id = id;
 	}
-	public String getNickname() {
-		return nickname;
+	public String getUsername() {
+		return username;
 	}
-	public void setNickname(String nickname) {
-		this.nickname = nickname;
+	public void setUsername(String nickname) {
+		this.username = nickname;
 	}
 	public String getFirstName() {
 		return firstName;

@@ -6,31 +6,18 @@ import javax.persistence.Persistence;
 
 import net.bytebuddy.asm.Advice.This;
 
-public class Setup {
+public class ServerSetup {
 
-	private static Setup instance = new Setup();
-	private String userName = null;
-	protected EntityManagerFactory entityManagerFactory = null;	
+	private static ServerSetup instance = new ServerSetup();
+	protected EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("VPM");	
 	
-	private Setup() {}
+	private ServerSetup() {}
 	
-	public static Setup createInstance() {
+	public static ServerSetup createInstance() {
 		return instance;
 	}
 
-	public String getUserName() {
-		return userName;
-	}
-
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
-	
 	public EntityManagerFactory getEntityManagerFactory() {
-		if(entityManagerFactory == null) {
-			entityManagerFactory = Persistence.createEntityManagerFactory("VPM");
-		}
-		
 		return entityManagerFactory;
 	}
 	

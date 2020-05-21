@@ -4,10 +4,9 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
-import javax.persistence.NoResultException;
 import javax.validation.ValidationException;
 
-import vpm.helper.Setup;
+import vpm.helper.ServerSetup;
 import vpm.model.UserEntity;
 import vpm.model.dao.UserDao;
 import vpm.model.dao.postgres.UserDaoPostgres;
@@ -15,20 +14,20 @@ import vpm.model.service.UserService;
 
 public class UserServiceImpl implements UserService {
 
-	Setup setup = Setup.createInstance();
+	ServerSetup serverSetup = ServerSetup.createInstance();
 	EntityManager entityManager;
 	UserDao userDao;
 	
 	@Override
-	public void create(UserEntity user) throws ValidationException{
-		entityManager = setup.getEntityManager();
+	public void create(UserEntity user) throws ValidationException {
+		entityManager = serverSetup.getEntityManager();
 		userDao = new UserDaoPostgres(entityManager);
 		
 		EntityTransaction transaction = entityManager.getTransaction();
 		transaction.begin();
 		
-		if(userDao.findByNickname(user.getNickname()) != null) {
-			throw new RuntimeException("User with Nickname " + user.getNickname() + " already exist.");
+		if(userDao.findByNickname(user.getUsername()) != null) {
+			throw new ValidationException("User with Nickname " + user.getUsername() + " already exist.");
 		}
 		
 		userDao.create(user);
@@ -38,8 +37,8 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public void remove(UserEntity user) throws ValidationException{
-		entityManager = setup.getEntityManager();
+	public void remove(UserEntity user) {
+		entityManager = serverSetup.getEntityManager();
 		userDao = new UserDaoPostgres(entityManager);
 		
 		EntityTransaction transaction = entityManager.getTransaction();
@@ -52,8 +51,8 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public UserEntity update(UserEntity user) throws ValidationException{
-		entityManager = setup.getEntityManager();
+	public UserEntity update(UserEntity user) {
+		entityManager = serverSetup.getEntityManager();
 		userDao = new UserDaoPostgres(entityManager);
 		
 		EntityTransaction transaction = entityManager.getTransaction();
@@ -69,7 +68,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public List<UserEntity> findAll() {
-		entityManager = setup.getEntityManager();
+		entityManager = serverSetup.getEntityManager();
 		userDao = new UserDaoPostgres(entityManager);
 		
 		entityManager.close();
@@ -79,7 +78,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public UserEntity findByNickname(String nickname) {
-		entityManager = setup.getEntityManager();
+		entityManager = serverSetup.getEntityManager();
 		userDao = new UserDaoPostgres(entityManager);
 		
 		UserEntity resultUserEntity ;

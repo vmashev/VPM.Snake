@@ -6,7 +6,7 @@ import vpm.model.UserEntity;
 
 public interface UserDao extends GenericDao<UserEntity, String> {
 
-	UserEntity findByNickname(String nickname);
+	UserEntity findByNickname(String username);
 	List<UserEntity> findTopByWins(int top);
 	
 }

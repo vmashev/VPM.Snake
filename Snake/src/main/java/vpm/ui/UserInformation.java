@@ -3,17 +3,23 @@ package vpm.ui;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
-import vpm.helper.Setup;
+import vpm.helper.ClientSetup;
+import vpm.helper.Command;
+import vpm.helper.Constants;
+import vpm.helper.JsonParser;
 import vpm.model.UserEntity;
 import vpm.model.service.UserService;
 import vpm.model.service.impl.UserServiceImpl;
@@ -28,7 +34,6 @@ public class UserInformation extends JDialog implements ActionListener {
 	private String newPassword;
 	private UserEntity user;
 	private UserService userService;
-	private Setup setup;
 	
 	public UserInformation() {
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -133,11 +138,11 @@ public class UserInformation extends JDialog implements ActionListener {
 		String email = emailFld.getText();
 		
 		if(nickname.equals("")) {
-			showErrorMessage("Username is empty.");
+			JOptionPane.showMessageDialog (	this , "Username is empty." , "Error", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 		
-		user.setNickname(nickname);
+		user.setUsername(nickname);
 		user.setFirstName(firstName);
 		user.setLastName(lastName);
 		user.setEmail(email);
@@ -145,27 +150,63 @@ public class UserInformation extends JDialog implements ActionListener {
 			user.setEncryptedPassword(newPassword);
 		}
 		
-		userService = new UserServiceImpl();
-		user = userService.update(user);
+		
+		try {
+			Socket socket = new Socket(Constants.SERVER_IP , Constants.PORT);
+			
+			ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
+			ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
+			
+			String message = JsonParser.parseFromUserEntity(user);
+			
+			Command sendCommand = new Command(3, message);
+			outputStream.writeObject(sendCommand);
+			
+			Command receiveCommand = (Command)inputStream.readObject();
+			user = JsonParser.parseToUserEntity(receiveCommand.getMessage());
+			
+		} catch (IOException | ClassNotFoundException e) {
+			JOptionPane.showMessageDialog(this, e.getMessage());
+			
+		}		
+
 
 	}
 	
 	private void getUserInfo() {
-		userService = new UserServiceImpl();
-		setup = Setup.createInstance();
+		ClientSetup clientSetup = ClientSetup.createInstance();
 		
-		user = userService.findByNickname(setup.getUserName());
+		try {
+			Socket socket = new Socket(Constants.SERVER_IP , Constants.PORT);
+			
+			ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
+			ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
+			
+			user = new UserEntity(clientSetup.getUserName());
+			String message = JsonParser.parseFromUserEntity(user);
+			
+			Command sendCommand = new Command(1, message);
+			outputStream.writeObject(sendCommand);
+			
+			Command receiveCommand = (Command)inputStream.readObject();
+			user = JsonParser.parseToUserEntity(receiveCommand.getMessage());
+			
+			if(user == null) {
+				JOptionPane.showMessageDialog (	this , "The username does not exist." , "Error", JOptionPane.ERROR_MESSAGE);
+				return;			
+			}
+			
+			userNameFld.setText(user.getUsername());
+			firstNameFld.setText(user.getFirstName());
+			lastNameFld.setText(user.getLastName());
+			emailFld.setText(user.getEmail());
+			
+		} catch (IOException | ClassNotFoundException e) {
+			JOptionPane.showMessageDialog(this, e.getMessage());
+			
+		}		
 		
-		userNameFld.setText(user.getNickname());
-		firstNameFld.setText(user.getFirstName());
-		lastNameFld.setText(user.getLastName());
-		emailFld.setText(user.getEmail());
-	}
 
-	private void showErrorMessage(String msg) {
-		JOptionPane.showMessageDialog (
-				this , msg ,
-				"Error", JOptionPane.ERROR_MESSAGE);
 	}
 	
 }

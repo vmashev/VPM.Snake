@@ -3,10 +3,13 @@ package vpm.ui;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -14,11 +17,12 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+import vpm.helper.ClientSetup;
+import vpm.helper.Command;
+import vpm.helper.Constants;
 import vpm.helper.EncryptionUtils;
-import vpm.helper.Setup;
+import vpm.helper.JsonParser;
 import vpm.model.UserEntity;
-import vpm.model.service.UserService;
-import vpm.model.service.impl.UserServiceImpl;
 
 public class LogIn extends JDialog implements ActionListener {
 
@@ -70,12 +74,6 @@ public class LogIn extends JDialog implements ActionListener {
 		contentPane.add(btnClose);
 	}
 
-	public void showErrorMessage(String msg) {
-		JOptionPane.showMessageDialog (
-				this , msg ,
-				"Error", JOptionPane.ERROR_MESSAGE);
-	}
-
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		switch (e.getActionCommand()) {
@@ -94,27 +92,44 @@ public class LogIn extends JDialog implements ActionListener {
 		password = EncryptionUtils.encryptMD5(password);
 		
 		if((userFld.getText().equals("")) || (passwordField.getPassword().length == 0)) {
-			showErrorMessage("The username or password is empty.");
+			JOptionPane.showMessageDialog (	this , "The username or password is empty." , "Error", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 		
-		UserService userService = new UserServiceImpl();
-		UserEntity user = userService.findByNickname(nickname);
-		
-		if(user == null) {
-			showErrorMessage("The username does not exist.");
-			return;			
-		}
-		
-		if(!user.getEncryptedPassword().equals(password)) {
-			showErrorMessage("The password is incorect.");
-			return;			
-		}
-		
-		Setup setup = Setup.createInstance();
-		setup.setUserName(nickname);
-
-		dispose();
-	}
+		try {
+			Socket socket = new Socket(Constants.SERVER_IP , Constants.PORT);
+			
+			ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
+			ObjectInputStream objectinput = new ObjectInputStream(socket.getInputStream());
+			
+			UserEntity user = new UserEntity(nickname);
+			String message = JsonParser.parseFromUserEntity(user);
+			
+			Command sendCommand = new Command(1, message);
+			objectOutput.writeObject(sendCommand);
+			
+			Command receiveCommand = (Command)objectinput.readObject();
+			user = JsonParser.parseToUserEntity(receiveCommand.getMessage());
+			
+			if(user == null) {
+				JOptionPane.showMessageDialog (	this , "The username does not exist." , "Error", JOptionPane.ERROR_MESSAGE);
+				return;			
+			}
+			
+			if(!user.getEncryptedPassword().equals(password)) {
+				JOptionPane.showMessageDialog (	this , "The password is incorect." , "Error", JOptionPane.ERROR_MESSAGE);
+				return;			
+			}
+			
+			ClientSetup clientSetup = ClientSetup.createInstance();
+			clientSetup.setUserName(nickname);
 	
+			dispose();
+			
+			
+		} catch (IOException | ClassNotFoundException e) {
+			JOptionPane.showMessageDialog(this, e.getMessage());
+			
+		}		
+	}
 }

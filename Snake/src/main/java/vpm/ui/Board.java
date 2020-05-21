@@ -8,22 +8,26 @@ import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import vpm.client.ServerConnection;
+import vpm.helper.ClientSetup;
+import vpm.helper.Command;
 import vpm.helper.Constants;
 import vpm.helper.Direction;
 import vpm.helper.Dot;
 import vpm.helper.GameStatus;
-import vpm.helper.Setup;
+import vpm.helper.JsonParser;
 import vpm.model.GameInfo;
+import vpm.model.UserEntity;
 
 public class Board extends JPanel implements Runnable, KeyListener {
 
@@ -35,30 +39,36 @@ public class Board extends JPanel implements Runnable, KeyListener {
 	private long targetTime;
 	
 	private GameInfo gameInfo;
-	private Setup setup = Setup.createInstance();
-	private Socket socket;
+	private String direction ;
+	private ClientSetup clientSetup = ClientSetup.createInstance();
+	
+	private Socket server;
 	private ServerConnection serverConnection;
-	private PrintWriter output;
+	private ObjectOutputStream objectOutput;
 	
 	public Board(int width, int height, int speed) throws UnknownHostException, IOException {
-		gameInfo = new GameInfo(setup.getUserName(), width , height , speed);
-		gameInfo.setSnake(gameInfo.createSnake());
-		gameInfo.setApple(gameInfo.generateApple());
+		
+		this.gameInfo = new GameInfo(clientSetup.getUserName(), width , height , speed);
+		this.gameInfo.setSnake(gameInfo.createSnake());
+		this.gameInfo.setApple(gameInfo.generateApple());
+		this.targetTime = 1000 / gameInfo.getSpeed();
+		
+		this.server = new Socket(Constants.SERVER_IP , Constants.PORT);
+		this.objectOutput = new ObjectOutputStream(server.getOutputStream());
 		
 		setPreferredSize(new Dimension(width, height));
 		setFocusable(true);
 		requestFocus();
 		addKeyListener(this);
-		
-		socket = new Socket(Constants.SERVER_IP , Constants.PORT);
-		serverConnection = new ServerConnection(socket, gameInfo);
-		output = new PrintWriter(socket.getOutputStream(),true);
+				
 	}
 	
-	public Board(GameInfo gameInfo) {
+	public Board(GameInfo gameInfo) throws IOException {
 		this.gameInfo = gameInfo;
-		
 		this.targetTime = 1000 / gameInfo.getSpeed();
+		
+		this.server = new Socket(Constants.SERVER_IP , Constants.PORT);
+		this.objectOutput = new ObjectOutputStream(server.getOutputStream());
 		
 		setPreferredSize(new Dimension(gameInfo.getWidth(), gameInfo.getHeight()));
 		setFocusable(true);
@@ -66,6 +76,14 @@ public class Board extends JPanel implements Runnable, KeyListener {
 		addKeyListener(this);
 	}
 	
+	public GameInfo getGameInfo() {
+		return gameInfo;
+	}
+
+	public void setGameInfo(GameInfo gameInfo) {
+		this.gameInfo = gameInfo;
+	}
+
 	@Override
 	public void addNotify() {
 		super.addNotify();
@@ -82,22 +100,22 @@ public class Board extends JPanel implements Runnable, KeyListener {
 	public void keyPressed(KeyEvent e) {
 		int k = e.getKeyCode();
 		if( k == KeyEvent.VK_W) {
-			gameInfo.setDirection(Direction.UP);
+			direction = Direction.UP.toString();
 		}
 		if( k == KeyEvent.VK_S) {
-			gameInfo.setDirection(Direction.DOWN);
+			direction = Direction.DOWN.toString();
 		}
 		if( k == KeyEvent.VK_A) {
-			gameInfo.setDirection(Direction.LEFT);
+			direction = Direction.LEFT.toString();
 		}
 		if( k == KeyEvent.VK_D) {
-			gameInfo.setDirection(Direction.RIGHT);
+			direction = Direction.RIGHT.toString();
 		}
 		if( k == KeyEvent.VK_ENTER) {
-			gameInfo.setStatus(GameStatus.Run);
+			direction = GameStatus.Run.toString();
 		}
 		if( k == KeyEvent.VK_ESCAPE) {
-			gameInfo.setStatus(GameStatus.Pause);
+			direction = GameStatus.Pause.toString();
 			pauseGame();
 		}
 	}
@@ -124,30 +142,44 @@ public class Board extends JPanel implements Runnable, KeyListener {
 		
 		init();
 		
-		while(running) {
-			startTime = System.nanoTime();
+		try {
 			
-			//update(0);
-			requestRender();
+			serverConnection = new ServerConnection(server, this);
 			
-			output.println(gameInfo.getDirection().toString());
-			
-			elapsed = System.nanoTime() - startTime;
-			wait = targetTime - elapsed / 1000000;
-			if(wait > 0) {
-				try {
-					Thread.sleep(wait);
-				} catch (Exception e) {
-					e.printStackTrace();
+			while(running) {
+				startTime = System.nanoTime();
+				
+				String message = direction;
+				Command sendCommand = new Command(10, message);
+				objectOutput.writeObject(sendCommand);
+				
+				//requestRender();
+				
+				elapsed = System.nanoTime() - startTime;
+				wait = targetTime - elapsed / 1000000;
+				if(wait > 0) {
+					try {
+						Thread.sleep(wait);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
 			}
-		}
-		
-		try {
-			socket.close();
+			
+			
 		} catch (IOException e) {
-			e.printStackTrace();
-		}
+			JOptionPane.showMessageDialog(this, e.getMessage());
+			
+		} finally {
+			try {
+				objectOutput.close();
+				server.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}	
+		}		
+		
+
 	}
 
 	private void init() {
@@ -157,7 +189,7 @@ public class Board extends JPanel implements Runnable, KeyListener {
 		targetTime = 1000 / gameInfo.getSpeed();
 	}
 	
-	private void requestRender() {
+	public void requestRender() {
 		render(graphics2D);
 		Graphics graphics = getGraphics();
 		graphics.drawImage(image,0,0,null);

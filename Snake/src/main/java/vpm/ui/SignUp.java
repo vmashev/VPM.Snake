@@ -3,11 +3,13 @@ package vpm.ui;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Arrays;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -15,11 +17,13 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+import vpm.helper.ClientSetup;
+import vpm.helper.Command;
+import vpm.helper.Constants;
 import vpm.helper.EncryptionUtils;
-import vpm.helper.Setup;
+import vpm.helper.JsonParser;
 import vpm.model.UserEntity;
 import vpm.model.service.UserService;
-import vpm.model.service.impl.UserServiceImpl;
 
 public class SignUp extends JDialog implements ActionListener{
 
@@ -120,12 +124,6 @@ public class SignUp extends JDialog implements ActionListener{
 		contentPane.add(emailFld);
 	}
 	
-	public void showErrorMessage(String msg) {
-		JOptionPane.showMessageDialog (
-				this , msg ,
-				"Error", JOptionPane.ERROR_MESSAGE);
-	}
-
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		switch (e.getActionCommand()) {
@@ -136,7 +134,6 @@ public class SignUp extends JDialog implements ActionListener{
 			dispose();
 			break;		
 		}
-		
 	}
 	
 	private void signUp() {
@@ -151,41 +148,56 @@ public class SignUp extends JDialog implements ActionListener{
 		String email = emailFld.getText();
 		
 		if(nickname.equals("")) {
-			showErrorMessage("Username is empty.");
+			JOptionPane.showMessageDialog (	this , "Username is empty." , "Error", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 		
 		if(password == "") {
-			showErrorMessage("Password is empty.");
+			JOptionPane.showMessageDialog (	this , "Password is empty." , "Error", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 		
 		if( !password.equals(rePassword)) {
-			showErrorMessage("Wrong re-entered password.");
+			JOptionPane.showMessageDialog (	this , "Wrong re-entered password." , "Error", JOptionPane.ERROR_MESSAGE);
 			passwordField2.setText("");
 			return;
 		}
 		
 		password = EncryptionUtils.encryptMD5(password);
 		
-		user = new UserEntity();
-		user.setNickname(nickname);
+		user = new UserEntity(nickname);
 		user.setEncryptedPassword(password);
 		user.setFirstName(firstName);
 		user.setLastName(lastName);
 		user.setEmail(email);
-		
-		userService = new UserServiceImpl();
+				
 		try {
-			userService.create(user);
-		} catch (Exception e) {
-			showErrorMessage(e.getMessage());
-			return;
-		}
-		
-		Setup setup = Setup.createInstance();
-		setup.setUserName(nickname);
+			Socket socket = new Socket(Constants.SERVER_IP , Constants.PORT);
+			
+			ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
+			ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
+			
+			String jsonMessage = JsonParser.parseFromUserEntity(user);
+			
+			Command sendCommand = new Command(2, jsonMessage);
+			outputStream.writeObject(sendCommand);
+			
+			Command receiveCommand = (Command)inputStream.readObject();
+			user = JsonParser.parseToUserEntity(receiveCommand.getMessage());
+			
+			if(user == null) {
+				JOptionPane.showMessageDialog(this, receiveCommand.getErrorMessage());
+				return;
+			}
+			
+			ClientSetup clientSetup = ClientSetup.createInstance();
+			clientSetup.setUserName(nickname);
 
-		dispose();
+			dispose();		
+			
+		} catch (IOException | ClassNotFoundException e) {
+			JOptionPane.showMessageDialog(this, e.getMessage());
+			
+		}		
 	}
 }

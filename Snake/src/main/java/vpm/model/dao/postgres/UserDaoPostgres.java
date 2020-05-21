@@ -18,7 +18,7 @@ public class UserDaoPostgres extends GenericDAOPostgreSQL<UserEntity, String> im
 	@Override
 	public List<UserEntity> findTopByWins(int top) {
 		Query query = getEntityManager().createNamedQuery("findTopUserByWins");
-		query.setParameter("nickname", top);
+		query.setParameter("username", top);
 		
 		try {
 			return query.getResultList();
@@ -28,9 +28,9 @@ public class UserDaoPostgres extends GenericDAOPostgreSQL<UserEntity, String> im
 	}
 
 	@Override
-	public UserEntity findByNickname(String nickname) {
+	public UserEntity findByNickname(String username) {
 		Query query = getEntityManager().createNamedQuery("findUserByNickname");
-		query.setParameter("nickname", nickname);
+		query.setParameter("username", username);
 		
 		try {
 			return (UserEntity)query.getSingleResult();
