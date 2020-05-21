@@ -2,6 +2,7 @@ package vpm.helper;
 
 import javax.validation.ValidationException;
 
+import vpm.model.GameInfo;
 import vpm.model.UserEntity;
 import vpm.model.service.UserService;
 import vpm.model.service.impl.UserServiceImpl;
@@ -25,9 +26,12 @@ public class CommandUtils {
 		case 3: // Insert User
 			updateUserEntity();
 			break;
-		case 10: // Play... 
-			//???
-			break;	
+		case 10: // New Game
+			newGame();
+			break;
+		case 11: // Play Game
+			playGame();
+			break;			
 		default:
 			break;
 		}
@@ -77,4 +81,43 @@ public class CommandUtils {
 		responseCommand = new Command(requestCommand.getNumber(), jsonMessage);
 	}
 	
+	private static void newGame() {
+		
+		GameInfo requestGameInfo = JsonParser.parseToGameInfo(requestCommand.getMessage());
+		requestGameInfo.setSnake(requestGameInfo.createSnake());
+		requestGameInfo.setApple(requestGameInfo.generateApple());
+
+		String jsonMessage = JsonParser.parseFromGameInfo(requestGameInfo);	
+		responseCommand = new Command(requestCommand.getNumber(), jsonMessage);
+	}
+	
+	private static void playGame() {
+		
+		GameInfo requestGameInfo = JsonParser.parseToGameInfo(requestCommand.getMessage());
+		
+		if((requestGameInfo.getStatus() == null) || (requestGameInfo.getStatus() == GameStatus.Pause)){
+			responseCommand = requestCommand;
+			return;
+		}
+		
+		switch (requestGameInfo.getStatus()) {
+		case Run:
+			if(requestGameInfo.getDirection() != null) {
+				requestGameInfo.update(0);
+			}
+			break;
+		case SetPause:
+			requestGameInfo.setStatus(GameStatus.Pause);
+			break;
+		case Save:
+			//Save open game for SP
+			break;	
+		default:
+			break;
+		}
+		
+		String jsonMessage = JsonParser.parseFromGameInfo(requestGameInfo);	
+		responseCommand = new Command(requestCommand.getNumber(), jsonMessage);
+		
+	}
 }

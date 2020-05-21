@@ -10,11 +10,15 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import vpm.helper.GameStatus;
+
 public class PauseMenu extends JDialog implements ActionListener{
 
 	private JPanel contentPane;
+	private Board board;
 	
 	public PauseMenu(Board board) {
+		this.board = board;
 		
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 220, 80);
@@ -44,10 +48,11 @@ public class PauseMenu extends JDialog implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		switch (e.getActionCommand()) {
 		case "Resume":
+			board.getGameInfo().setStatus(GameStatus.Run);
 			dispose();
 			break;
 		case "Quit":
-			
+			board.getGameInfo().setStatus(GameStatus.Save);
 			dispose();
 			break;		
 		}

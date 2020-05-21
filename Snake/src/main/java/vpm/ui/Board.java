@@ -39,7 +39,6 @@ public class Board extends JPanel implements Runnable, KeyListener {
 	private long targetTime;
 	
 	private GameInfo gameInfo;
-	private String direction ;
 	private ClientSetup clientSetup = ClientSetup.createInstance();
 	
 	private Socket server;
@@ -49,9 +48,6 @@ public class Board extends JPanel implements Runnable, KeyListener {
 	public Board(int width, int height, int speed) throws UnknownHostException, IOException {
 		
 		this.gameInfo = new GameInfo(clientSetup.getUserName(), width , height , speed);
-		this.gameInfo.setSnake(gameInfo.createSnake());
-		this.gameInfo.setApple(gameInfo.generateApple());
-		this.targetTime = 1000 / gameInfo.getSpeed();
 		
 		this.server = new Socket(Constants.SERVER_IP , Constants.PORT);
 		this.objectOutput = new ObjectOutputStream(server.getOutputStream());
@@ -65,7 +61,6 @@ public class Board extends JPanel implements Runnable, KeyListener {
 	
 	public Board(GameInfo gameInfo) throws IOException {
 		this.gameInfo = gameInfo;
-		this.targetTime = 1000 / gameInfo.getSpeed();
 		
 		this.server = new Socket(Constants.SERVER_IP , Constants.PORT);
 		this.objectOutput = new ObjectOutputStream(server.getOutputStream());
@@ -100,23 +95,22 @@ public class Board extends JPanel implements Runnable, KeyListener {
 	public void keyPressed(KeyEvent e) {
 		int k = e.getKeyCode();
 		if( k == KeyEvent.VK_W) {
-			direction = Direction.UP.toString();
+			gameInfo.setDirection(Direction.UP);
 		}
 		if( k == KeyEvent.VK_S) {
-			direction = Direction.DOWN.toString();
+			gameInfo.setDirection(Direction.DOWN);
 		}
 		if( k == KeyEvent.VK_A) {
-			direction = Direction.LEFT.toString();
+			gameInfo.setDirection(Direction.LEFT);
 		}
 		if( k == KeyEvent.VK_D) {
-			direction = Direction.RIGHT.toString();
+			gameInfo.setDirection(Direction.RIGHT);
 		}
 		if( k == KeyEvent.VK_ENTER) {
-			direction = GameStatus.Run.toString();
+			gameInfo.setStatus(GameStatus.Run);
 		}
 		if( k == KeyEvent.VK_ESCAPE) {
-			direction = GameStatus.Pause.toString();
-			pauseGame();
+			gameInfo.setStatus(GameStatus.SetPause);
 		}
 	}
 
@@ -140,20 +134,30 @@ public class Board extends JPanel implements Runnable, KeyListener {
 			return;
 		}
 		
-		init();
-		
 		try {
-			
-			serverConnection = new ServerConnection(server, this);
+			init();
 			
 			while(running) {
 				startTime = System.nanoTime();
 				
-				String message = direction;
-				Command sendCommand = new Command(10, message);
-				objectOutput.writeObject(sendCommand);
+				if((gameInfo.getDirection() != null) && (gameInfo.getStatus() != GameStatus.Pause)) {
+					
+					if(gameInfo.getStatus() == null) {
+						gameInfo.setStatus(GameStatus.Run);
+					}
+
+					String message = JsonParser.parseFromGameInfo(gameInfo);
+					Command sendCommand = new Command(11, message);
+					objectOutput.writeObject(sendCommand);
+					
+					if(gameInfo.getStatus() == GameStatus.SetPause) {
+						pauseGame();
+					}
+				}
 				
-				//requestRender();
+				if(gameInfo.getStatus() == GameStatus.GameOver) {
+					break;
+				}
 				
 				elapsed = System.nanoTime() - startTime;
 				wait = targetTime - elapsed / 1000000;
@@ -177,12 +181,20 @@ public class Board extends JPanel implements Runnable, KeyListener {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}	
-		}		
+		}	
 		
-
+		
 	}
 
-	private void init() {
+	private void init() throws IOException {
+		serverConnection = new ServerConnection(server, this);
+		new Thread(serverConnection).start();
+		
+		String message = JsonParser.parseFromGameInfo(gameInfo);
+		Command sendCommand = new Command(10, message);
+		objectOutput.writeObject(sendCommand);
+		
+		targetTime = 1000 / gameInfo.getSpeed();
 		image= new BufferedImage(gameInfo.getWidth(), gameInfo.getHeight(), BufferedImage.TYPE_INT_ARGB);
 		graphics2D = image.createGraphics();
 		running = true;
@@ -230,7 +242,6 @@ public class Board extends JPanel implements Runnable, KeyListener {
 		PauseMenu pauseMenu = new PauseMenu(this);
 		pauseMenu.setModalExclusionType(ModalExclusionType.NO_EXCLUDE);
 		pauseMenu.setVisible(true);
-		gameInfo.setStatus(GameStatus.Run);
 	}
 	
 }
