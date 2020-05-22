@@ -89,4 +89,28 @@ public class JsonParser {
 		
 		return jsonString;
 	}
+	
+	public static SnakeMoveInfo parseToSnakeMoveInfo(String jsonString) {
+		if(jsonString == null) {
+			return null;
+		}
+		
+		Gson gson = new Gson();
+		SnakeMoveInfo snakeMove = gson.fromJson(jsonString, SnakeMoveInfo.class);
+
+		return snakeMove;
+	}
+	
+	public static String parseFromSnakeMoveInfo(SnakeMoveInfo snakeMove) {
+		
+		if(snakeMove == null) {
+			return null;
+		}
+		
+		Gson gson = new Gson();
+		String jsonString = gson.toJson(snakeMove);
+		
+		return jsonString;
+	}
+
 }

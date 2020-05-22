@@ -11,6 +11,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
@@ -53,12 +54,12 @@ public class Singleplayer extends JDialog implements ActionListener {
 		btnCancel.addActionListener(this);
 		contentPane.add(btnCancel);
 		
-		JLabel lblNewLabel_2 = new JLabel("Width");
+		JLabel lblNewLabel_2 = new JLabel("Width (min 300)");
 		lblNewLabel_2.setFont(new Font("Times New Roman", Font.PLAIN, 14));
 		lblNewLabel_2.setBounds(10, 82, 60, 20);
 		contentPane.add(lblNewLabel_2);
 		
-		JLabel lblPassword = new JLabel("Height");
+		JLabel lblPassword = new JLabel("Height (min 300)");
 		lblPassword.setFont(new Font("Times New Roman", Font.PLAIN, 14));
 		lblPassword.setBounds(10, 48, 60, 20);
 		contentPane.add(lblPassword);
@@ -103,16 +104,20 @@ public class Singleplayer extends JDialog implements ActionListener {
 		int width = Integer.valueOf(widthFld.getText());
 		int speed = Integer.valueOf(speedFld.getText());
 		
-		Board board = new Board(width, height , speed);
-		
-		JFrame frame = new JFrame("Singleplayer");
-		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		frame.setContentPane(board);
-		frame.setResizable(false);
-		frame.pack();
-		frame.setPreferredSize(new Dimension(width, height));
-		frame.setLocationRelativeTo(null);
-		frame.setVisible(true);
-	}
+		if(height < 300 || width < 300) {
+			JOptionPane.showMessageDialog(this, "Width and Height must me greater than 300.");
+		} else {
+			Board board = new Board(width, height , speed);
+			
+			JFrame frame = new JFrame("Singleplayer");
+			frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+			frame.setContentPane(board);
+			frame.setResizable(false);
+			frame.pack();
+			frame.setPreferredSize(new Dimension(width, height));
+			frame.setLocationRelativeTo(null);
+			frame.setVisible(true);
 	
+		}
+	}
 }

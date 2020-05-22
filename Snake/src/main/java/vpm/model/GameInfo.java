@@ -2,6 +2,8 @@ package vpm.model;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 import javax.persistence.AttributeOverride;
@@ -13,6 +15,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Transient;
 
 import vpm.helper.Constants;
 import vpm.helper.Direction;
@@ -25,32 +28,29 @@ public class GameInfo implements Serializable{
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	
-	private String username;
+	private String hostUsername;
+	private Snake hostSnake;
 	private LocalDateTime dateTime;
 	private int width;
 	private int height;
 	private int speed;
-	
-	private int score;
-	private int rowChange;
-	private int colChange;
-	
-	private Snake snake ;
+		
+	@Transient
+	private Map<String,Snake> snakes = new HashMap<String, Snake>();
 	
 	@AttributeOverrides({
 		@AttributeOverride(name = "row" , column = @Column(name = "apple_row")),
 		@AttributeOverride(name = "col" , column = @Column(name = "apple_col"))
 	})
 	private Dot apple;
-	@Enumerated(EnumType.STRING)
-	private Direction direction = null;
+
 	@Enumerated(EnumType.STRING)
 	private GameStatus status = null;
 	
 	public GameInfo() {	}
 	
 	public GameInfo(String username, int width, int height, int speed) {
-		this.username = username;
+		this.hostUsername = username;
 		this.width = width;
 		this.height = height;
 		this.speed = speed;
@@ -67,6 +67,14 @@ public class GameInfo implements Serializable{
 	}
 
 	
+	public Snake getHostSnake() {
+		return hostSnake;
+	}
+
+	public void setHostSnake(Snake hostSnake) {
+		this.hostSnake = hostSnake;
+	}
+
 	public LocalDateTime getDateTime() {
 		return dateTime;
 	}
@@ -75,8 +83,8 @@ public class GameInfo implements Serializable{
 		this.dateTime = dateTime;
 	}
 
-	public String getUserName() {
-		return username;
+	public String getHostUsername() {
+		return hostUsername;
 	}
 	public int getWidth() {
 		return width;
@@ -84,28 +92,6 @@ public class GameInfo implements Serializable{
 	public int getHeight() {
 		return height;
 	}
-	public int getScore() {
-		return score;
-	}
-	public void setScore(int score) {
-		this.score = score;
-	}
-	public int getRowChange() {
-		return rowChange;
-	}
-
-	public void setRowChange(int rowChange) {
-		this.rowChange = rowChange;
-	}
-
-	public int getColChange() {
-		return colChange;
-	}
-
-	public void setColChange(int colChange) {
-		this.colChange = colChange;
-	}
-
 	public int getSpeed() {
 		return speed;
 	}
@@ -115,12 +101,6 @@ public class GameInfo implements Serializable{
 	public void setApple(Dot apple) {
 		this.apple = apple;
 	}
-	public Direction getDirection() {
-		return direction;
-	}
-	public void setDirection(Direction direction) {
-		this.direction = direction;
-	}
 	public GameStatus getStatus() {
 		return status;
 	}
@@ -128,24 +108,49 @@ public class GameInfo implements Serializable{
 	public void setStatus(GameStatus status) {
 		this.status = status;
 	}
-
-	public Snake getSnake() {
-		return snake;
+	public Map<String, Snake> getSnakes() {
+		return snakes;
 	}
-	public void setSnake(Snake snake) {
-		this.snake = snake;
+	public void setSnakes(Map<String, Snake> snakes) {
+		this.snakes = snakes;
 	}
 
-	public Snake createSnake() {
+	@Override
+	public String toString() {
+		return "Username: " + getHostUsername() + 
+				", Speed: " + getSpeed()+ 
+				", Board Width: " + getWidth() + 
+				", Board Height: " + getHeight();
+	}
+	
+	public void createSnake(String username[]) {
 		Dot tempDot = null;
-		Snake snake = new Snake();
+		Snake snake ;
 		
-		for(int i = 0 ; i < 3 ; i++) {
-			tempDot = new Dot(i * Constants.SIZE, 1 * Constants.SIZE);
-			snake.getList().add(tempDot) ;
+		for (int i = 1; i <= username.length; i++) {
+			snake = new Snake();
+			
+			switch (i) {
+			case 1:
+				for(int j = 0 ; j < 3 ; j++) {
+					tempDot = new Dot(j * Constants.SIZE, 1 * Constants.SIZE);
+					snake.getList().add(tempDot) ;
+				}
+				break;
+
+			case 2:
+				for(int j = 0 ; j < 3 ; j++) {
+					tempDot = new Dot(j * Constants.SIZE, getWidth() - Constants.SIZE);
+					snake.getList().add(tempDot) ;
+				}
+				break;
+			}
+			
+			snake.setHead(tempDot);
+			
+			snakes.put(username[i-1], snake);
 		}
-		snake.setHead(tempDot);
-		return snake;
+
 	}
 	
 	public Dot generateApple() {
@@ -159,11 +164,12 @@ public class GameInfo implements Serializable{
 			randomAppleDot = new Dot(randomRow * Constants.SIZE, randomCol * Constants.SIZE);
 			
 			collison = false;
-			if (hasSnakeCollison(snake, randomAppleDot)) {
-				collison = true;
-				break;
-			}					
-			
+			for (Snake snake : getSnakes().values()) {
+				if (hasSnakeCollison(snake, randomAppleDot)) {
+					collison = true;
+					break;
+				}				
+			}		
 		}
 		
 		return randomAppleDot;
@@ -184,55 +190,40 @@ public class GameInfo implements Serializable{
 		return false;
 	}
 	
-	public boolean hasCollison(Dot nextDot) {
+	public boolean hasCollison(Dot headDot) {
 		
-		if((nextDot.getRow() < 0) || (nextDot.getRow() == height) ||
-			(nextDot.getCol() < 0) || (nextDot.getCol() == width)) {
+		if((headDot.getRow() < 0) || (headDot.getRow() == height) ||
+			(headDot.getCol() < 0) || (headDot.getCol() == width)) {
 			return true;
 		}
 		
-		if (hasSnakeCollison(snake, nextDot)) {
-			return true;
+		for (Snake snake : getSnakes().values()) {
+			if (hasSnakeCollison(snake, headDot)) {
+				return true;
+			}
 		}
-		
+
 		return false;
 	}
 	
-	public boolean update(int player) {
-		
-		if(getDirection() == Direction.UP && rowChange == 0) {
-			rowChange = -Constants.SIZE;
-			colChange = 0;
-		}
-		if(getDirection() == Direction.DOWN && rowChange == 0) {
-			rowChange = Constants.SIZE;
-			colChange = 0;
-		}	
-		if(getDirection() == Direction.LEFT && colChange == 0) {
-			rowChange = 0;
-			colChange = -Constants.SIZE;
-		}
-		if(getDirection() == Direction.RIGHT && colChange == 0) {
-			rowChange = 0;
-			colChange = Constants.SIZE;
-		}
-		
-		
-		if(rowChange != 0 || colChange != 0) {
+	//Return false if has collison 
+	public boolean updateSnake(String username, Direction direction) {
+		Snake snake;
+		if((snake = snakes.get(username)) != null) {
+			snake.setDirection(direction);
+			snake.move();
 			
-			Dot nextDot = new Dot(getSnake().getHead().getRow() + rowChange, getSnake().getHead().getCol() + colChange);
-			
-			if(hasCollison(nextDot)) {
-				return false;
-			}
-				
-			if(nextDot.equals(getApple())) {
-				getSnake().grow(nextDot);
-				setScore(getScore()+1); ;
+			if(snake.getHead().equals(getApple())) {
+				snake.setScore(snake.getScore()+1);
 				setApple(generateApple());
 			} else {
-				getSnake().move(nextDot);
+				if(hasCollison(snake.getHead())) {
+					return false;
+				}
+				snake.getList().remove(0);
 			}
+		} else {
+			return false;
 		}
 		
 		return true;

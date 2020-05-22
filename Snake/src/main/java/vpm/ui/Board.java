@@ -10,13 +10,11 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Map;
 
-import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -28,9 +26,10 @@ import vpm.helper.Constants;
 import vpm.helper.Direction;
 import vpm.helper.GameStatus;
 import vpm.helper.JsonParser;
+import vpm.helper.SnakeMoveInfo;
 import vpm.model.Dot;
 import vpm.model.GameInfo;
-import vpm.model.UserEntity;
+import vpm.model.Snake;
 
 public class Board extends JPanel implements Runnable, KeyListener {
 
@@ -42,6 +41,8 @@ public class Board extends JPanel implements Runnable, KeyListener {
 	private long targetTime;
 	
 	private GameInfo gameInfo;
+	private SnakeMoveInfo snakeMove;
+
 	private ClientSetup clientSetup = ClientSetup.createInstance();
 	
 	private Socket server;
@@ -54,6 +55,7 @@ public class Board extends JPanel implements Runnable, KeyListener {
 		this.gameInfo = new GameInfo(clientSetup.getUserName(), width , height , speed);
 		this.server = new Socket(Constants.SERVER_IP , Constants.PORT);
 		this.objectOutput = new ObjectOutputStream(server.getOutputStream());
+		this.snakeMove = new SnakeMoveInfo(clientSetup.getUserName());
 		
 		setPreferredSize(new Dimension(width, height));
 		setFocusable(true);
@@ -66,6 +68,7 @@ public class Board extends JPanel implements Runnable, KeyListener {
 		this.gameInfo = gameInfo;
 		this.server = new Socket(Constants.SERVER_IP , Constants.PORT);
 		this.objectOutput = new ObjectOutputStream(server.getOutputStream());
+		this.snakeMove = new SnakeMoveInfo(clientSetup.getUserName());
 		
 		setPreferredSize(new Dimension(gameInfo.getWidth(), gameInfo.getHeight()));
 		setFocusable(true);
@@ -79,6 +82,15 @@ public class Board extends JPanel implements Runnable, KeyListener {
 
 	public void setGameInfo(GameInfo gameInfo) {
 		this.gameInfo = gameInfo;
+		this.snakeMove.setStatus(gameInfo.getStatus());
+	}
+
+	public SnakeMoveInfo getSnakeMove() {
+		return snakeMove;
+	}
+
+	public void setSnakeMove(SnakeMoveInfo snakeMove) {
+		this.snakeMove = snakeMove;
 	}
 
 	@Override
@@ -97,19 +109,19 @@ public class Board extends JPanel implements Runnable, KeyListener {
 	public void keyPressed(KeyEvent e) {
 		int k = e.getKeyCode();
 		if( k == KeyEvent.VK_W) {
-			gameInfo.setDirection(Direction.UP);
+			snakeMove.setDirection(Direction.UP);
 		}
 		if( k == KeyEvent.VK_S) {
-			gameInfo.setDirection(Direction.DOWN);
+			snakeMove.setDirection(Direction.DOWN);
 		}
 		if( k == KeyEvent.VK_A) {
-			gameInfo.setDirection(Direction.LEFT);
+			snakeMove.setDirection(Direction.LEFT);
 		}
 		if( k == KeyEvent.VK_D) {
-			gameInfo.setDirection(Direction.RIGHT);
+			snakeMove.setDirection(Direction.RIGHT);
 		}
 		if( k == KeyEvent.VK_ESCAPE) {
-			gameInfo.setStatus(GameStatus.SetPause);
+			snakeMove.setStatus(GameStatus.SetPause);
 		}
 		
 	}
@@ -135,12 +147,34 @@ public class Board extends JPanel implements Runnable, KeyListener {
 			while(running) {
 				startTime = System.nanoTime();
 				
-				if((gameInfo.getDirection() != null) && (gameInfo.getStatus() != GameStatus.Pause)) {
+				if((snakeMove.getDirection() != null) && (snakeMove.getStatus() != GameStatus.Pause)) {
 					
-					String message = JsonParser.parseFromGameInfo(gameInfo);
+					if(snakeMove.getStatus() == GameStatus.Ready) {
+						snakeMove.setStatus(GameStatus.Run);
+					}
+					
+					String message = JsonParser.parseFromSnakeMoveInfo(snakeMove);
 					Command sendCommand = new Command(11, message);
 					objectOutput.writeObject(sendCommand);
 					
+				}
+				
+				if(snakeMove.getStatus() != null) {
+					switch (snakeMove.getStatus()) {
+					case GameOver:
+						JOptionPane.showMessageDialog(this, "GameOver! Max Score: ???");// + snake.getScore());
+						win.dispose();
+						thread.interrupt();
+						break;
+						
+					case Save:
+						win.dispose();
+						thread.interrupt();
+						break;
+					case SetPause:
+						pauseGame();
+						break;						
+					}
 				}
 				
 				elapsed = System.nanoTime() - startTime;
@@ -151,23 +185,6 @@ public class Board extends JPanel implements Runnable, KeyListener {
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
-				}
-				
-				switch (gameInfo.getStatus()) {
-				case SetPause:
-					pauseGame();
-					break;
-
-				case GameOver:
-					JOptionPane.showMessageDialog(this, "GameOver! Max Score: " + gameInfo.getScore());
-					win.dispose();
-					thread.interrupt();
-					break;
-					
-				case Save:
-					win.dispose();
-					thread.interrupt();
-					break;
 				}
 			}
 			
@@ -186,7 +203,6 @@ public class Board extends JPanel implements Runnable, KeyListener {
 				e.printStackTrace();
 			}	
 		}
-		
 	}
 
 	private void init() throws IOException {
@@ -219,27 +235,52 @@ public class Board extends JPanel implements Runnable, KeyListener {
 	private void render(Graphics2D graphics) {
 		graphics2D.clearRect(0, 0, gameInfo.getWidth() , gameInfo.getHeight() );
 		graphics2D.setColor(Color.BLUE);
-		for (Dot dot : gameInfo.getSnake().getList()) {
-			dot.render(graphics2D);
-		}
 		
+		for (Snake snake : gameInfo.getSnakes().values()) {
+			for (Dot dot : snake.getList()) {
+				dot.render(graphics2D);
+			}
+		}
+
 		graphics2D.setColor(Color.GREEN);
 		gameInfo.getApple().render(graphics2D);
 		
-		if(gameInfo.getStatus() == GameStatus.Pause) {
-			graphics2D.drawString("PAUSE", (gameInfo.getWidth() / 2) -10, (gameInfo.getHeight() / 2));
-		}
-		
 		graphics2D.setColor(Color.WHITE);
-		String playerInfo = "Score: " + gameInfo.getScore();
-		if(gameInfo.getUserName() != null) {
-			playerInfo = "User: " + gameInfo.getUserName() + " " + playerInfo;
-		}
-		graphics2D.drawString(playerInfo, 10, 10);
 		
-		if(gameInfo.getRowChange() == 0 && gameInfo.getColChange() == 0) {
-			graphics2D.drawString("Ready!", (gameInfo.getWidth() / 2) -10, (gameInfo.getHeight() / 2));
+		int i = 0;
+		for (Map.Entry<String,Snake> snakeEntry : gameInfo.getSnakes().entrySet()) {
+			
+			i++;
+			
+			String playerInfo = snakeEntry.getKey() + " score: " + snakeEntry.getValue().getScore();
+			
+			switch (i) {
+			case 1:
+				graphics2D.drawString(playerInfo, 10, 10);
+				break;
+			case 2:
+				graphics2D.drawString(playerInfo, 10 , getHeight() - 10);
+				break;
+			default:
+				break;
+			}			
 		}
+		
+		if(gameInfo.getStatus() != null) {
+			switch (gameInfo.getStatus()) {
+			case Pause:
+				graphics2D.drawString("PAUSE", (gameInfo.getWidth() / 2) -10, (gameInfo.getHeight() / 2));
+				break;
+			case Ready:
+				graphics2D.drawString("Ready!", (gameInfo.getWidth() / 2) -10, (gameInfo.getHeight() / 2));
+				break;
+			case GameOver:
+				int score = gameInfo.getSnakes().get(clientSetup.getUserName()).getScore();
+				graphics2D.drawString("GameOver! Score: " + score, (gameInfo.getWidth() / 2) -10, (gameInfo.getHeight() / 2));
+				break;
+			}
+		}
+		
 	}
 	
 	private void pauseGame() throws IOException {

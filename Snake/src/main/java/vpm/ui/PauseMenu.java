@@ -48,11 +48,11 @@ public class PauseMenu extends JDialog implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		switch (e.getActionCommand()) {
 		case "Resume":
-			board.getGameInfo().setStatus(GameStatus.Run);
+			board.getSnakeMove().setStatus(GameStatus.Run);
 			dispose();
 			break;
 		case "Quit":
-			board.getGameInfo().setStatus(GameStatus.Save);
+			board.getSnakeMove().setStatus(GameStatus.Save);
 			dispose();
 			break;		
 		}

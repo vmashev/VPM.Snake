@@ -2,6 +2,8 @@ package vpm.helper;
 
 import java.io.Serializable;
 
+import vpm.comand.strategy.CommandExecuteStrategy;
+
 public class Command implements Serializable{
 
 	private int number;
@@ -37,4 +39,7 @@ public class Command implements Serializable{
 		this.errorMessage = errorMessage;
 	}
 	
+	public Command execute(CommandExecuteStrategy executeStrategy) {
+		return executeStrategy.execute(this);
+	}
 }

@@ -21,7 +21,7 @@
 	
 	<named-query name="findSavedGameInfoByUsername">
 		<query><![CDATA[ select g from GameInfo g 
-			where g.username = :username and 
+			where g.hostUsername = :username and 
 				g.status = :status]]></query>
 	</named-query>
 	<named-query name="findGameInfoByDateTime">

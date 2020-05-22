@@ -20,7 +20,6 @@ public class ServerConnection implements Runnable{
 		this.server = server;
 		this.board = board;
 		this.objectInput = new ObjectInputStream(server.getInputStream());
-		
 	}
 	
 	@Override
@@ -32,11 +31,13 @@ public class ServerConnection implements Runnable{
 				Command receiveCommand = (Command)objectInput.readObject();
 				GameInfo gameInfo = JsonParser.parseToGameInfo(receiveCommand.getMessage());
 				
-				board.setGameInfo(gameInfo);
-				board.requestRender();
+				if(gameInfo != null) {
+					board.setGameInfo(gameInfo);
+					board.requestRender();
 				
-				if(gameInfo.getStatus() == GameStatus.GameOver) {
-					break;
+					if(gameInfo.getStatus() == GameStatus.GameOver) {
+						break;
+					}
 				}
 			}
 		} catch (IOException | ClassNotFoundException e) {

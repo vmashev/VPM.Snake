@@ -17,13 +17,10 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
-
-import org.hibernate.cfg.annotations.Nullability;
 
 import vpm.helper.ClientSetup;
 import vpm.helper.Command;
@@ -31,6 +28,7 @@ import vpm.helper.Constants;
 import vpm.helper.GameStatus;
 import vpm.helper.JsonParser;
 import vpm.model.GameInfo;
+import vpm.model.Snake;
 import vpm.model.UserEntity;
 
 public class SingleplayerMenu extends JDialog implements ActionListener{
@@ -44,11 +42,9 @@ public class SingleplayerMenu extends JDialog implements ActionListener{
 	
 	public SingleplayerMenu() throws UnknownHostException, IOException {
 		socket = new Socket(Constants.SERVER_IP , Constants.PORT);
-		
 		outputStream = new ObjectOutputStream(socket.getOutputStream());
 		inputStream = new ObjectInputStream(socket.getInputStream());
 
-		
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 570, 230);
 		setTitle("Singleplayer Menu");
@@ -94,7 +90,6 @@ public class SingleplayerMenu extends JDialog implements ActionListener{
 		ClientSetup clientSetup = ClientSetup.createInstance();
 		
 		try {
-			
 			UserEntity user = new UserEntity(clientSetup.getUserName());
 			String message = JsonParser.parseFromUserEntity(user);
 			
@@ -106,7 +101,7 @@ public class SingleplayerMenu extends JDialog implements ActionListener{
 
 			for (int i = 0; i < games.size(); i++) {
 				model.addRow(new Object[]{ i+1 , 
-											games.get(i).getUserName(), 
+											games.get(i).getHostUsername(), 
 											games.get(i).getDateTime(),
 											games.get(i).getHeight(), 
 											games.get(i).getWidth(), 
@@ -117,15 +112,7 @@ public class SingleplayerMenu extends JDialog implements ActionListener{
 		} catch (IOException | ClassNotFoundException e) {
 			JOptionPane.showMessageDialog(this, e.getMessage());
 			
-		} finally {
-			try {
-				outputStream.close();
-				inputStream.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			
-		}		
+		} 	
 	}
 
 	@Override
@@ -161,12 +148,10 @@ public class SingleplayerMenu extends JDialog implements ActionListener{
     			
     			Command receiveCommand = (Command)inputStream.readObject();
     			gameInfo = JsonParser.parseToGameInfo(receiveCommand.getMessage());
-    			gameInfo.setStatus(GameStatus.Run);
-    			gameInfo.setDirection(null);
-    			gameInfo.setRowChange(0);
-    			gameInfo.setColChange(0);
+    			gameInfo.setStatus(GameStatus.Ready);
+    			gameInfo.getSnakes().put(gameInfo.getHostUsername(), gameInfo.getHostSnake());
     			
-        		Board board = new Board(gameInfo);
+    			Board board = new Board(gameInfo);
         		
         		JFrame frame = new JFrame("Singleplayer");
         		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -180,15 +165,7 @@ public class SingleplayerMenu extends JDialog implements ActionListener{
     		} catch (IOException | ClassNotFoundException e) {
     			JOptionPane.showMessageDialog(this, e.getMessage());
     			
-    		}	finally {
-    			try {
-    				outputStream.close();
-    				inputStream.close();
-    			} catch (IOException e) {
-    				e.printStackTrace();
-    			}
-    			
-    		}	
+    		}
         
         }
 	}

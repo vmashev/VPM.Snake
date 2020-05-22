@@ -16,11 +16,8 @@ public class Server {
 	private ExecutorService pool = Executors.newFixedThreadPool(1000);
 	
 	public static void main(String[] args) throws Exception {
-		
 		new Server();
-		
 	}
-	
 	
 	public Server() throws IOException, ClassNotFoundException {
 		

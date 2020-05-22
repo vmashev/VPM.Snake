@@ -6,10 +6,10 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import vpm.comand.strategy.CommandExecuteFactory;
+import vpm.comand.strategy.CommandExecuteStrategy;
 import vpm.helper.Command;
-import vpm.helper.CommandUtils;
 import vpm.model.GameInfo;
-
 
 public class ClientHandler implements Runnable{
 
@@ -23,6 +23,7 @@ public class ClientHandler implements Runnable{
 	public ClientHandler(Socket socket, ArrayList<ClientHandler> clients) throws IOException {
 		this.socket = socket;
 		this.clients = clients;
+		this.gameInfo = new GameInfo();
 		
 		this.objectOutput = new ObjectOutputStream(socket.getOutputStream());
 		this.objectInput = new ObjectInputStream(socket.getInputStream());
@@ -34,12 +35,17 @@ public class ClientHandler implements Runnable{
 			while(true) {
 				
 				Command inCommand = (Command)objectInput.readObject();
-				System.out.println("Received Json: " + inCommand.getMessage());
+				System.out.println("Received Command: " + inCommand.getNumber() + ", Message: " + inCommand.getMessage());
 				
-				Command outCommand = CommandUtils.execute(inCommand);
+				CommandExecuteStrategy executeStrategy = CommandExecuteFactory.createCommand(inCommand.getNumber() , gameInfo);
+				Command outCommand = inCommand.execute(executeStrategy);
+				
 				objectOutput.writeObject(outCommand);
-				System.out.println("Send Json: " + outCommand.getMessage());
-					
+				System.out.println("Send Json: " + outCommand.getNumber() + ", Message: " + outCommand.getMessage());
+
+				if(executeStrategy.getGameInfo() != null) {
+					gameInfo = executeStrategy.getGameInfo();
+				}
 			}
 			
 		} catch (IOException | ClassNotFoundException e) {
@@ -55,6 +61,8 @@ public class ClientHandler implements Runnable{
 			
 		}
 	}	
+	
+	
 	
 }
 
