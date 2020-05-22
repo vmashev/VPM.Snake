@@ -1,30 +1,28 @@
 package vpm.ui;
 
-import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.net.UnknownHostException;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
-public class Singleplayer extends JDialog implements ActionListener {
+import vpm.ui.controler.SingleplayerControler;
+
+public class NewSingleplayerGame extends JDialog{
 
 	private JPanel contentPane;
-	private JTextField speedFld;
-	private JTextField heightFld;
-	private JTextField widthFld;
-
-	public Singleplayer() {
+	public JTextField speedFld;
+	public JTextField heightFld;
+	public JTextField widthFld;
+	private SingleplayerControler controler;
+	
+	public NewSingleplayerGame() {
+		this.controler = new SingleplayerControler(this);
+		
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 250, 190);
 		setTitle("New singleplayer game");
@@ -45,13 +43,13 @@ public class Singleplayer extends JDialog implements ActionListener {
 		JButton loginBtn = new JButton("Start");
 		loginBtn.setFont(new Font("Times New Roman", Font.PLAIN, 12));
 		loginBtn.setBounds(36, 121, 89, 23);
-		loginBtn.addActionListener(this);
+		loginBtn.addActionListener(controler);
 		contentPane.add(loginBtn);
 		
 		JButton btnCancel = new JButton("Cancel");
 		btnCancel.setFont(new Font("Times New Roman", Font.PLAIN, 12));
 		btnCancel.setBounds(135, 121, 89, 23);
-		btnCancel.addActionListener(this);
+		btnCancel.addActionListener(controler);
 		contentPane.add(btnCancel);
 		
 		JLabel lblNewLabel_2 = new JLabel("Width (min 300)");
@@ -82,42 +80,7 @@ public class Singleplayer extends JDialog implements ActionListener {
 		contentPane.add(widthFld);
 	}
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		switch (e.getActionCommand()) {
-		case "Start":
-			try {
-				startGame();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-			dispose();
-			break;
-		case "Cancel":
-			dispose();
-			break;		
-		}
-	}
-
-	private void startGame() throws UnknownHostException, IOException {
-		int height = Integer.valueOf(heightFld.getText());
-		int width = Integer.valueOf(widthFld.getText());
-		int speed = Integer.valueOf(speedFld.getText());
-		
-		if(height < 300 || width < 300) {
-			JOptionPane.showMessageDialog(this, "Width and Height must me greater than 300.");
-		} else {
-			Board board = new Board(width, height , speed);
-			
-			JFrame frame = new JFrame("Singleplayer");
-			frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-			frame.setContentPane(board);
-			frame.setResizable(false);
-			frame.pack();
-			frame.setPreferredSize(new Dimension(width, height));
-			frame.setLocationRelativeTo(null);
-			frame.setVisible(true);
-	
-		}
+	public void showMessage(String msg) {
+		JOptionPane.showMessageDialog (	this , msg , "Error", JOptionPane.ERROR_MESSAGE);
 	}
 }

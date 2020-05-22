@@ -1,12 +1,6 @@
 package vpm.ui;
 
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -16,27 +10,23 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
-import vpm.helper.ClientSetup;
-import vpm.helper.Command;
-import vpm.helper.Constants;
-import vpm.helper.JsonParser;
-import vpm.model.UserEntity;
-import vpm.model.service.UserService;
-import vpm.model.service.impl.UserServiceImpl;
+import vpm.ui.controler.UserInformationControler;
 
-public class UserInformation extends JDialog implements ActionListener {
+public class UserInformation extends JDialog {
 
 	private JPanel contentPane;
-	private JTextField userNameFld;
-	private JTextField firstNameFld;
-	private JTextField lastNameFld;
-	private JTextField emailFld;
 	private String newPassword;
-	private UserEntity user;
-	private UserService userService;
-	private JTextField maxScoreFld;
+	public JTextField userNameFld;
+	public JTextField firstNameFld;
+	public JTextField lastNameFld;
+	public JTextField emailFld;
+	public JTextField maxScoreFld;
+	
+	private UserInformationControler controler;
 	
 	public UserInformation() {
+		this.controler = new UserInformationControler(this);
+		
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 590, 190);
 		setTitle("User Information");
@@ -89,19 +79,19 @@ public class UserInformation extends JDialog implements ActionListener {
 		JButton saveBtn = new JButton("Save");
 		saveBtn.setFont(new Font("Times New Roman", Font.PLAIN, 12));
 		saveBtn.setBounds(376, 115, 89, 23);
-		saveBtn.addActionListener(this);
+		saveBtn.addActionListener(controler);
 		contentPane.add(saveBtn);
 		
 		JButton btnClose = new JButton("Close");
 		btnClose.setFont(new Font("Times New Roman", Font.PLAIN, 12));
 		btnClose.setBounds(475, 115, 89, 23);
-		btnClose.addActionListener(this);
+		btnClose.addActionListener(controler);
 		contentPane.add(btnClose);
 		
 		JButton changePassBtn = new JButton("Change Password");
 		changePassBtn.setFont(new Font("Times New Roman", Font.PLAIN, 12));
 		changePassBtn.setBounds(246, 115, 120, 23);
-		changePassBtn.addActionListener(this);
+		changePassBtn.addActionListener(controler);
 		contentPane.add(changePassBtn);
 		
 		JLabel maxScoreLbl = new JLabel("Max Score");
@@ -116,7 +106,7 @@ public class UserInformation extends JDialog implements ActionListener {
 		maxScoreFld.setEditable(false);
 		contentPane.add(maxScoreFld);
 		
-		getUserInfo();
+		controler.getUserInfo();
 	}
 
 	public String getNewPassword() {
@@ -127,99 +117,8 @@ public class UserInformation extends JDialog implements ActionListener {
 		this.newPassword = newPassword;
 	}
 	
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		switch (e.getActionCommand()) {
-		case "Save":
-			save();
-			dispose();
-			break;		
-		case "Change Password":
-			ChangePassword changePassword = new ChangePassword(this);
-			changePassword.setVisible(true);
-			break;
-		case "Close":
-			dispose();
-			break;		
-		}
+	public void showMessage(String msg) {
+		JOptionPane.showMessageDialog (	this , msg , "Error", JOptionPane.ERROR_MESSAGE);
 	}
 	
-	private void save() {
-		String nickname = userNameFld.getText();
-		String firstName = firstNameFld.getText();
-		String lastName = lastNameFld.getText();
-		String email = emailFld.getText();
-		
-		if(nickname.equals("")) {
-			JOptionPane.showMessageDialog (	this , "Username is empty." , "Error", JOptionPane.ERROR_MESSAGE);
-			return;
-		}
-		
-		user.setUsername(nickname);
-		user.setFirstName(firstName);
-		user.setLastName(lastName);
-		user.setEmail(email);
-		if(newPassword != null) {
-			user.setEncryptedPassword(newPassword);
-		}
-		
-		
-		try {
-			Socket socket = new Socket(Constants.SERVER_IP , Constants.PORT);
-			
-			ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
-			ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
-			
-			String message = JsonParser.parseFromUserEntity(user);
-			
-			Command sendCommand = new Command(3, message);
-			outputStream.writeObject(sendCommand);
-			
-			Command receiveCommand = (Command)inputStream.readObject();
-			user = JsonParser.parseToUserEntity(receiveCommand.getMessage());
-			
-		} catch (IOException | ClassNotFoundException e) {
-			JOptionPane.showMessageDialog(this, e.getMessage());
-			
-		}		
-
-
-	}
-	
-	private void getUserInfo() {
-		ClientSetup clientSetup = ClientSetup.createInstance();
-		
-		try {
-			Socket socket = new Socket(Constants.SERVER_IP , Constants.PORT);
-			
-			ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
-			ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
-			
-			user = new UserEntity(clientSetup.getUserName());
-			String message = JsonParser.parseFromUserEntity(user);
-			
-			Command sendCommand = new Command(1, message);
-			outputStream.writeObject(sendCommand);
-			
-			Command receiveCommand = (Command)inputStream.readObject();
-			user = JsonParser.parseToUserEntity(receiveCommand.getMessage());
-			
-			if(user == null) {
-				JOptionPane.showMessageDialog (	this , "The username does not exist." , "Error", JOptionPane.ERROR_MESSAGE);
-				return;			
-			}
-			
-			userNameFld.setText(user.getUsername());
-			firstNameFld.setText(user.getFirstName());
-			lastNameFld.setText(user.getLastName());
-			emailFld.setText(user.getEmail());
-			maxScoreFld.setText(String.valueOf(user.getMaxScore()));
-			
-		} catch (IOException | ClassNotFoundException e) {
-			JOptionPane.showMessageDialog(this, e.getMessage());
-			
-		}		
-		
-
-	}
 }

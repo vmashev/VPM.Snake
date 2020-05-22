@@ -14,16 +14,19 @@ import javax.swing.JPasswordField;
 import javax.swing.border.EmptyBorder;
 
 import vpm.helper.EncryptionUtils;
+import vpm.ui.controler.ChangePasswordControler;
 
-public class ChangePassword extends JDialog implements ActionListener {
+public class ChangePassword extends JDialog {
 
 	private JPanel contentPane;
-	private JPasswordField passwordField2;
-	private JPasswordField passwordFld;
-	private UserInformation userInformation;
+	public JPasswordField passwordField2;
+	public JPasswordField passwordFld;
+	public UserInformation userInformation;
+	private ChangePasswordControler controler;
 	
 	public ChangePassword(UserInformation userInformation) {
 		this.userInformation = userInformation;
+		this.controler = new ChangePasswordControler(this);
 		
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 250, 160);
@@ -38,13 +41,13 @@ public class ChangePassword extends JDialog implements ActionListener {
 		JButton btnClose = new JButton("Cancel");
 		btnClose.setFont(new Font("Times New Roman", Font.PLAIN, 12));
 		btnClose.setBounds(135, 91, 89, 23);
-		btnClose.addActionListener(this);
+		btnClose.addActionListener(controler);
 		contentPane.add(btnClose);
 		
 		JButton btnOK = new JButton("OK");
 		btnOK.setFont(new Font("Times New Roman", Font.PLAIN, 12));
 		btnOK.setBounds(36, 91, 89, 23);
-		btnOK.addActionListener(this);
+		btnOK.addActionListener(controler);
 		contentPane.add(btnOK);
 		
 		passwordField2 = new JPasswordField();
@@ -66,51 +69,8 @@ public class ChangePassword extends JDialog implements ActionListener {
 		contentPane.add(passwordFld);
 	}
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		switch (e.getActionCommand()) {
-		case "OK":
-			
-			String password = new String(passwordFld.getPassword());
-			String rePassword = new String(passwordField2.getPassword());
-			
-			if(password == "") {
-				JOptionPane.showMessageDialog (	this , "Password is empty." , "Error", JOptionPane.ERROR_MESSAGE);
-				return;
-			}
-			
-			if(!passwordIsValid(password , rePassword)) {
-				passwordField2.setText("");
-				return;
-			}
-			
-			setNewPassword(password);
-			
-			dispose();
-			break;
-		case "Cancel":
-			dispose();
-			break;		
-		}
-	}
-
-	private boolean passwordIsValid(String password, String rePassword) {
-		if(password == "") {
-			JOptionPane.showMessageDialog (	this , "Password is empty." , "Error", JOptionPane.ERROR_MESSAGE);
-			return false;
-		}
-		
-		if( !password.equals(rePassword)) {
-			JOptionPane.showMessageDialog (	this , "Wrong re-entered password." , "Error", JOptionPane.ERROR_MESSAGE);
-			return false;
-		}
-		
-		return true;
-	}
-	
-	private void setNewPassword(String password) {
-		password = EncryptionUtils.encryptMD5(password);
-		userInformation.setNewPassword(password);
+	public void showMessage(String msg) {
+		JOptionPane.showMessageDialog (	this , msg , "Error", JOptionPane.ERROR_MESSAGE);
 	}
 	
 }

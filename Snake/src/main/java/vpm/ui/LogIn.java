@@ -23,14 +23,18 @@ import vpm.helper.Constants;
 import vpm.helper.EncryptionUtils;
 import vpm.helper.JsonParser;
 import vpm.model.UserEntity;
+import vpm.ui.controler.LogInControler;
 
-public class LogIn extends JDialog implements ActionListener {
+public class LogIn extends JDialog {
 
 	private JPanel contentPane;
-	private JTextField userFld;
-	private JPasswordField passwordField;
+	public JTextField userFld;
+	public JPasswordField passwordField;
+	private LogInControler controler;
 
 	public LogIn() {
+		controler = new LogInControler(this);
+		
 		setModalExclusionType(ModalExclusionType.TOOLKIT_EXCLUDE);
 		
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -64,72 +68,18 @@ public class LogIn extends JDialog implements ActionListener {
 		JButton btnLogin = new JButton("Login");
 		btnLogin.setFont(new Font("Times New Roman", Font.PLAIN, 12));
 		btnLogin.setBounds(36, 91, 89, 23);
-		btnLogin.addActionListener(this);
+		btnLogin.addActionListener(controler);
 		contentPane.add(btnLogin);
 		
 		JButton btnClose = new JButton("Close");
 		btnClose.setFont(new Font("Times New Roman", Font.PLAIN, 12));
 		btnClose.setBounds(135, 91, 89, 23);
-		btnClose.addActionListener(this);
+		btnClose.addActionListener(controler);
 		contentPane.add(btnClose);
 	}
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		switch (e.getActionCommand()) {
-		case "Login":
-			logIn();
-			break;
-		case "Close":
-			dispose();
-			break;		
-		}
-	}
 	
-	private void logIn() {
-		String nickname = userFld.getText();
-		String password = new String(passwordField.getPassword());
-		password = EncryptionUtils.encryptMD5(password);
+	public void showMessage(String msg) {
+		JOptionPane.showMessageDialog (	this , msg , "Error", JOptionPane.ERROR_MESSAGE);
 		
-		if((userFld.getText().equals("")) || (passwordField.getPassword().length == 0)) {
-			JOptionPane.showMessageDialog (	this , "The username or password is empty." , "Error", JOptionPane.ERROR_MESSAGE);
-			return;
-		}
-		
-		try {
-			Socket socket = new Socket(Constants.SERVER_IP , Constants.PORT);
-			
-			ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
-			ObjectInputStream objectinput = new ObjectInputStream(socket.getInputStream());
-			
-			UserEntity user = new UserEntity(nickname);
-			String message = JsonParser.parseFromUserEntity(user);
-			
-			Command sendCommand = new Command(1, message);
-			objectOutput.writeObject(sendCommand);
-			
-			Command receiveCommand = (Command)objectinput.readObject();
-			user = JsonParser.parseToUserEntity(receiveCommand.getMessage());
-			
-			if(user == null) {
-				JOptionPane.showMessageDialog (	this , "The username does not exist." , "Error", JOptionPane.ERROR_MESSAGE);
-				return;			
-			}
-			
-			if(!user.getEncryptedPassword().equals(password)) {
-				JOptionPane.showMessageDialog (	this , "The password is incorect." , "Error", JOptionPane.ERROR_MESSAGE);
-				return;			
-			}
-			
-			ClientSetup clientSetup = ClientSetup.createInstance();
-			clientSetup.setUserName(nickname);
-	
-			dispose();
-			
-			
-		} catch (IOException | ClassNotFoundException e) {
-			JOptionPane.showMessageDialog(this, e.getMessage());
-			
-		}		
 	}
 }

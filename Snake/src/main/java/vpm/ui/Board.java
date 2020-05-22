@@ -234,7 +234,6 @@ public class Board extends JPanel implements Runnable, KeyListener {
 	public void requestRender() {
 		render(graphics2D);
 		Graphics graphics = getGraphics();
-		System.out.println(image);
 		graphics.drawImage(image,0,0,null);
 		graphics.dispose();
 	}

@@ -30,21 +30,19 @@ import vpm.helper.JsonParser;
 import vpm.model.GameInfo;
 import vpm.model.Snake;
 import vpm.model.UserEntity;
+import vpm.ui.controler.SingleplayerMenuControler;
 
-public class SingleplayerMenu extends JDialog implements ActionListener{
+public class SingleplayerMenu extends JDialog{
 
 	private JPanel contentPane;
-	private JTable table;
-	private DefaultTableModel model;
-	private Socket socket;
-	private ObjectOutputStream outputStream;
-	private ObjectInputStream inputStream;
+	public JTable table;
+	public DefaultTableModel model;
+	private SingleplayerMenuControler controler;
+
 	
 	public SingleplayerMenu() throws UnknownHostException, IOException {
-		socket = new Socket(Constants.SERVER_IP , Constants.PORT);
-		outputStream = new ObjectOutputStream(socket.getOutputStream());
-		inputStream = new ObjectInputStream(socket.getInputStream());
-
+		this.controler = new SingleplayerMenuControler(this);
+		
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 570, 230);
 		setTitle("Singleplayer Menu");
@@ -58,19 +56,19 @@ public class SingleplayerMenu extends JDialog implements ActionListener{
 		JButton joinBtn = new JButton("Resume");
 		joinBtn.setFont(new Font("Times New Roman", Font.PLAIN, 12));
 		joinBtn.setBounds(366, 165, 89, 23);
-		joinBtn.addActionListener(this);
+		joinBtn.addActionListener(controler);
 		contentPane.add(joinBtn);
 		
 		JButton btnClose = new JButton("Close");
 		btnClose.setFont(new Font("Times New Roman", Font.PLAIN, 12));
 		btnClose.setBounds(465, 165, 89, 23);
-		btnClose.addActionListener(this);
+		btnClose.addActionListener(controler);
 		contentPane.add(btnClose);
 		
 		JButton newGameBtn = new JButton("New Game");
 		newGameBtn.setFont(new Font("Times New Roman", Font.PLAIN, 12));
 		newGameBtn.setBounds(267, 165, 89, 23);
-		newGameBtn.addActionListener(this);
+		newGameBtn.addActionListener(controler);
 		contentPane.add(newGameBtn);
 		
 		model = new DefaultTableModel( new Object[][] {}, new String[] { "Line No.", "Username", "DateTime", "Board Height", "Board Width", "Game Speed"} );
@@ -82,92 +80,12 @@ public class SingleplayerMenu extends JDialog implements ActionListener{
 
 		contentPane.add(table);
 
-		getSavedGames();
+		controler.getSavedGames();
 		
 	}
 	
-	private void getSavedGames() {
-		ClientSetup clientSetup = ClientSetup.createInstance();
-		
-		try {
-			UserEntity user = new UserEntity(clientSetup.getUserName());
-			String message = JsonParser.parseFromUserEntity(user);
-			
-			Command sendCommand = new Command(4, message);
-			outputStream.writeObject(sendCommand);
-			
-			Command receiveCommand = (Command)inputStream.readObject();
-			List<GameInfo> games = JsonParser.parseToGameInfoList(receiveCommand.getMessage());
-
-			for (int i = 0; i < games.size(); i++) {
-				model.addRow(new Object[]{ i+1 , 
-											games.get(i).getHostUsername(), 
-											games.get(i).getDateTime(),
-											games.get(i).getHeight(), 
-											games.get(i).getWidth(), 
-											games.get(i).getSpeed()});
-			}		
-			
-
-		} catch (IOException | ClassNotFoundException e) {
-			JOptionPane.showMessageDialog(this, e.getMessage());
-			
-		} 	
-	}
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		switch (e.getActionCommand()) {
-		case "New Game":
-			Singleplayer singleplayer = new Singleplayer();
-			singleplayer.setVisible(true);
-			break;
-		case "Resume":
-			resumeGame();
-			break;
-		case "Close":
-			dispose();
-			break;		
-		}
-		
-	}
-	
-	private void resumeGame() {
-		if (table.getSelectedRowCount() > 0) {
-            int selectedRow = table.getSelectedRow();
-            
-            LocalDateTime dateTime = LocalDateTime.parse(table.getValueAt(selectedRow, 2).toString());
-            
-            try {
-    			GameInfo gameInfo = new GameInfo();
-    			gameInfo.setDateTime(dateTime);
-    			
-    			String message = JsonParser.parseFromGameInfo(gameInfo);
-    			Command sendCommand = new Command(5, message);
-    			outputStream.writeObject(sendCommand);
-    			
-    			Command receiveCommand = (Command)inputStream.readObject();
-    			gameInfo = JsonParser.parseToGameInfo(receiveCommand.getMessage());
-    			gameInfo.setStatus(GameStatus.Ready);
-    			gameInfo.getSnakes().put(gameInfo.getHostUsername(), gameInfo.getHostSnake());
-    			
-    			Board board = new Board(gameInfo);
-        		
-        		JFrame frame = new JFrame("Singleplayer");
-        		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        		frame.setContentPane(board);
-        		frame.setResizable(false);
-        		frame.pack();
-        		frame.setPreferredSize(new Dimension(gameInfo.getWidth(), gameInfo.getHeight()));
-        		frame.setLocationRelativeTo(null);
-        		frame.setVisible(true);	
-    			
-    		} catch (IOException | ClassNotFoundException e) {
-    			JOptionPane.showMessageDialog(this, e.getMessage());
-    			
-    		}
-        
-        }
+	public void showMessage(String msg) {
+		JOptionPane.showMessageDialog (	this , msg , "Error", JOptionPane.ERROR_MESSAGE);
 	}
 
 }

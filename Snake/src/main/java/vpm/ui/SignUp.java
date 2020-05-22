@@ -24,24 +24,27 @@ import vpm.helper.EncryptionUtils;
 import vpm.helper.JsonParser;
 import vpm.model.UserEntity;
 import vpm.model.service.UserService;
+import vpm.ui.controler.SignUpControler;
 
-public class SignUp extends JDialog implements ActionListener{
+public class SignUp extends JDialog {
 
 	private JPanel contentPane;
-	private JTextField userFld;
 	private JLabel lblPassword;
 	private JLabel lblNewLabel_2;
-	private JPasswordField passwordField;
-	private JPasswordField passwordField2;
 	private JLabel lblNewLabel_1;
 	private JLabel lblNewLabel_3;
 	private JLabel lblNewLabel_4;
-	private JTextField firsNameFld;
-	private JTextField lastNameFld;
-	private JTextField emailFld;
-
+	public JTextField userFld;
+	public JPasswordField passwordField;
+	public JPasswordField passwordField2;
+	public JTextField firsNameFld;
+	public JTextField lastNameFld;
+	public JTextField emailFld;
+	private SignUpControler controler;
 
 	public SignUp() {
+		controler = new SignUpControler(this);
+		
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 310, 310);
 		setTitle("SignUp");
@@ -83,14 +86,14 @@ public class SignUp extends JDialog implements ActionListener{
 		JButton loginBtn = new JButton("SignUp");
 		loginBtn.setFont(new Font("Times New Roman", Font.PLAIN, 12));
 		loginBtn.setBounds(88, 239, 89, 23);
-		loginBtn.addActionListener(this);
+		loginBtn.addActionListener(controler);
 		
 		contentPane.add(loginBtn);
 		
 		JButton btnClose = new JButton("Close");
 		btnClose.setFont(new Font("Times New Roman", Font.PLAIN, 12));
 		btnClose.setBounds(187, 239, 89, 23);
-		btnClose.addActionListener(this);
+		btnClose.addActionListener(controler);
 		contentPane.add(btnClose);
 		
 		lblNewLabel_1 = new JLabel("First Name");
@@ -123,81 +126,8 @@ public class SignUp extends JDialog implements ActionListener{
 		emailFld.setBounds(99, 203, 180, 25);
 		contentPane.add(emailFld);
 	}
-	
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		switch (e.getActionCommand()) {
-		case "SignUp":
-			signUp();
-			break;
-		case "Close":
-			dispose();
-			break;		
-		}
-	}
-	
-	private void signUp() {
-		UserService userService;
-		UserEntity user;
-		
-		String nickname = userFld.getText();
-		String password = new String(passwordField.getPassword());
-		String rePassword = new String(passwordField2.getPassword());
-		String firstName = firsNameFld.getText();
-		String lastName = lastNameFld.getText();
-		String email = emailFld.getText();
-		
-		if(nickname.equals("")) {
-			JOptionPane.showMessageDialog (	this , "Username is empty." , "Error", JOptionPane.ERROR_MESSAGE);
-			return;
-		}
-		
-		if(password == "") {
-			JOptionPane.showMessageDialog (	this , "Password is empty." , "Error", JOptionPane.ERROR_MESSAGE);
-			return;
-		}
-		
-		if( !password.equals(rePassword)) {
-			JOptionPane.showMessageDialog (	this , "Wrong re-entered password." , "Error", JOptionPane.ERROR_MESSAGE);
-			passwordField2.setText("");
-			return;
-		}
-		
-		password = EncryptionUtils.encryptMD5(password);
-		
-		user = new UserEntity(nickname);
-		user.setEncryptedPassword(password);
-		user.setFirstName(firstName);
-		user.setLastName(lastName);
-		user.setEmail(email);
-				
-		try {
-			Socket socket = new Socket(Constants.SERVER_IP , Constants.PORT);
-			
-			ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
-			ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
-			
-			String jsonMessage = JsonParser.parseFromUserEntity(user);
-			
-			Command sendCommand = new Command(2, jsonMessage);
-			outputStream.writeObject(sendCommand);
-			
-			Command receiveCommand = (Command)inputStream.readObject();
-			user = JsonParser.parseToUserEntity(receiveCommand.getMessage());
-			
-			if(user == null) {
-				JOptionPane.showMessageDialog(this, receiveCommand.getErrorMessage());
-				return;
-			}
-			
-			ClientSetup clientSetup = ClientSetup.createInstance();
-			clientSetup.setUserName(nickname);
 
-			dispose();		
-			
-		} catch (IOException | ClassNotFoundException e) {
-			JOptionPane.showMessageDialog(this, e.getMessage());
-			
-		}		
+	public void showMessage(String msg) {
+		JOptionPane.showMessageDialog (	this , msg , "Error", JOptionPane.ERROR_MESSAGE);
 	}
 }
