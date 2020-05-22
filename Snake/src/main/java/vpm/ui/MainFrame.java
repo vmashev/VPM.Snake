@@ -31,32 +31,34 @@ public class MainFrame extends JFrame implements ActionListener{
 		logInButton = new JButton("LogIn");
 		logInButton.addActionListener(this);
 		
-		logOutButton = new JButton("LogOut");
-		logOutButton.setEnabled(false);
-		logOutButton.addActionListener(this);
-		
 		signInButton = new JButton("SignUp");
 		signInButton.addActionListener(this);
 		
 		singlePlayerButton = new JButton("Singleplayer");
+		singlePlayerButton.setEnabled(false);
 		singlePlayerButton.addActionListener(this);
 		
 		multiPlayerButton = new JButton("Multiplayer");
+		multiPlayerButton.setEnabled(false);
 		multiPlayerButton.addActionListener(this);
 		
 		userInfoButton = new JButton("User Information");
 		userInfoButton.setEnabled(false);
 		userInfoButton.addActionListener(this);
 		
+		logOutButton = new JButton("LogOut");
+		logOutButton.setEnabled(false);
+		logOutButton.addActionListener(this);
+		
 		quitButton = new JButton("Quit");
 		quitButton.addActionListener(this);
 		
 		add(logInButton);
-		add(logOutButton);
 		add(signInButton);
 		add(singlePlayerButton);
 		add(multiPlayerButton);
 		add(userInfoButton);
+		add(logOutButton);
 		add(quitButton);
 		
 		setSize(300	, 300);
@@ -73,21 +75,15 @@ public class MainFrame extends JFrame implements ActionListener{
 			
 			clientSetup = clientSetup.createInstance();
 			userIsLogged = clientSetup.getUserName() != null;
-			
-			logInButton.setEnabled(!userIsLogged);
-			signInButton.setEnabled(!userIsLogged);
-			logOutButton.setEnabled(userIsLogged);
-			userInfoButton.setEnabled(userIsLogged);
+
+			updateButtonEnabled();
 			
 			break;
 		case "LogOut": 
 			clientSetup = clientSetup.createInstance();
 			clientSetup.setUserName(null);
 			
-			logInButton.setEnabled(true);
-			signInButton.setEnabled(true);
-			logOutButton.setEnabled(false);
-			userInfoButton.setEnabled(false);
+			updateButtonEnabled();
 			
 			break;			
 		case "SignUp": 
@@ -97,10 +93,7 @@ public class MainFrame extends JFrame implements ActionListener{
 			clientSetup = clientSetup.createInstance();
 			userIsLogged = clientSetup.getUserName() != null;
 			
-			logInButton.setEnabled(!userIsLogged);
-			signInButton.setEnabled(!userIsLogged);
-			logOutButton.setEnabled(userIsLogged);
-			userInfoButton.setEnabled(userIsLogged);
+			updateButtonEnabled();
 			
 			break;			
 		case "Singleplayer": 
@@ -124,6 +117,14 @@ public class MainFrame extends JFrame implements ActionListener{
 			dispose();
 			break;			
 		}
-		
+	}
+	
+	private void updateButtonEnabled() {
+		logInButton.setEnabled(!userIsLogged);
+		signInButton.setEnabled(!userIsLogged);
+		singlePlayerButton.setEnabled(userIsLogged);
+		multiPlayerButton.setEnabled(userIsLogged);
+		logOutButton.setEnabled(userIsLogged);
+		userInfoButton.setEnabled(userIsLogged);
 	}
 }

@@ -21,6 +21,8 @@ public class CommandExecuteFactory {
 			return new NewGameCommand(gameInfo);
 		case 11: // Move Game
 			return new MoveCommand(gameInfo);
+		case 12: // New Game
+			return new ResumeGameCommand(gameInfo);
 		}
 		
 		return null;

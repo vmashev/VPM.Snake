@@ -1,12 +1,18 @@
 package vpm.comand.strategy;
 
+import java.util.Map;
+
 import vpm.helper.Command;
 import vpm.helper.GameStatus;
 import vpm.helper.JsonParser;
 import vpm.helper.SnakeMoveInfo;
 import vpm.model.GameInfo;
+import vpm.model.Snake;
+import vpm.model.UserEntity;
 import vpm.model.service.GameInfoService;
+import vpm.model.service.UserService;
 import vpm.model.service.impl.GameInfoServiceImpl;
+import vpm.model.service.impl.UserServiceImpl;
 
 public class MoveCommand extends CommandExecuteStrategy{
 
@@ -59,6 +65,27 @@ public class MoveCommand extends CommandExecuteStrategy{
 		
 		GameInfoService gameInfoService = new GameInfoServiceImpl();
 		gameInfoService.create(gameInfo);
+		
+		updateMaxScore(gameInfo);
+		
 	}
 
+	private static void updateMaxScore(GameInfo gameInfo) {
+		
+		for (Map.Entry<String,Snake> snakeEntry : gameInfo.getSnakes().entrySet()) {
+			
+			UserService userService = new UserServiceImpl();
+			UserEntity user = userService.findByUsername(snakeEntry.getKey());
+			
+			if(user != null) {
+				if(user.getMaxScore() < snakeEntry.getValue().getScore()) {
+					user.setMaxScore(snakeEntry.getValue().getScore());
+					userService.update(user);
+				}
+			}
+		}
+		
+		
+	}
+	
 }

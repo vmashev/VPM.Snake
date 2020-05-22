@@ -30,6 +30,8 @@ public class UserEntity implements Serializable{
 	
 	private String encryptedPassword;
 	
+	private int maxScore;
+	
 	public UserEntity() {}
 	
 	public UserEntity(String username) {
@@ -71,6 +73,12 @@ public class UserEntity implements Serializable{
 	}
 	public void setEncryptedPassword(String encryptedPassword) {
 		this.encryptedPassword = encryptedPassword;
+	}
+	public int getMaxScore() {
+		return maxScore;
+	}
+	public void setMaxScore(int maxScore) {
+		this.maxScore = maxScore;
 	}
 	
 }

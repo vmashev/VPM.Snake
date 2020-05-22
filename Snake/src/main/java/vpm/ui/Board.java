@@ -69,6 +69,7 @@ public class Board extends JPanel implements Runnable, KeyListener {
 		this.server = new Socket(Constants.SERVER_IP , Constants.PORT);
 		this.objectOutput = new ObjectOutputStream(server.getOutputStream());
 		this.snakeMove = new SnakeMoveInfo(clientSetup.getUserName());
+		this.snakeMove.setStatus(GameStatus.Ready);
 		
 		setPreferredSize(new Dimension(gameInfo.getWidth(), gameInfo.getHeight()));
 		setFocusable(true);
@@ -211,23 +212,29 @@ public class Board extends JPanel implements Runnable, KeyListener {
 		serverConnectionThread.start();
 		
 		targetTime = 1000 / gameInfo.getSpeed();
-		image= new BufferedImage(gameInfo.getWidth(), gameInfo.getHeight(), BufferedImage.TYPE_INT_ARGB);
+		image = new BufferedImage(gameInfo.getWidth(), gameInfo.getHeight(), BufferedImage.TYPE_INT_ARGB);
 		graphics2D = image.createGraphics();
 		running = true;
 		targetTime = 1000 / gameInfo.getSpeed();
 
+		String message = JsonParser.parseFromGameInfo(gameInfo);
+		Command sendCommand;
 		if(gameInfo.getId() == null) {
-			String message = JsonParser.parseFromGameInfo(gameInfo);
-			Command sendCommand = new Command(10, message);
-			objectOutput.writeObject(sendCommand);
+			//New game
+			sendCommand = new Command(10, message);
 		} else {
+			//Resume game
+			sendCommand = new Command(12, message);
 			requestRender();
 		}
+		objectOutput.writeObject(sendCommand);
+		
 	}
 	
 	public void requestRender() {
 		render(graphics2D);
 		Graphics graphics = getGraphics();
+		System.out.println(image);
 		graphics.drawImage(image,0,0,null);
 		graphics.dispose();
 	}

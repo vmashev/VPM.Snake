@@ -34,6 +34,7 @@ public class UserInformation extends JDialog implements ActionListener {
 	private String newPassword;
 	private UserEntity user;
 	private UserService userService;
+	private JTextField maxScoreFld;
 	
 	public UserInformation() {
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -102,6 +103,18 @@ public class UserInformation extends JDialog implements ActionListener {
 		changePassBtn.setBounds(246, 115, 120, 23);
 		changePassBtn.addActionListener(this);
 		contentPane.add(changePassBtn);
+		
+		JLabel maxScoreLbl = new JLabel("Max Score");
+		maxScoreLbl.setFont(new Font("Times New Roman", Font.PLAIN, 14));
+		maxScoreLbl.setBounds(289, 12, 79, 20);
+		contentPane.add(maxScoreLbl);
+		
+		maxScoreFld = new JTextField();
+		maxScoreFld.setText((String) null);
+		maxScoreFld.setColumns(10);
+		maxScoreFld.setBounds(378, 11, 180, 25);
+		maxScoreFld.setEditable(false);
+		contentPane.add(maxScoreFld);
 		
 		getUserInfo();
 	}
@@ -200,6 +213,7 @@ public class UserInformation extends JDialog implements ActionListener {
 			firstNameFld.setText(user.getFirstName());
 			lastNameFld.setText(user.getLastName());
 			emailFld.setText(user.getEmail());
+			maxScoreFld.setText(String.valueOf(user.getMaxScore()));
 			
 		} catch (IOException | ClassNotFoundException e) {
 			JOptionPane.showMessageDialog(this, e.getMessage());
@@ -208,5 +222,4 @@ public class UserInformation extends JDialog implements ActionListener {
 		
 
 	}
-	
 }
