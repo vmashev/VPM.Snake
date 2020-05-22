@@ -16,7 +16,9 @@ public class CommandExecuteFactory {
 		case 4: // Get saved games to list
 			return new FindSavedGamesCommand();
 		case 5: // Get selected game to resume
-			return new FindGameByDateTimeCommand();			
+			return new FindGameByDateTimeCommand();	
+		case 6: // Find Game History
+			return new FindGameHistoryCommand();	
 		case 10: // New Game
 			return new NewGameCommand(gameInfo);
 		case 11: // Move Game

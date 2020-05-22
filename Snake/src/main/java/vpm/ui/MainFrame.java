@@ -20,13 +20,14 @@ public class MainFrame extends JFrame implements ActionListener{
 	JButton quitButton;
 	JButton logOutButton;
 	JButton userInfoButton;
+	JButton statisticButton;
 	ClientSetup clientSetup;
 	boolean userIsLogged;
 	
 	public MainFrame() {
 		
 		super("Snake");
-		setLayout(new GridLayout(7,1));
+		setLayout(new GridLayout(8,1));
 		
 		logInButton = new JButton("LogIn");
 		logInButton.addActionListener(this);
@@ -46,6 +47,10 @@ public class MainFrame extends JFrame implements ActionListener{
 		userInfoButton.setEnabled(false);
 		userInfoButton.addActionListener(this);
 		
+		statisticButton = new JButton("Statistic");
+		statisticButton.setEnabled(false);
+		statisticButton.addActionListener(this);
+		
 		logOutButton = new JButton("LogOut");
 		logOutButton.setEnabled(false);
 		logOutButton.addActionListener(this);
@@ -58,6 +63,7 @@ public class MainFrame extends JFrame implements ActionListener{
 		add(singlePlayerButton);
 		add(multiPlayerButton);
 		add(userInfoButton);
+		add(statisticButton);
 		add(logOutButton);
 		add(quitButton);
 		
@@ -113,6 +119,10 @@ public class MainFrame extends JFrame implements ActionListener{
 			UserInformation userInformation = new UserInformation();
 			userInformation.setVisible(true);
 			break;	
+		case "Statistic": 
+			Statistic statistic = new Statistic();
+			statistic.setVisible(true);
+			break;				
 		case "Quit": 
 			dispose();
 			break;			
@@ -126,5 +136,6 @@ public class MainFrame extends JFrame implements ActionListener{
 		multiPlayerButton.setEnabled(userIsLogged);
 		logOutButton.setEnabled(userIsLogged);
 		userInfoButton.setEnabled(userIsLogged);
+		statisticButton.setEnabled(userIsLogged);
 	}
 }

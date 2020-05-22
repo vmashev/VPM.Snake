@@ -7,6 +7,7 @@ import vpm.model.GameInfo;
 
 public interface GameInfoDao extends GenericDao<GameInfo, Long> {
 
-	List<GameInfo> findByUsernames(String username);
+	List<GameInfo> findSavedGameInfoByUsername(String username);
+	List<GameInfo> findGameInfoHistoryByUsername(String username);
 	GameInfo findByDateTime(LocalDateTime dateTime);
 }

@@ -18,8 +18,8 @@ public class GameInfoDaoPostgres extends GenericDAOPostgreSQL<GameInfo, Long> im
 	}
 
 	@Override
-	public List<GameInfo> findByUsernames(String username) {
-		Query query = getEntityManager().createNamedQuery("findSavedGameInfoByUsername");
+	public List<GameInfo> findSavedGameInfoByUsername(String username) {
+		Query query = getEntityManager().createNamedQuery("findGameInfoByUsernameAndStatus");
 		query.setParameter("username", username)
 			.setParameter("status", GameStatus.Save);
 		
@@ -37,6 +37,19 @@ public class GameInfoDaoPostgres extends GenericDAOPostgreSQL<GameInfo, Long> im
 		
 		try {
 			return (GameInfo) query.getSingleResult();
+		} catch (NoResultException e) {
+			return null;
+		}
+	}
+
+	@Override
+	public List<GameInfo> findGameInfoHistoryByUsername(String username) {
+		Query query = getEntityManager().createNamedQuery("findGameInfoByUsernameAndStatus");
+		query.setParameter("username", username)
+			.setParameter("status", GameStatus.GameOver);
+		
+		try {
+			return query.getResultList();
 		} catch (NoResultException e) {
 			return null;
 		}

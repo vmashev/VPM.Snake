@@ -11,6 +11,7 @@ import vpm.model.GameInfo;
 public interface GameInfoService {
 
 	List<GameInfo> findSavedGamesByUsername(String username);
+	List<GameInfo> findGameHistoryByUsername(String username);
 	GameInfo findById(Long id);
 	GameInfo findByDateTime(LocalDateTime dateTime);
 	

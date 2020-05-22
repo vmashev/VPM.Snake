@@ -1,35 +1,18 @@
 package vpm.ui;
 
-import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
 import java.net.UnknownHostException;
-import java.time.LocalDateTime;
-import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
-import vpm.helper.ClientSetup;
-import vpm.helper.Command;
-import vpm.helper.Constants;
-import vpm.helper.GameStatus;
-import vpm.helper.JsonParser;
-import vpm.model.GameInfo;
-import vpm.model.Snake;
-import vpm.model.UserEntity;
 import vpm.ui.controler.SingleplayerMenuControler;
 
 public class SingleplayerMenu extends JDialog{
@@ -44,7 +27,7 @@ public class SingleplayerMenu extends JDialog{
 		this.controler = new SingleplayerMenuControler(this);
 		
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 570, 230);
+		setBounds(100, 100, 710, 240);
 		setTitle("Singleplayer Menu");
 		setResizable(false);
 		
@@ -55,30 +38,38 @@ public class SingleplayerMenu extends JDialog{
 		
 		JButton joinBtn = new JButton("Resume");
 		joinBtn.setFont(new Font("Times New Roman", Font.PLAIN, 12));
-		joinBtn.setBounds(366, 165, 89, 23);
+		joinBtn.setBounds(496, 165, 89, 23);
 		joinBtn.addActionListener(controler);
 		contentPane.add(joinBtn);
 		
 		JButton btnClose = new JButton("Close");
 		btnClose.setFont(new Font("Times New Roman", Font.PLAIN, 12));
-		btnClose.setBounds(465, 165, 89, 23);
+		btnClose.setBounds(595, 165, 89, 23);
 		btnClose.addActionListener(controler);
 		contentPane.add(btnClose);
 		
 		JButton newGameBtn = new JButton("New Game");
 		newGameBtn.setFont(new Font("Times New Roman", Font.PLAIN, 12));
-		newGameBtn.setBounds(267, 165, 89, 23);
+		newGameBtn.setBounds(397, 165, 89, 23);
 		newGameBtn.addActionListener(controler);
 		contentPane.add(newGameBtn);
 		
-		model = new DefaultTableModel( new Object[][] {}, new String[] { "Line No.", "Username", "DateTime", "Board Height", "Board Width", "Game Speed"} );
+		model = new DefaultTableModel( new Object[][] {}, new String[] { "Line No.", "Username", "DateTime", "Board Height", "Board Width", "Game Speed" } ) {
+				boolean[] columnEditables = new boolean[] {
+					false, false, false, false, false, false
+				};
+				public boolean isCellEditable(int row, int column) {
+					return columnEditables[column];
+				}
+			};
 		
-		model.setColumnIdentifiers(new String[] { "Line No.", "Username", "DateTime", "Board Height", "Board Width", "Game Speed"});
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(10, 11, 674, 143);
+		contentPane.add(scrollPane);
+		
 		table = new JTable(model);
-		table.setBounds(10, 11, 544, 143);
+		scrollPane.setViewportView(table);
 		table.setAutoResizeMode(5);
-
-		contentPane.add(table);
 
 		controler.getSavedGames();
 		

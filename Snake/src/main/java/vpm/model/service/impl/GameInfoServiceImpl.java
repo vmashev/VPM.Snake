@@ -74,7 +74,7 @@ public class GameInfoServiceImpl implements GameInfoService{
 		entityManager = serverSetup.getEntityManager();
 		gameInfoDao = new GameInfoDaoPostgres(entityManager);
 		
-		List<GameInfo> result = gameInfoDao.findByUsernames(username);
+		List<GameInfo> result = gameInfoDao.findSavedGameInfoByUsername(username);
 		entityManager.close();
 		
 		return result;
@@ -100,6 +100,17 @@ public class GameInfoServiceImpl implements GameInfoService{
 		entityManager.close();
 		
 		return gameInfo;
+	}
+
+	@Override
+	public List<GameInfo> findGameHistoryByUsername(String username) {
+		entityManager = serverSetup.getEntityManager();
+		gameInfoDao = new GameInfoDaoPostgres(entityManager);
+		
+		List<GameInfo> result = gameInfoDao.findGameInfoHistoryByUsername(username);
+		entityManager.close();
+		
+		return result;
 	}
 
 }
