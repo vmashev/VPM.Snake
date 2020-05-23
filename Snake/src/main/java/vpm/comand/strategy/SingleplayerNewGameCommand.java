@@ -20,7 +20,7 @@ public class SingleplayerNewGameCommand extends CommandExecuteStrategy{
 		gameInfo.setStatus(GameStatus.Ready);
 		
 		String jsonMessage = JsonParser.parseFromGameInfo(gameInfo);	
-		Command responseCommand = new Command(requestCommand.getNumber(), jsonMessage);
+		Command responseCommand = new Command(0, jsonMessage);
 		
 		return responseCommand;
 	}

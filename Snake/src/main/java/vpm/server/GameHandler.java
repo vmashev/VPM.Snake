@@ -8,6 +8,7 @@ import vpm.comand.strategy.CommandExecuteFactory;
 import vpm.comand.strategy.CommandExecuteStrategy;
 import vpm.helper.ClientConnection;
 import vpm.helper.Command;
+import vpm.helper.JsonParser;
 import vpm.model.GameInfo;
 
 public class GameHandler implements Runnable{
@@ -19,32 +20,37 @@ public class GameHandler implements Runnable{
 	private Command inCommand;
 	private Command outCommand;
 	private CommandExecuteStrategy executeStrategy;
-	
+	private GameOutHandler gameOutHandler;
+	private GameInHandler gameInHandler;
 	private GameInfo gameInfo;
 	
-	public GameHandler(ClientConnection client) throws IOException {
+	public GameHandler(ClientConnection client, GameInfo gameInfo) {
 		this.clients = new ArrayList<ClientConnection>();
 		this.clients.add(client);
 		
 		this.gameOutHandlers = new ArrayList<GameOutHandler>();
 		this.inCommands = new ArrayBlockingQueue<Command>(1000);
 		
-		this.gameInfo = new GameInfo();	
+		this.gameInfo = gameInfo;						
 	}
 	
 	@Override
 	public void run() {
+
 		try {
 
 			for (ClientConnection clientConnection : clients) {
-				GameOutHandler gameOutHandler = new GameOutHandler(clientConnection);
+				gameOutHandler = new GameOutHandler(clientConnection);
 				gameOutHandlers.add(gameOutHandler);
-				new Thread(gameOutHandler).run();
+				new Thread(gameOutHandler).start();
 				
-				GameInHandler gameInHandler = new GameInHandler(clientConnection, inCommands);
-				new Thread(gameInHandler).run();
+				gameInHandler = new GameInHandler(clientConnection, inCommands);
+				new Thread(gameInHandler).start();
 				
-				inCommands.add(inCommand); //New Command Ready to Start!
+				String message = JsonParser.parseFromGameInfo(gameInfo);
+				outCommand = new Command(1, message);
+				gameOutHandler.addCommand(outCommand);
+				
 			}
 
 			while(true) {

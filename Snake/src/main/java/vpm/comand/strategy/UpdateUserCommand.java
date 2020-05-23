@@ -17,7 +17,7 @@ public class UpdateUserCommand extends CommandExecuteStrategy{
 		requestUserEntity = userService.update(requestUserEntity);
 		
 		String jsonMessage = JsonParser.parseFromUserEntity(requestUserEntity);	
-		Command responseCommand = new Command(requestCommand.getNumber(), jsonMessage);
+		Command responseCommand = new Command(0, jsonMessage);
 		
 		return responseCommand;
 	}

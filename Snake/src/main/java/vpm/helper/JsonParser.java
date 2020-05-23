@@ -82,7 +82,7 @@ public class JsonParser {
 			return null;
 		}
 		
-		Hibernate.initialize(games);
+		//Hibernate.initialize(games);
 		
 		Gson gson = new Gson();
 		String jsonString = gson.toJson(games);

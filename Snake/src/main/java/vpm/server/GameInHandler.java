@@ -21,10 +21,9 @@ public class GameInHandler implements Runnable {
 	
 	@Override
 	public void run() {
-		
 		try {
 			
-			objectInput = new ObjectInputStream(clientConnection.getSocket().getInputStream());
+			objectInput = clientConnection.getObjectInput();
 
 			while(true) {
 				

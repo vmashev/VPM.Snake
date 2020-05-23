@@ -1,15 +1,18 @@
 package vpm.helper;
 
-import java.net.Socket;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 public class ClientConnection {
 
 	private String username;
-	private Socket socket;
+	private ObjectOutputStream objectOutput ;
+	private ObjectInputStream objectInput ;
 	
-	public ClientConnection(String username , Socket socket) {
+	public ClientConnection(String username , ObjectOutputStream objectOutput, ObjectInputStream objectInput) {
 		this.username = username;
-		this.socket = socket;
+		this.objectOutput = objectOutput;
+		this.objectInput = objectInput;
 	}
 
 	public String getUsername() {
@@ -20,11 +23,20 @@ public class ClientConnection {
 		this.username = username;
 	}
 
-	public Socket getSocket() {
-		return socket;
+	public ObjectOutputStream getObjectOutput() {
+		return objectOutput;
 	}
 
-	public void setSocket(Socket socket) {
-		this.socket = socket;
+	public void setObjectOutput(ObjectOutputStream objectOutput) {
+		this.objectOutput = objectOutput;
 	}
+
+	public ObjectInputStream getObjectInput() {
+		return objectInput;
+	}
+
+	public void setObjectInput(ObjectInputStream objectInput) {
+		this.objectInput = objectInput;
+	}
+
 }

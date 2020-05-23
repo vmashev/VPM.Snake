@@ -29,9 +29,9 @@ public class Snake implements Serializable{
 	private Dot head;
 	private int score;
 	@Transient
-	private int rowChange;
+	private Integer rowChange;
 	@Transient
-	private int colChange;
+	private Integer colChange;
 	//@Enumerated(EnumType.STRING)
 	@Transient
 	private Direction direction = null;
@@ -50,16 +50,16 @@ public class Snake implements Serializable{
 	public void setScore(int score) {
 		this.score = score;
 	}
-	public int getRowChange() {
-		return rowChange;
+	public Integer getRowChange() {
+		return rowChange == null ? 0:rowChange;
 	}
-	public void setRowChange(int rowChange) {
+	public void setRowChange(Integer rowChange) {
 		this.rowChange = rowChange;
 	}
-	public int getColChange() {
-		return colChange;
+	public Integer getColChange() {
+		return colChange == null ? 0:colChange;
 	}
-	public void setColChange(int colChange) {
+	public void setColChange(Integer colChange) {
 		this.colChange = colChange;
 	}
 	public Direction getDirection() {
@@ -83,27 +83,27 @@ public class Snake implements Serializable{
 	
 	public void move() {
 		
-		if(getDirection() == Direction.UP && rowChange == 0) {
+		if(getDirection() == Direction.UP && rowChange == null) {
 			rowChange = -Constants.SIZE;
-			colChange = 0;
+			colChange = null;
 		}
-		if(getDirection() == Direction.DOWN && rowChange == 0) {
+		if(getDirection() == Direction.DOWN && rowChange == null) {
 			rowChange = Constants.SIZE;
-			colChange = 0;
+			colChange = null;
 		}	
-		if(getDirection() == Direction.LEFT && colChange == 0) {
-			rowChange = 0;
+		if(getDirection() == Direction.LEFT && colChange == null) {
+			rowChange = null;
 			colChange = -Constants.SIZE;
 		}
-		if(getDirection() == Direction.RIGHT && colChange == 0) {
-			rowChange = 0;
+		if(getDirection() == Direction.RIGHT && colChange == null) {
+			rowChange = null;
 			colChange = Constants.SIZE;
 		}
 		
 		
-		if(rowChange != 0 || colChange != 0) {
+		if(rowChange != null || colChange != null) {
 			
-			Dot nextDot = new Dot(getHead().getRow() + rowChange, getHead().getCol() + colChange);
+			Dot nextDot = new Dot(getHead().getRow() + getRowChange(), getHead().getCol() + getColChange());
 			
 			list.add(nextDot);
 			this.head = nextDot;

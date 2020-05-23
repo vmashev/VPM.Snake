@@ -30,10 +30,10 @@ public class GameInfo implements Serializable{
 	
 	private String hostUsername;
 	private Snake hostSnake;
-	private LocalDateTime dateTime;
-	private int width;
-	private int height;
-	private int speed;
+	private LocalDateTime dateTime ;
+	private Integer width;
+	private Integer height;
+	private Integer speed;
 		
 	@Transient
 	private Map<String,Snake> snakes = new HashMap<String, Snake>();

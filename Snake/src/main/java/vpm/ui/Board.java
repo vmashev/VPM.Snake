@@ -77,23 +77,6 @@ public class Board extends JPanel implements Runnable, KeyListener {
 		addKeyListener(this);
 	}
 	
-	public GameInfo getGameInfo() {
-		return gameInfo;
-	}
-
-	public void setGameInfo(GameInfo gameInfo) {
-		this.gameInfo = gameInfo;
-		this.snakeMove.setStatus(gameInfo.getStatus());
-	}
-
-	public SnakeMoveInfo getSnakeMove() {
-		return snakeMove;
-	}
-
-	public void setSnakeMove(SnakeMoveInfo snakeMove) {
-		this.snakeMove = snakeMove;
-	}
-
 	@Override
 	public void addNotify() {
 		super.addNotify();
@@ -206,6 +189,23 @@ public class Board extends JPanel implements Runnable, KeyListener {
 		}
 	}
 
+	
+	public GameInfo getGameInfo() {
+		return gameInfo;
+	}
+
+	public void setGameInfo(GameInfo gameInfo) {
+		this.gameInfo = gameInfo;
+	}
+
+	public SnakeMoveInfo getSnakeMove() {
+		return snakeMove;
+	}
+
+	public void setSnakeMove(SnakeMoveInfo snakeMove) {
+		this.snakeMove = snakeMove;
+	}
+	
 	private void init() throws IOException {
 		serverConnection = new ServerConnection(server, this);
 		serverConnectionThread = new Thread(serverConnection);
@@ -217,6 +217,10 @@ public class Board extends JPanel implements Runnable, KeyListener {
 		running = true;
 		targetTime = 1000 / gameInfo.getSpeed();
 
+		sendInitCommand();
+	}
+	
+	private void sendInitCommand() throws IOException {
 		String message = JsonParser.parseFromGameInfo(gameInfo);
 		Command sendCommand;
 		if(gameInfo.getId() == null) {
@@ -228,7 +232,6 @@ public class Board extends JPanel implements Runnable, KeyListener {
 			requestRender();
 		}
 		objectOutput.writeObject(sendCommand);
-		
 	}
 	
 	public void requestRender() {

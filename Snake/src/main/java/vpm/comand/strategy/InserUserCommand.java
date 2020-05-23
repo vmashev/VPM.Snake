@@ -28,7 +28,7 @@ public class InserUserCommand extends CommandExecuteStrategy{
 			errorMessage = e.getMessage();
 		}
 		
-		Command responseCommand = new Command(requestCommand.getNumber(), jsonMessage);
+		Command responseCommand = new Command(0, jsonMessage);
 		responseCommand.setErrorMessage(errorMessage);
 		
 		return responseCommand;

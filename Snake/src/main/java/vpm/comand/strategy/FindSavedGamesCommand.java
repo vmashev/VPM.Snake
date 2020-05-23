@@ -19,7 +19,7 @@ public class FindSavedGamesCommand extends CommandExecuteStrategy{
 		List<GameInfo> games = gameInfoService.findSavedGamesByUsername(requestUserEntity.getUsername());
         
 		String jsonMessage = JsonParser.parseFromGameInfoList(games);	
-		Command responseCommand = new Command(requestCommand.getNumber(), jsonMessage);
+		Command responseCommand = new Command(0, jsonMessage);
 		
 		return responseCommand;
 	}

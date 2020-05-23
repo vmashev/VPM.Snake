@@ -19,7 +19,7 @@ public class StartServer {
 	
 	public static void main(String[] args) throws Exception {
 		
-		new Server();
+		new StartServer();
 	}
 	
 	public StartServer() throws IOException, ClassNotFoundException {

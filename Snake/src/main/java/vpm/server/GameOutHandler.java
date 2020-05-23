@@ -26,7 +26,7 @@ public class GameOutHandler implements Runnable {
 		
 		try {
 			
-			objectOutput = new ObjectOutputStream(clientConnection.getSocket().getOutputStream());
+			objectOutput = clientConnection.getObjectOutput();
 			
 			while(true) {
 				

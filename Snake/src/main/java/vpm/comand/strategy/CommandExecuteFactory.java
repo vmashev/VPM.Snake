@@ -23,13 +23,13 @@ public class CommandExecuteFactory {
 			return new SingleplayerNewGameCommand(gameInfo);
 		case 11: // In game commands
 			return new MoveCommand(gameInfo);
-		case 12: // Resume paused game
+		case 12: // Resume saved game
 			return new ResumeGameCommand(gameInfo);
-		case 13: // New Multiplayer game
+		case 13: // Create lobby
 			return new CreateLobbyCommand(gameInfo);
 		case 14: // Join lobby (start new multiplayer game)
 			return new JoinLobbyCommand();
-		case 15: // Create lobby
+		case 15: // Get Lobbies 
 			return new GetLobbyCommand();
 		case 16: // Create lobby
 			return new WaitingForOpponentCommand();

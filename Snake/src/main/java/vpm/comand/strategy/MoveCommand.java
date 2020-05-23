@@ -26,8 +26,7 @@ public class MoveCommand extends CommandExecuteStrategy{
 		SnakeMoveInfo requestSnakeMove = JsonParser.parseToSnakeMoveInfo(requestCommand.getMessage());
 		
 		if((requestSnakeMove.getStatus() == null) || (requestSnakeMove.getStatus() == GameStatus.Pause)){
-			responseCommand = requestCommand;
-			responseCommand.setMessage(null);
+			responseCommand = new Command(0, null);
 			return responseCommand;
 		}
 
@@ -54,13 +53,22 @@ public class MoveCommand extends CommandExecuteStrategy{
 			break;
 		}
 		
-		String jsonMessage = JsonParser.parseFromGameInfo(gameInfo);	
-		responseCommand = new Command(requestCommand.getNumber(), jsonMessage);
+		String jsonMessage = JsonParser.parseFromGameInfo(createDeltaGameInfo());	
+		responseCommand = new Command(2, jsonMessage);
 		
 		return responseCommand;
 	}
 
-	private static void saveGame(GameInfo gameInfo) {
+	private GameInfo createDeltaGameInfo() {
+		GameInfo deltaGameInfo = new GameInfo();
+		deltaGameInfo.setSnakes(gameInfo.getSnakes());
+		deltaGameInfo.setApple(gameInfo.getApple());
+		deltaGameInfo.setStatus(gameInfo.getStatus());
+		
+		return deltaGameInfo;
+	}
+	
+	private void saveGame(GameInfo gameInfo) {
 		gameInfo.setHostSnake(gameInfo.getSnakes().get(gameInfo.getHostUsername()));
 		
 		GameInfoService gameInfoService = new GameInfoServiceImpl();
@@ -70,7 +78,7 @@ public class MoveCommand extends CommandExecuteStrategy{
 		
 	}
 
-	private static void updateMaxScore(GameInfo gameInfo) {
+	private void updateMaxScore(GameInfo gameInfo) {
 		
 		for (Map.Entry<String,Snake> snakeEntry : gameInfo.getSnakes().entrySet()) {
 			

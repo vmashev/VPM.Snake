@@ -16,7 +16,7 @@ public class FindGameByDateTimeCommand extends CommandExecuteStrategy{
 		GameInfo gameInfo = gameInfoService.findByDateTime(requestGameInfo.getDateTime());
         
 		String jsonMessage = JsonParser.parseFromGameInfo(gameInfo);	
-		Command responseCommand = new Command(requestCommand.getNumber(), jsonMessage);
+		Command responseCommand = new Command(0, jsonMessage);
 		
 		return responseCommand;
 	}

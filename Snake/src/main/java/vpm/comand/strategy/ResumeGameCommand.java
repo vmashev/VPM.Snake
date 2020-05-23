@@ -14,9 +14,7 @@ public class ResumeGameCommand extends CommandExecuteStrategy{
 	public Command execute(Command requestCommand) {
 		gameInfo = JsonParser.parseToGameInfo(requestCommand.getMessage());
 		
-		String jsonMessage = JsonParser.parseFromGameInfo(gameInfo);	
-Command responseCommand = new Command(requestCommand.getNumber(), jsonMessage);
-		
+		Command responseCommand = new Command(1, requestCommand.getMessage());
 		return responseCommand;
 	}
 
