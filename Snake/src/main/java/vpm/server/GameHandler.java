@@ -8,6 +8,7 @@ import vpm.comand.strategy.CommandExecuteFactory;
 import vpm.comand.strategy.CommandExecuteStrategy;
 import vpm.helper.ClientConnection;
 import vpm.helper.Command;
+import vpm.helper.GameStatus;
 import vpm.helper.JsonParser;
 import vpm.model.GameInfo;
 
@@ -38,7 +39,10 @@ public class GameHandler implements Runnable{
 	public void run() {
 
 		try {
-
+			
+			String message = JsonParser.parseFromGameInfo(gameInfo);
+			outCommand = new Command(1, message);
+			
 			for (ClientConnection clientConnection : clients) {
 				gameOutHandler = new GameOutHandler(clientConnection);
 				gameOutHandlers.add(gameOutHandler);
@@ -47,19 +51,17 @@ public class GameHandler implements Runnable{
 				gameInHandler = new GameInHandler(clientConnection, inCommands);
 				new Thread(gameInHandler).start();
 				
-				String message = JsonParser.parseFromGameInfo(gameInfo);
-				outCommand = new Command(1, message);
 				gameOutHandler.addCommand(outCommand);
-				
 			}
-
+			
 			while(true) {
-				
 				inCommand = inCommands.poll();
 				if(inCommand != null) {
-					
 					executeStrategy = CommandExecuteFactory.createCommand(inCommand.getNumber() , gameInfo);
 					outCommand = inCommand.execute(executeStrategy);
+					
+					gameInfo = executeStrategy.getGameInfo();
+					
 					
 					for (GameOutHandler gameOutHandler : gameOutHandlers) {
 						gameOutHandler.addCommand(outCommand);

@@ -12,15 +12,16 @@ import javax.swing.table.DefaultTableModel;
 import vpm.ui.controler.MultiplayerMenuControler;
 
 public class MultiplayerMenu extends JDialog {
-	private JTable table;
-	private MultiplayerMenuControler controler;
+	public JTable table;
 	public DefaultTableModel model;
-
+	private MultiplayerMenuControler controler;
+	
 	public MultiplayerMenu() {
 		this.controler = new MultiplayerMenuControler(this);
 		
 		setBounds(100, 100, 710, 240);
 		getContentPane().setLayout(null);
+		setTitle("Multiplayer menu");
 		
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(10, 11, 674, 143);

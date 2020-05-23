@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
 
+import vpm.helper.ClientSetup;
 import vpm.helper.Command;
 import vpm.helper.GameStatus;
 import vpm.helper.JsonParser;
@@ -12,27 +13,24 @@ import vpm.ui.Board;
 
 public class ServerConnection implements Runnable{
 
-	private Socket server;
 	private Board board;
 	private GameInfo gameInfo;
 	private ObjectInputStream objectInput;
 	private boolean running;
 	
-	public ServerConnection(Socket server, Board board) throws IOException {
-		this.server = server;
+	public ServerConnection(Board board) throws IOException {
 		this.board = board;
-		this.objectInput = new ObjectInputStream(server.getInputStream());
+		this.objectInput = board.getObjectInput();
 	}
 	
 	@Override
 	public void run() {
 		running = true;
-		
+		ClientSetup setup = ClientSetup.createInstance();
 		try {
 			while (running) {
 				
 				Command receiveCommand = (Command)objectInput.readObject();
-				System.out.println("Client received: " + receiveCommand.getMessage());
 				gameInfo = JsonParser.parseToGameInfo(receiveCommand.getMessage());
 				
 				switch (receiveCommand.getNumber()) {
@@ -61,7 +59,6 @@ public class ServerConnection implements Runnable{
 		} finally {
 			try {
 				objectInput.close();
-				server.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

@@ -27,9 +27,7 @@ import vpm.ui.SingleplayerMenu;
 public class SingleplayerMenuControler implements ActionListener{
 
 	private SingleplayerMenu singleplayerMenu;
-	private Socket socket;
-	private ObjectOutputStream outputStream;
-	private ObjectInputStream inputStream;
+	private ClientSetup clientSetup;
 	
 	public SingleplayerMenuControler(SingleplayerMenu singleplayerMenu) {
 		this.singleplayerMenu = singleplayerMenu;
@@ -39,8 +37,7 @@ public class SingleplayerMenuControler implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		switch (e.getActionCommand()) {
 		case "New Game":
-			NewGame newGame = new NewGame(false);
-			newGame.setVisible(true);
+			newGame();
 			break;
 		case "Resume":
 			resumeGame();
@@ -52,6 +49,47 @@ public class SingleplayerMenuControler implements ActionListener{
 		
 	}
 	
+	private void newGame() {
+		NewGame newGame = new NewGame();
+		newGame.setVisible(true);
+		
+		if(!newGame.widthFld.getText().equals("")) {
+			int width = Integer.valueOf(newGame.widthFld.getText());
+			int height = Integer.valueOf(newGame.heightFld.getText());
+			int speed = Integer.valueOf(newGame.speedFld.getText());
+		
+			clientSetup = ClientSetup.createInstance();
+	        try {
+	        	Socket socket = new Socket(Constants.SERVER_IP , Constants.PORT);
+	    		ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
+	    		ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
+	    		
+	    		GameInfo gameInfo = new GameInfo(clientSetup.getUserName(), width , height , speed);
+	    		
+				String message = JsonParser.parseFromGameInfo(gameInfo);
+				Command sendCommand = new Command(10, message);
+				outputStream.writeObject(sendCommand);
+				
+				Command receiveCommand = (Command)inputStream.readObject();
+				gameInfo = JsonParser.parseToGameInfo(receiveCommand.getMessage());
+				
+				Board board = new Board(gameInfo, outputStream, inputStream);
+	    		
+	    		JFrame frame = new JFrame("Play");
+	    		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+	    		frame.setContentPane(board);
+	    		frame.setResizable(false);
+	    		frame.pack();
+	    		frame.setPreferredSize(new Dimension(gameInfo.getWidth(), gameInfo.getHeight()));
+	    		frame.setLocationRelativeTo(null);
+	    		frame.setVisible(true);	
+				
+			} catch (IOException | ClassNotFoundException e) {
+				singleplayerMenu.showMessage(e.getMessage());
+			} 
+		}
+	}
+	
 	private void resumeGame() {
 		if (singleplayerMenu.table.getSelectedRowCount() > 0) {
             int selectedRow = singleplayerMenu.table.getSelectedRow();
@@ -59,9 +97,9 @@ public class SingleplayerMenuControler implements ActionListener{
             LocalDateTime dateTime = LocalDateTime.parse(singleplayerMenu.table.getValueAt(selectedRow, 2).toString());
             
             try {
-        		socket = new Socket(Constants.SERVER_IP , Constants.PORT);
-        		outputStream = new ObjectOutputStream(socket.getOutputStream());
-        		inputStream = new ObjectInputStream(socket.getInputStream());
+            	Socket socket = new Socket(Constants.SERVER_IP , Constants.PORT);
+            	ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
+            	ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
         		
     			GameInfo gameInfo = new GameInfo();
     			gameInfo.setDateTime(dateTime);
@@ -72,12 +110,10 @@ public class SingleplayerMenuControler implements ActionListener{
     			
     			Command receiveCommand = (Command)inputStream.readObject();
     			gameInfo = JsonParser.parseToGameInfo(receiveCommand.getMessage());
-    			gameInfo.setStatus(GameStatus.Ready);
-    			gameInfo.getSnakes().put(gameInfo.getHostUsername(), gameInfo.getHostSnake());
     			
-    			Board board = new Board(gameInfo);
+    			Board board = new Board(gameInfo, outputStream, inputStream);
         		
-        		JFrame frame = new JFrame("Singleplayer");
+        		JFrame frame = new JFrame("Play");
         		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         		frame.setContentPane(board);
         		frame.setResizable(false);
@@ -88,14 +124,7 @@ public class SingleplayerMenuControler implements ActionListener{
     			
     		} catch (IOException | ClassNotFoundException e) {
     			singleplayerMenu.showMessage(e.getMessage());
-    		} finally {
-    			try {
-    				outputStream.close();
-    				inputStream.close();
-    			} catch (IOException e) {
-    				singleplayerMenu.showMessage(e.getMessage());
-    			}
-    		}
+    		} 
         
         }
 	}
@@ -105,9 +134,9 @@ public class SingleplayerMenuControler implements ActionListener{
 		ClientSetup clientSetup = ClientSetup.createInstance();
 		
 		try {
-			socket = new Socket(Constants.SERVER_IP , Constants.PORT);
-    		outputStream = new ObjectOutputStream(socket.getOutputStream());
-    		inputStream = new ObjectInputStream(socket.getInputStream());
+			Socket socket = new Socket(Constants.SERVER_IP , Constants.PORT);
+			ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
+			ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
     		
 			UserEntity user = new UserEntity(clientSetup.getUserName());
 			String message = JsonParser.parseFromUserEntity(user);
@@ -128,14 +157,7 @@ public class SingleplayerMenuControler implements ActionListener{
 			}		
 		} catch (IOException | ClassNotFoundException e) {
 			singleplayerMenu.showMessage(e.getMessage());
-		} finally {
-			try {
-				outputStream.close();
-				inputStream.close();
-			} catch (IOException e) {
-				singleplayerMenu.showMessage(e.getMessage());
-			}
-		}	 	
+		}  	
 	}
 
 }

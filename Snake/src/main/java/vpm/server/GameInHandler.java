@@ -24,7 +24,6 @@ public class GameInHandler implements Runnable {
 		try {
 			
 			objectInput = clientConnection.getObjectInput();
-
 			while(true) {
 				
 				command = (Command)objectInput.readObject();

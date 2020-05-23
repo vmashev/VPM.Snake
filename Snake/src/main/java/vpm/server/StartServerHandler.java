@@ -12,6 +12,7 @@ import vpm.comand.strategy.CommandExecuteFactory;
 import vpm.comand.strategy.CommandExecuteStrategy;
 import vpm.helper.ClientConnection;
 import vpm.helper.Command;
+import vpm.helper.GameStatus;
 import vpm.helper.JsonParser;
 import vpm.model.GameInfo;
 
@@ -47,17 +48,25 @@ public class StartServerHandler implements Runnable{
 			while(runnable) {
 				
 				inCommand = (Command)objectInput.readObject();
-				System.out.println("Received Command: " + inCommand.getNumber() + ", Message: " + inCommand.getMessage());
+				System.out.println("Received: " + inCommand.getNumber() + ", Message: " + inCommand.getMessage());
 				
 				switch (inCommand.getNumber()) {
+				
+				case 5: 
+					executeStrategy = CommandExecuteFactory.createCommand(inCommand.getNumber() , gameInfo);
+					inCommand.execute(executeStrategy);
+					
+					gHandler = new GameHandler(new ClientConnection("vm", objectOutput, objectInput),executeStrategy.getGameInfo());
+					new Thread(gHandler).start(); 
+					runnable = false;				
+					break;
 				//New Singleplayer Game - start new game and close this thread
 				case 10:
 					executeStrategy = CommandExecuteFactory.createCommand(inCommand.getNumber() , gameInfo);
 					inCommand.execute(executeStrategy);
 					
 					gHandler = new GameHandler(new ClientConnection("vm", objectOutput, objectInput),executeStrategy.getGameInfo());
-					Thread gameThread = new Thread(gHandler); 
-					gameThread.start();
+					new Thread(gHandler).start(); 
 					runnable = false;
 					break;
 				//Create Lobby
@@ -75,12 +84,27 @@ public class StartServerHandler implements Runnable{
 					break;
 				//Join Lobby - start new game and close this thread
 				case 14:
-					inCommand.execute(executeStrategy); // return index 
-					int index= 0;
-					gHandler = gameHandlers.get(index);
-					gHandler.joinGame(new ClientConnection("vm", objectOutput, objectInput));
-					new Thread(gHandler).run(); //..
-					runnable = false;
+					for (int i = 0; i < gameHandlers.size(); i++) {
+						gHandler = gameHandlers.get(i);
+						if(gHandler.getGameInfo().getHostUsername().equals(inCommand.getMessage())) {
+							
+							GameInfo gameInfo = gHandler.getGameInfo();
+							gameInfo.setStatus(GameStatus.Ready);
+							
+							String message3 = JsonParser.parseFromGameInfo(gameInfo);
+							outCommand = new Command(0, message3);
+							objectOutput.writeObject(outCommand);
+							
+							System.out.println("Status at join: " + gHandler.getGameInfo().getStatus());
+							
+							gameHandlers.remove(i);
+							gHandler.joinGame(new ClientConnection("vm2", objectOutput, objectInput));
+							new Thread(gHandler).start();
+							runnable = false;
+							break;
+						}
+					}
+					
 					break;	
 				//Get Lobbies 
 				case 15:
@@ -105,8 +129,10 @@ public class StartServerHandler implements Runnable{
 				
 			}
 			
+			System.out.println("Close StartServerHandler");
+			
 		} catch (IOException | ClassNotFoundException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		} 
 	}	
 	

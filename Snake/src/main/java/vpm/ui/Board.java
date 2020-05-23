@@ -10,9 +10,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.Map;
 
 import javax.swing.JOptionPane;
@@ -22,7 +21,6 @@ import javax.swing.SwingUtilities;
 import vpm.client.ServerConnection;
 import vpm.helper.ClientSetup;
 import vpm.helper.Command;
-import vpm.helper.Constants;
 import vpm.helper.Direction;
 import vpm.helper.GameStatus;
 import vpm.helper.JsonParser;
@@ -38,7 +36,6 @@ public class Board extends JPanel implements Runnable, KeyListener {
 	
 	private Thread thread;
 	private boolean running;
-	private boolean multiplayer;
 	private long targetTime;
 	
 	private GameInfo gameInfo;
@@ -46,29 +43,15 @@ public class Board extends JPanel implements Runnable, KeyListener {
 
 	private ClientSetup clientSetup = ClientSetup.createInstance();
 	
-	private Socket server;
 	private ServerConnection serverConnection;
 	private ObjectOutputStream objectOutput;
+	private ObjectInputStream objectInput;
 	private Thread serverConnectionThread;
 	
-	public Board(int width, int height, int speed, boolean multiplayer) throws UnknownHostException, IOException {
-		this.multiplayer = multiplayer;
-		this.gameInfo = new GameInfo(clientSetup.getUserName(), width , height , speed);
-		this.server = new Socket(Constants.SERVER_IP , Constants.PORT);
-		this.objectOutput = new ObjectOutputStream(server.getOutputStream());
-		this.snakeMove = new SnakeMoveInfo(clientSetup.getUserName());
-		
-		setPreferredSize(new Dimension(width, height));
-		setFocusable(true);
-		requestFocus();
-		addKeyListener(this);
-				
-	}
-	
-	public Board(GameInfo gameInfo) throws IOException {
+	public Board(GameInfo gameInfo,ObjectOutputStream objectOutput, ObjectInputStream objectInput) throws IOException {
 		this.gameInfo = gameInfo;
-		this.server = new Socket(Constants.SERVER_IP , Constants.PORT);
-		this.objectOutput = new ObjectOutputStream(server.getOutputStream());
+		this.objectOutput = objectOutput;
+		this.objectInput = objectInput;
 		this.snakeMove = new SnakeMoveInfo(clientSetup.getUserName());
 		this.snakeMove.setStatus(GameStatus.Ready);
 		
@@ -180,9 +163,6 @@ public class Board extends JPanel implements Runnable, KeyListener {
 				if(	objectOutput != null) {
 					objectOutput.close();
 				}
-				if(server != null) {
-					server.close();
-				}	
 				thread.join();
 			} catch (IOException | InterruptedException e) {
 				e.printStackTrace();
@@ -191,6 +171,14 @@ public class Board extends JPanel implements Runnable, KeyListener {
 	}
 
 	
+	public ObjectOutputStream getObjectOutput() {
+		return objectOutput;
+	}
+
+	public ObjectInputStream getObjectInput() {
+		return objectInput;
+	}
+
 	public GameInfo getGameInfo() {
 		return gameInfo;
 	}
@@ -208,35 +196,24 @@ public class Board extends JPanel implements Runnable, KeyListener {
 	}
 	
 	private void init() throws IOException {
-		serverConnection = new ServerConnection(server, this);
+		serverConnection = new ServerConnection(this);
 		serverConnectionThread = new Thread(serverConnection);
 		serverConnectionThread.start();
 		
 		targetTime = 1000 / gameInfo.getSpeed();
 		image = new BufferedImage(gameInfo.getWidth(), gameInfo.getHeight(), BufferedImage.TYPE_INT_ARGB);
+		
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
 		graphics2D = image.createGraphics();
 		running = true;
 		targetTime = 1000 / gameInfo.getSpeed();
 
-		sendInitCommand();
-	}
-	
-	private void sendInitCommand() throws IOException {
-		String message = JsonParser.parseFromGameInfo(gameInfo);
-		Command sendCommand;
-		if(gameInfo.getId() == null) {
-			//New game
-			if(!multiplayer) {
-				sendCommand = new Command(10, message);
-			} else {
-				sendCommand = new Command(13, message);
-			}
-		} else {
-			//Resume game
-			sendCommand = new Command(12, message);
-			requestRender();
-		}
-		objectOutput.writeObject(sendCommand);
+		requestRender();
 	}
 	
 	public void requestRender() {

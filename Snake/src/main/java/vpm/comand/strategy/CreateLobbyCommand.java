@@ -16,7 +16,7 @@ public class CreateLobbyCommand extends CommandExecuteStrategy{
 		gameInfo = JsonParser.parseToGameInfo(requestCommand.getMessage());
 		gameInfo.setStatus(GameStatus.WaitingForOpponent);
 		gameInfo.setApple(gameInfo.generateApple());
-		gameInfo.createSnake(new String[] {gameInfo.getHostUsername(),""});
+		gameInfo.createSnake(new String[] {gameInfo.getHostUsername(),"vm2"});
 		
 		String jsonMessage = JsonParser.parseFromGameInfo(gameInfo);	
 		Command responseCommand = new Command(1, jsonMessage);

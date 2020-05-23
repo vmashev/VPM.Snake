@@ -32,8 +32,8 @@ public class StartServer {
 			Socket socket = serverSocket.accept(); 
 			
 			StartServerHandler clientThread = new StartServerHandler(socket,gameHandlers);
-			
-			pool.execute(clientThread);
+			new Thread(clientThread).start();
+			//pool.execute(clientThread);
 		}
 		
 	}

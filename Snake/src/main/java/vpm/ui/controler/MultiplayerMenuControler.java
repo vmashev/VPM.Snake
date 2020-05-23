@@ -1,28 +1,34 @@
 package vpm.ui.controler;
 
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.time.LocalDateTime;
 import java.util.List;
+
+import javax.swing.JFrame;
+import javax.swing.WindowConstants;
 
 import vpm.helper.ClientSetup;
 import vpm.helper.Command;
 import vpm.helper.Constants;
+import vpm.helper.GameStatus;
 import vpm.helper.JsonParser;
 import vpm.model.GameInfo;
 import vpm.model.UserEntity;
+import vpm.ui.Board;
 import vpm.ui.MultiplayerMenu;
 import vpm.ui.NewGame;
 
 public class MultiplayerMenuControler implements ActionListener{
 
 	private MultiplayerMenu multiplayerMenu;
-	private Socket socket;
-	private ObjectOutputStream outputStream;
-	private ObjectInputStream inputStream;
+	private ClientSetup clientSetup;
+
 	
 	public MultiplayerMenuControler(MultiplayerMenu multiplayerMenu) {
 		this.multiplayerMenu = multiplayerMenu;
@@ -32,11 +38,10 @@ public class MultiplayerMenuControler implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		switch (e.getActionCommand()) {
 		case "New Lobby":
-			NewGame newGame = new NewGame(true);
-			newGame.setVisible(true);
+			newLobby();
 			break;
 		case "Join":
-			//resumeGame();
+			joinLobby();
 			break;
 		case "Close":
 			multiplayerMenu.dispose();
@@ -44,12 +49,90 @@ public class MultiplayerMenuControler implements ActionListener{
 		}
 	}
 
-	public void getLobbies() {
+	private void newLobby() {
+		NewGame newGame = new NewGame();
+		newGame.setVisible(true);
 		
+		if(!newGame.widthFld.getText().equals("")) {
+			int width = Integer.valueOf(newGame.widthFld.getText());
+			int height = Integer.valueOf(newGame.heightFld.getText());
+			int speed = Integer.valueOf(newGame.speedFld.getText());
+		
+			clientSetup = ClientSetup.createInstance();
+	        try {
+	        	Socket socket = new Socket(Constants.SERVER_IP , Constants.PORT);
+	        	ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
+	    		ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
+	    		
+	    		GameInfo gameInfo = new GameInfo(clientSetup.getUserName(), width , height , speed);
+	    		
+				String message = JsonParser.parseFromGameInfo(gameInfo);
+				Command sendCommand = new Command(13, message);
+
+				outputStream.writeObject(sendCommand);
+				
+				Command receiveCommand = (Command)inputStream.readObject();
+				gameInfo = JsonParser.parseToGameInfo(receiveCommand.getMessage());
+				
+				Board board = new Board(gameInfo, outputStream, inputStream);
+	    		
+	    		JFrame frame = new JFrame("Play");
+	    		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+	    		frame.setContentPane(board);
+	    		frame.setResizable(false);
+	    		frame.pack();
+	    		frame.setPreferredSize(new Dimension(gameInfo.getWidth(), gameInfo.getHeight()));
+	    		frame.setLocationRelativeTo(null);
+	    		frame.setVisible(true);	
+				
+			} catch (IOException | ClassNotFoundException e) {
+				multiplayerMenu.showMessage(e.getMessage());
+			} 
+		}
+	}
+	
+	private void joinLobby() {
+		if (multiplayerMenu.table.getSelectedRowCount() > 0) {
+            int selectedRow = multiplayerMenu.table.getSelectedRow();
+            
+            String username = (String) multiplayerMenu.table.getValueAt(selectedRow, 1);
+            
+            try {
+            	Socket socket = new Socket(Constants.SERVER_IP , Constants.PORT);
+            	ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
+            	ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
+        		
+    			String message = username;
+    			Command sendCommand = new Command(14, message);
+    			outputStream.writeObject(sendCommand);
+    			
+    			Command receiveCommand = (Command)inputStream.readObject();
+    			GameInfo gameInfo = JsonParser.parseToGameInfo(receiveCommand.getMessage());
+    			
+    			Board board = new Board(gameInfo, outputStream, inputStream);
+        		
+        		JFrame frame = new JFrame("Play");
+        		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        		frame.setContentPane(board);
+        		frame.setResizable(false);
+        		frame.pack();
+        		frame.setPreferredSize(new Dimension(gameInfo.getWidth(), gameInfo.getHeight()));
+        		frame.setLocationRelativeTo(null);
+        		frame.setVisible(true);	
+    			
+    		} catch (IOException | ClassNotFoundException e) {
+    			multiplayerMenu.showMessage(e.getMessage());
+    		} 
+        }
+	}
+	
+	public void getLobbies() {
+		ObjectOutputStream outputStream = null;
+		ObjectInputStream inputStream = null;
 		try {
-			socket = new Socket(Constants.SERVER_IP , Constants.PORT);
+			Socket socket = new Socket(Constants.SERVER_IP , Constants.PORT);
 			outputStream = new ObjectOutputStream(socket.getOutputStream());
-    		inputStream = new ObjectInputStream(socket.getInputStream());
+			inputStream = new ObjectInputStream(socket.getInputStream());
     		
     		Command sendCommand = new Command(15, null);
 			outputStream.writeObject(sendCommand);
@@ -68,8 +151,12 @@ public class MultiplayerMenuControler implements ActionListener{
 			multiplayerMenu.showMessage(e.getMessage());
 		} finally {
 			try {
-				outputStream.close();
-				inputStream.close();
+				if(outputStream != null) {
+					outputStream.close();
+				}
+				if(inputStream != null) {
+					inputStream.close();
+				}
 			} catch (IOException e) {
 				multiplayerMenu.showMessage(e.getMessage());
 			}

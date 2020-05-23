@@ -29,7 +29,6 @@ public class GameOutHandler implements Runnable {
 			objectOutput = clientConnection.getObjectOutput();
 			
 			while(true) {
-				
 				Command command = outCommands.poll();
 				
 				if(command != null) {						

@@ -19,10 +19,8 @@ public class NewGame extends JDialog{
 	public JTextField heightFld;
 	public JTextField widthFld;
 	private NewGameControler controler;
-	public boolean multiplayer;
 	
-	public NewGame(boolean multiplayer) {
-		this.multiplayer = multiplayer;
+	public NewGame() {
 		this.controler = new NewGameControler(this);
 		
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -42,11 +40,11 @@ public class NewGame extends JDialog{
 		speedFld.setText(String.valueOf(5));
 		contentPane.add(speedFld);
 		
-		JButton loginBtn = new JButton("Start");
-		loginBtn.setFont(new Font("Times New Roman", Font.PLAIN, 12));
-		loginBtn.setBounds(36, 121, 89, 23);
-		loginBtn.addActionListener(controler);
-		contentPane.add(loginBtn);
+		JButton okBtn = new JButton("OK");
+		okBtn.setFont(new Font("Times New Roman", Font.PLAIN, 12));
+		okBtn.setBounds(36, 121, 89, 23);
+		okBtn.addActionListener(controler);
+		contentPane.add(okBtn);
 		
 		JButton btnCancel = new JButton("Cancel");
 		btnCancel.setFont(new Font("Times New Roman", Font.PLAIN, 12));
