@@ -103,17 +103,12 @@ public class MainFrame extends JFrame implements ActionListener{
 			
 			break;			
 		case "Singleplayer": 
-			SingleplayerMenu singleplayerMenu;
-			try {
-				singleplayerMenu = new SingleplayerMenu();
-				singleplayerMenu.setVisible(true);
-			} catch (IOException e1) {
-				JOptionPane.showMessageDialog(this, e1.getMessage());
-			}
-			
+			SingleplayerMenu singleplayerMenu = new SingleplayerMenu();
+			singleplayerMenu.setVisible(true);
 			break;
 		case "Multiplayer":
-
+			MultiplayerMenu multiplayerMenu = new MultiplayerMenu();
+			multiplayerMenu.setVisible(true);
 			break;
 		case "User Information": 
 			UserInformation userInformation = new UserInformation();

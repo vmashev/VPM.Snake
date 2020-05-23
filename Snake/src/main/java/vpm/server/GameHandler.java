@@ -76,6 +76,10 @@ public class GameHandler implements Runnable{
 	public void joinGame(ClientConnection client) {
 		clients.add(client);
 	}
+
+	public GameInfo getGameInfo() {
+		return gameInfo;
+	}
 	
 }
 

@@ -21,7 +21,7 @@ import vpm.helper.JsonParser;
 import vpm.model.GameInfo;
 import vpm.model.UserEntity;
 import vpm.ui.Board;
-import vpm.ui.NewSingleplayerGame;
+import vpm.ui.NewGame;
 import vpm.ui.SingleplayerMenu;
 
 public class SingleplayerMenuControler implements ActionListener{
@@ -39,8 +39,8 @@ public class SingleplayerMenuControler implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		switch (e.getActionCommand()) {
 		case "New Game":
-			NewSingleplayerGame singleplayer = new NewSingleplayerGame();
-			singleplayer.setVisible(true);
+			NewGame newGame = new NewGame(false);
+			newGame.setVisible(true);
 			break;
 		case "Resume":
 			resumeGame();

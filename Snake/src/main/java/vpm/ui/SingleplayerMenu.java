@@ -23,7 +23,7 @@ public class SingleplayerMenu extends JDialog{
 	private SingleplayerMenuControler controler;
 
 	
-	public SingleplayerMenu() throws UnknownHostException, IOException {
+	public SingleplayerMenu() {
 		this.controler = new SingleplayerMenuControler(this);
 		
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);

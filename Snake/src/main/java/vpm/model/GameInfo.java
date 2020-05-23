@@ -140,7 +140,7 @@ public class GameInfo implements Serializable{
 
 			case 2:
 				for(int j = 0 ; j < 3 ; j++) {
-					tempDot = new Dot(j * Constants.SIZE, getWidth() - Constants.SIZE);
+					tempDot = new Dot(j * Constants.SIZE, getWidth() - (2 * Constants.SIZE));
 					snake.getList().add(tempDot) ;
 				}
 				break;

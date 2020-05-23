@@ -32,6 +32,7 @@ public class ServerConnection implements Runnable{
 			while (running) {
 				
 				Command receiveCommand = (Command)objectInput.readObject();
+				System.out.println("Client received: " + receiveCommand.getMessage());
 				gameInfo = JsonParser.parseToGameInfo(receiveCommand.getMessage());
 				
 				switch (receiveCommand.getNumber()) {

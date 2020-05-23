@@ -6,11 +6,13 @@ import java.io.ObjectOutputStream;
 import java.lang.annotation.Documented;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.List;
 
 import vpm.comand.strategy.CommandExecuteFactory;
 import vpm.comand.strategy.CommandExecuteStrategy;
 import vpm.helper.ClientConnection;
 import vpm.helper.Command;
+import vpm.helper.JsonParser;
 import vpm.model.GameInfo;
 
 public class StartServerHandler implements Runnable{
@@ -63,6 +65,10 @@ public class StartServerHandler implements Runnable{
 					executeStrategy = CommandExecuteFactory.createCommand(inCommand.getNumber() , gameInfo);
 					inCommand.execute(executeStrategy);
 					
+					String message2 = JsonParser.parseFromGameInfo(executeStrategy.getGameInfo());
+					outCommand = new Command(1, message2);
+					objectOutput.writeObject(outCommand);
+					
 					gHandler = new GameHandler(new ClientConnection("vm", objectOutput, objectInput),executeStrategy.getGameInfo());
 					gameHandlers.add(gHandler);
 					runnable = false;
@@ -76,12 +82,16 @@ public class StartServerHandler implements Runnable{
 					new Thread(gHandler).run(); //..
 					runnable = false;
 					break;	
-				//Get Lobby - start new game and close this thread
+				//Get Lobbies 
 				case 15:
-					//inCommand.execute(executeStrategy); // return gameHandlers
-					//int index= 0;
-					gameHandlers.get(0);
-					new Thread(gHandler).run(); 
+					List<GameInfo> games = new ArrayList<GameInfo>();
+					for (GameHandler gameHandler : gameHandlers) {
+						games.add(gameHandler.getGameInfo());
+					}
+					String message = JsonParser.parseFromGameInfoList(games);
+					outCommand = new Command(0, message);
+					objectOutput.writeObject(outCommand);
+					
 					break;						
 				default:
 					

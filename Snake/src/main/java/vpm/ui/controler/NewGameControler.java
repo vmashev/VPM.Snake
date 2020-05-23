@@ -10,14 +10,14 @@ import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
 import vpm.ui.Board;
-import vpm.ui.NewSingleplayerGame;
+import vpm.ui.NewGame;
 
-public class SingleplayerControler  implements ActionListener {
+public class NewGameControler  implements ActionListener {
 
-	private NewSingleplayerGame singleplayer;
+	private NewGame newGame;
 	
-	public SingleplayerControler(NewSingleplayerGame singleplayer) {
-		this.singleplayer = singleplayer;
+	public NewGameControler(NewGame newGame) {
+		this.newGame = newGame;
 	}
 
 	@Override
@@ -29,25 +29,25 @@ public class SingleplayerControler  implements ActionListener {
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
-			singleplayer.dispose();
+			newGame.dispose();
 			break;
 		case "Cancel":
-			singleplayer.dispose();
+			newGame.dispose();
 			break;		
 		}
 	}
 
-	private void startGame() throws UnknownHostException, IOException {
-		int height = Integer.valueOf(singleplayer.heightFld.getText());
-		int width = Integer.valueOf(singleplayer.widthFld.getText());
-		int speed = Integer.valueOf(singleplayer.speedFld.getText());
+	private void startGame() throws UnknownHostException, IOException{
+		int height = Integer.valueOf(newGame.heightFld.getText());
+		int width = Integer.valueOf(newGame.widthFld.getText());
+		int speed = Integer.valueOf(newGame.speedFld.getText());
 		
 		if(height < 300 || width < 300) {
-			singleplayer.showMessage("Width and Height must me greater than 300.");
+			newGame.showMessage("Width and Height must me greater than 300.");
 		} else {
-			Board board = new Board(width, height , speed);
+			Board board = new Board(width, height , speed, newGame.multiplayer);
 			
-			JFrame frame = new JFrame("Singleplayer");
+			JFrame frame = new JFrame("Play");
 			frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 			frame.setContentPane(board);
 			frame.setResizable(false);

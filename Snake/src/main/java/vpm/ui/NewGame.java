@@ -10,18 +10,20 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
-import vpm.ui.controler.SingleplayerControler;
+import vpm.ui.controler.NewGameControler;
 
-public class NewSingleplayerGame extends JDialog{
+public class NewGame extends JDialog{
 
 	private JPanel contentPane;
 	public JTextField speedFld;
 	public JTextField heightFld;
 	public JTextField widthFld;
-	private SingleplayerControler controler;
+	private NewGameControler controler;
+	public boolean multiplayer;
 	
-	public NewSingleplayerGame() {
-		this.controler = new SingleplayerControler(this);
+	public NewGame(boolean multiplayer) {
+		this.multiplayer = multiplayer;
+		this.controler = new NewGameControler(this);
 		
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 250, 190);

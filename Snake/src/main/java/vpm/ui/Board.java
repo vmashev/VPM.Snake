@@ -38,6 +38,7 @@ public class Board extends JPanel implements Runnable, KeyListener {
 	
 	private Thread thread;
 	private boolean running;
+	private boolean multiplayer;
 	private long targetTime;
 	
 	private GameInfo gameInfo;
@@ -50,8 +51,8 @@ public class Board extends JPanel implements Runnable, KeyListener {
 	private ObjectOutputStream objectOutput;
 	private Thread serverConnectionThread;
 	
-	public Board(int width, int height, int speed) throws UnknownHostException, IOException {
-		
+	public Board(int width, int height, int speed, boolean multiplayer) throws UnknownHostException, IOException {
+		this.multiplayer = multiplayer;
 		this.gameInfo = new GameInfo(clientSetup.getUserName(), width , height , speed);
 		this.server = new Socket(Constants.SERVER_IP , Constants.PORT);
 		this.objectOutput = new ObjectOutputStream(server.getOutputStream());
@@ -225,7 +226,11 @@ public class Board extends JPanel implements Runnable, KeyListener {
 		Command sendCommand;
 		if(gameInfo.getId() == null) {
 			//New game
-			sendCommand = new Command(10, message);
+			if(!multiplayer) {
+				sendCommand = new Command(10, message);
+			} else {
+				sendCommand = new Command(13, message);
+			}
 		} else {
 			//Resume game
 			sendCommand = new Command(12, message);
@@ -249,6 +254,8 @@ public class Board extends JPanel implements Runnable, KeyListener {
 			for (Dot dot : snake.getList()) {
 				dot.render(graphics2D);
 			}
+			
+			graphics2D.setColor(Color.RED);
 		}
 
 		graphics2D.setColor(Color.GREEN);
@@ -268,7 +275,7 @@ public class Board extends JPanel implements Runnable, KeyListener {
 				graphics2D.drawString(playerInfo, 10, 10);
 				break;
 			case 2:
-				graphics2D.drawString(playerInfo, 10 , getHeight() - 10);
+				graphics2D.drawString(playerInfo, getWidth() - 100 , 10);
 				break;
 			default:
 				break;
@@ -283,9 +290,12 @@ public class Board extends JPanel implements Runnable, KeyListener {
 			case Ready:
 				graphics2D.drawString("Ready!", (gameInfo.getWidth() / 2) -10, (gameInfo.getHeight() / 2));
 				break;
+			case WaitingForOpponent:
+				graphics2D.drawString("Waiting for opponent.", (gameInfo.getWidth() / 2) -40, (gameInfo.getHeight() / 2));
+				break;				
 			case GameOver:
 				int score = gameInfo.getSnakes().get(clientSetup.getUserName()).getScore();
-				graphics2D.drawString("GameOver! Score: " + score, (gameInfo.getWidth() / 2) -10, (gameInfo.getHeight() / 2));
+				graphics2D.drawString("GameOver! Score: " + score, (gameInfo.getWidth() / 2) -40, (gameInfo.getHeight() / 2));
 				break;
 			}
 		}
