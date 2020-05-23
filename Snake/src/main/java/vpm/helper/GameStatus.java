@@ -6,5 +6,6 @@ public enum GameStatus {
 	SetPause,
 	GameOver,
 	Save,
-	Ready
+	Ready,
+	WaitingForOpponent
 }

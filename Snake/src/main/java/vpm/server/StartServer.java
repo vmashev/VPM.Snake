@@ -7,29 +7,31 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import vpm.helper.ClientConnection;
 import vpm.helper.Constants;
 import vpm.helper.ServerSetup;
 
-public class Server {
+public class StartServer {
 
-	private ArrayList<ClientHandler> clients = new ArrayList<ClientHandler>();
 	private ExecutorService pool = Executors.newFixedThreadPool(1000);
+	private ArrayList<GameHandler> gameHandlers = new ArrayList<GameHandler>();
+	private ArrayList<ClientConnection> clientConnections = new ArrayList<ClientConnection>();
 	
 	public static void main(String[] args) throws Exception {
+		
 		new Server();
 	}
 	
-	public Server() throws IOException, ClassNotFoundException {
+	public StartServer() throws IOException, ClassNotFoundException {
 		
-		ServerSocket serverSocket = new ServerSocket(Constants.PORT);
 		ServerSetup serverSetup = ServerSetup.createInstance();
+		ServerSocket serverSocket = new ServerSocket(Constants.PORT);
 		
 		while (true) {
 			System.out.println("Server is running on port " + Constants.PORT);
-			Socket socket = serverSocket.accept(); //Keeps the program running!
+			Socket socket = serverSocket.accept(); 
 			
-			ClientHandler clientThread = new ClientHandler(socket);
-			clients.add(clientThread);
+			StartServerHandler clientThread = new StartServerHandler(socket,gameHandlers);
 			
 			pool.execute(clientThread);
 		}

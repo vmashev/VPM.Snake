@@ -14,15 +14,13 @@ import vpm.model.GameInfo;
 public class ClientHandler implements Runnable{
 
 	Socket socket ;
-	ArrayList<ClientHandler> clients;
 	GameInfo gameInfo;
 	
 	ObjectOutputStream objectOutput ;
 	ObjectInputStream objectInput ;
 	
-	public ClientHandler(Socket socket, ArrayList<ClientHandler> clients) throws IOException {
+	public ClientHandler(Socket socket) throws IOException {
 		this.socket = socket;
-		this.clients = clients;
 		this.gameInfo = new GameInfo();
 		
 		this.objectOutput = new ObjectOutputStream(socket.getOutputStream());

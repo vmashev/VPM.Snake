@@ -19,12 +19,21 @@ public class CommandExecuteFactory {
 			return new FindGameByDateTimeCommand();	
 		case 6: // Find Game History
 			return new FindGameHistoryCommand();	
-		case 10: // New Game
-			return new NewGameCommand(gameInfo);
-		case 11: // Move Game
+		case 10: // New Singleplayer game
+			return new SingleplayerNewGameCommand(gameInfo);
+		case 11: // In game commands
 			return new MoveCommand(gameInfo);
-		case 12: // New Game
+		case 12: // Resume paused game
 			return new ResumeGameCommand(gameInfo);
+		case 13: // New Multiplayer game
+			return new CreateLobbyCommand(gameInfo);
+		case 14: // Join lobby (start new multiplayer game)
+			return new JoinLobbyCommand();
+		case 15: // Create lobby
+			return new GetLobbyCommand();
+		case 16: // Create lobby
+			return new WaitingForOpponentCommand();
+
 		}
 		
 		return null;
