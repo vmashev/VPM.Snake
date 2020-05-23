@@ -7,18 +7,18 @@ import java.util.ArrayList;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import vpm.helper.ClientConnection;
-import vpm.helper.Command;
+import vpm.helper.CommunicationCommand;
 import vpm.model.GameInfo;
 
 public class GameOutHandler implements Runnable {
 
 	private ClientConnection clientConnection;
-	private ArrayBlockingQueue<Command> outCommands;
+	private ArrayBlockingQueue<CommunicationCommand> outCommands;
 	private ObjectOutputStream objectOutput ;
 	
 	public GameOutHandler(ClientConnection clientConnection) throws IOException {
 		this.clientConnection = clientConnection;
-		this.outCommands = new ArrayBlockingQueue<Command>(1000);
+		this.outCommands = new ArrayBlockingQueue<CommunicationCommand>(1000);
 	}
 	
 	@Override
@@ -29,7 +29,7 @@ public class GameOutHandler implements Runnable {
 			objectOutput = clientConnection.getObjectOutput();
 			
 			while(true) {
-				Command command = outCommands.poll();
+				CommunicationCommand command = outCommands.poll();
 				
 				if(command != null) {						
 					objectOutput.writeObject(command);
@@ -50,7 +50,7 @@ public class GameOutHandler implements Runnable {
 		}	
 	}
 
-	public void addCommand(Command command) {
+	public void addCommand(CommunicationCommand command) {
 		outCommands.add(command);
 	}
 }

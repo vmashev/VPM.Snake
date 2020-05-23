@@ -8,8 +8,10 @@ public class SnakeMoveInfo implements Serializable{
 	private Direction direction ;
 	private GameStatus status ;
 
-	public SnakeMoveInfo(String username) {
+	public SnakeMoveInfo(String username, GameStatus status, Direction direction) {
 		this.username = username;
+		this.direction = direction;
+		this.status = status;
 	}
 
 	public String getUsername() {

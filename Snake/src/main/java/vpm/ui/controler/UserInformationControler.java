@@ -10,7 +10,7 @@ import java.net.Socket;
 import javax.swing.JOptionPane;
 
 import vpm.helper.ClientSetup;
-import vpm.helper.Command;
+import vpm.helper.CommunicationCommand;
 import vpm.helper.Constants;
 import vpm.helper.JsonParser;
 import vpm.model.UserEntity;
@@ -75,10 +75,10 @@ public class UserInformationControler implements ActionListener{
 			
 			String message = JsonParser.parseFromUserEntity(user);
 			
-			Command sendCommand = new Command(3, message);
+			CommunicationCommand sendCommand = new CommunicationCommand(3, message);
 			outputStream.writeObject(sendCommand);
 			
-			Command receiveCommand = (Command)inputStream.readObject();
+			CommunicationCommand receiveCommand = (CommunicationCommand)inputStream.readObject();
 			user = JsonParser.parseToUserEntity(receiveCommand.getMessage());
 			
 		} catch (IOException | ClassNotFoundException e) {
@@ -104,10 +104,10 @@ public class UserInformationControler implements ActionListener{
 			user = new UserEntity(clientSetup.getUserName());
 			String message = JsonParser.parseFromUserEntity(user);
 			
-			Command sendCommand = new Command(1, message);
+			CommunicationCommand sendCommand = new CommunicationCommand(1, message);
 			outputStream.writeObject(sendCommand);
 			
-			Command receiveCommand = (Command)inputStream.readObject();
+			CommunicationCommand receiveCommand = (CommunicationCommand)inputStream.readObject();
 			user = JsonParser.parseToUserEntity(receiveCommand.getMessage());
 			
 			if(user == null) {

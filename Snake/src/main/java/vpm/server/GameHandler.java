@@ -4,23 +4,24 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import vpm.comand.strategy.CommandExecuteFactory;
-import vpm.comand.strategy.CommandExecuteStrategy;
+import vpm.comand.CommandFactory;
+import vpm.comand.Command;
 import vpm.helper.ClientConnection;
-import vpm.helper.Command;
+import vpm.helper.CommunicationCommand;
 import vpm.helper.GameStatus;
 import vpm.helper.JsonParser;
 import vpm.model.GameInfo;
+import vpm.model.Snake;
 
 public class GameHandler implements Runnable{
 
 	private ArrayList<ClientConnection> clients;
 	private ArrayList<GameOutHandler> gameOutHandlers;
-	private ArrayBlockingQueue<Command> inCommands;
+	private ArrayBlockingQueue<CommunicationCommand> inCommands;
 
-	private Command inCommand;
-	private Command outCommand;
-	private CommandExecuteStrategy executeStrategy;
+	private CommunicationCommand inCommand;
+	private CommunicationCommand outCommand;
+	private Command executeStrategy;
 	private GameOutHandler gameOutHandler;
 	private GameInHandler gameInHandler;
 	private GameInfo gameInfo;
@@ -30,7 +31,7 @@ public class GameHandler implements Runnable{
 		this.clients.add(client);
 		
 		this.gameOutHandlers = new ArrayList<GameOutHandler>();
-		this.inCommands = new ArrayBlockingQueue<Command>(1000);
+		this.inCommands = new ArrayBlockingQueue<CommunicationCommand>(1000);
 		
 		this.gameInfo = gameInfo;						
 	}
@@ -41,7 +42,7 @@ public class GameHandler implements Runnable{
 		try {
 			
 			String message = JsonParser.parseFromGameInfo(gameInfo);
-			outCommand = new Command(1, message);
+			outCommand = new CommunicationCommand(1, message);
 			
 			for (ClientConnection clientConnection : clients) {
 				gameOutHandler = new GameOutHandler(clientConnection);
@@ -57,8 +58,8 @@ public class GameHandler implements Runnable{
 			while(true) {
 				inCommand = inCommands.poll();
 				if(inCommand != null) {
-					executeStrategy = CommandExecuteFactory.createCommand(inCommand.getNumber() , gameInfo);
-					outCommand = inCommand.execute(executeStrategy);
+					executeStrategy = CommandFactory.createCommand(inCommand.getNumber() , gameInfo, null);
+					outCommand = executeStrategy.execute(inCommand);
 					
 					gameInfo = executeStrategy.getGameInfo();
 					
@@ -77,6 +78,7 @@ public class GameHandler implements Runnable{
 	
 	public void joinGame(ClientConnection client) {
 		clients.add(client);
+		gameInfo.getSnakes().put(client.getUsername(), Snake.createSnake(2, gameInfo.getWidth()));
 	}
 
 	public GameInfo getGameInfo() {

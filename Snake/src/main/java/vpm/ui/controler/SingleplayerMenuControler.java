@@ -14,7 +14,7 @@ import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
 import vpm.helper.ClientSetup;
-import vpm.helper.Command;
+import vpm.helper.CommunicationCommand;
 import vpm.helper.Constants;
 import vpm.helper.GameStatus;
 import vpm.helper.JsonParser;
@@ -67,10 +67,10 @@ public class SingleplayerMenuControler implements ActionListener{
 	    		GameInfo gameInfo = new GameInfo(clientSetup.getUserName(), width , height , speed);
 	    		
 				String message = JsonParser.parseFromGameInfo(gameInfo);
-				Command sendCommand = new Command(10, message);
+				CommunicationCommand sendCommand = new CommunicationCommand(10, message);
 				outputStream.writeObject(sendCommand);
 				
-				Command receiveCommand = (Command)inputStream.readObject();
+				CommunicationCommand receiveCommand = (CommunicationCommand)inputStream.readObject();
 				gameInfo = JsonParser.parseToGameInfo(receiveCommand.getMessage());
 				
 				Board board = new Board(gameInfo, outputStream, inputStream);
@@ -105,10 +105,10 @@ public class SingleplayerMenuControler implements ActionListener{
     			gameInfo.setDateTime(dateTime);
     			
     			String message = JsonParser.parseFromGameInfo(gameInfo);
-    			Command sendCommand = new Command(5, message);
+    			CommunicationCommand sendCommand = new CommunicationCommand(5, message);
     			outputStream.writeObject(sendCommand);
     			
-    			Command receiveCommand = (Command)inputStream.readObject();
+    			CommunicationCommand receiveCommand = (CommunicationCommand)inputStream.readObject();
     			gameInfo = JsonParser.parseToGameInfo(receiveCommand.getMessage());
     			
     			Board board = new Board(gameInfo, outputStream, inputStream);
@@ -141,10 +141,10 @@ public class SingleplayerMenuControler implements ActionListener{
 			UserEntity user = new UserEntity(clientSetup.getUserName());
 			String message = JsonParser.parseFromUserEntity(user);
 			
-			Command sendCommand = new Command(4, message);
+			CommunicationCommand sendCommand = new CommunicationCommand(4, message);
 			outputStream.writeObject(sendCommand);
 			
-			Command receiveCommand = (Command)inputStream.readObject();
+			CommunicationCommand receiveCommand = (CommunicationCommand)inputStream.readObject();
 			List<GameInfo> games = JsonParser.parseToGameInfoList(receiveCommand.getMessage());
 
 			for (int i = 0; i < games.size(); i++) {

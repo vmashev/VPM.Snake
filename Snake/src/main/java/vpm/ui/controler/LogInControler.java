@@ -8,7 +8,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 import vpm.helper.ClientSetup;
-import vpm.helper.Command;
+import vpm.helper.CommunicationCommand;
 import vpm.helper.Constants;
 import vpm.helper.EncryptionUtils;
 import vpm.helper.JsonParser;
@@ -56,10 +56,10 @@ public class LogInControler implements ActionListener{
 			UserEntity user = new UserEntity(nickname);
 			String message = JsonParser.parseFromUserEntity(user);
 			
-			Command sendCommand = new Command(1, message);
+			CommunicationCommand sendCommand = new CommunicationCommand(1, message);
 			objectOutput.writeObject(sendCommand);
 			
-			Command receiveCommand = (Command)objectinput.readObject();
+			CommunicationCommand receiveCommand = (CommunicationCommand)objectinput.readObject();
 			user = JsonParser.parseToUserEntity(receiveCommand.getMessage());
 			
 			if(user == null) {

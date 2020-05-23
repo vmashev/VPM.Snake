@@ -20,7 +20,7 @@ import javax.swing.SwingUtilities;
 
 import vpm.client.ServerConnection;
 import vpm.helper.ClientSetup;
-import vpm.helper.Command;
+import vpm.helper.CommunicationCommand;
 import vpm.helper.Direction;
 import vpm.helper.GameStatus;
 import vpm.helper.JsonParser;
@@ -46,14 +46,12 @@ public class Board extends JPanel implements Runnable, KeyListener {
 	private ServerConnection serverConnection;
 	private ObjectOutputStream objectOutput;
 	private ObjectInputStream objectInput;
-	private Thread serverConnectionThread;
 	
 	public Board(GameInfo gameInfo,ObjectOutputStream objectOutput, ObjectInputStream objectInput) throws IOException {
 		this.gameInfo = gameInfo;
 		this.objectOutput = objectOutput;
 		this.objectInput = objectInput;
-		this.snakeMove = new SnakeMoveInfo(clientSetup.getUserName());
-		this.snakeMove.setStatus(GameStatus.Ready);
+		this.snakeMove = new SnakeMoveInfo(clientSetup.getUserName() , GameStatus.Ready , Direction.DOWN);
 		
 		setPreferredSize(new Dimension(gameInfo.getWidth(), gameInfo.getHeight()));
 		setFocusable(true);
@@ -78,15 +76,19 @@ public class Board extends JPanel implements Runnable, KeyListener {
 		int k = e.getKeyCode();
 		if( k == KeyEvent.VK_W) {
 			snakeMove.setDirection(Direction.UP);
+			snakeMove.setStatus(GameStatus.Run);
 		}
 		if( k == KeyEvent.VK_S) {
 			snakeMove.setDirection(Direction.DOWN);
+			snakeMove.setStatus(GameStatus.Run);
 		}
 		if( k == KeyEvent.VK_A) {
 			snakeMove.setDirection(Direction.LEFT);
+			snakeMove.setStatus(GameStatus.Run);
 		}
 		if( k == KeyEvent.VK_D) {
 			snakeMove.setDirection(Direction.RIGHT);
+			snakeMove.setStatus(GameStatus.Run);
 		}
 		if( k == KeyEvent.VK_ESCAPE) {
 			snakeMove.setStatus(GameStatus.SetPause);
@@ -115,14 +117,10 @@ public class Board extends JPanel implements Runnable, KeyListener {
 			while(running) {
 				startTime = System.nanoTime();
 				
-				if((snakeMove.getDirection() != null) && (snakeMove.getStatus() != GameStatus.Pause)) {
-					
-					if(snakeMove.getStatus() == GameStatus.Ready) {
-						snakeMove.setStatus(GameStatus.Run);
-					}
+				if((snakeMove.getDirection() != null) && (snakeMove.getStatus() != GameStatus.Ready) && (snakeMove.getStatus() != GameStatus.Pause)) {
 					
 					String message = JsonParser.parseFromSnakeMoveInfo(snakeMove);
-					Command sendCommand = new Command(11, message);
+					CommunicationCommand sendCommand = new CommunicationCommand(11, message);
 					objectOutput.writeObject(sendCommand);
 					
 				}
@@ -196,15 +194,11 @@ public class Board extends JPanel implements Runnable, KeyListener {
 	}
 	
 	private void init() throws IOException {
-		serverConnection = new ServerConnection(this);
-		serverConnectionThread = new Thread(serverConnection);
-		serverConnectionThread.start();
-		
 		targetTime = 1000 / gameInfo.getSpeed();
 		image = new BufferedImage(gameInfo.getWidth(), gameInfo.getHeight(), BufferedImage.TYPE_INT_ARGB);
 		
 		try {
-			Thread.sleep(500);
+			Thread.sleep(200);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -214,6 +208,10 @@ public class Board extends JPanel implements Runnable, KeyListener {
 		targetTime = 1000 / gameInfo.getSpeed();
 
 		requestRender();
+		
+		serverConnection = new ServerConnection(this);
+		new Thread(serverConnection).start();
+		
 	}
 	
 	public void requestRender() {

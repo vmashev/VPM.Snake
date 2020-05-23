@@ -14,7 +14,7 @@ import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
 import vpm.helper.ClientSetup;
-import vpm.helper.Command;
+import vpm.helper.CommunicationCommand;
 import vpm.helper.Constants;
 import vpm.helper.GameStatus;
 import vpm.helper.JsonParser;
@@ -67,11 +67,11 @@ public class MultiplayerMenuControler implements ActionListener{
 	    		GameInfo gameInfo = new GameInfo(clientSetup.getUserName(), width , height , speed);
 	    		
 				String message = JsonParser.parseFromGameInfo(gameInfo);
-				Command sendCommand = new Command(13, message);
+				CommunicationCommand sendCommand = new CommunicationCommand(13, message);
 
 				outputStream.writeObject(sendCommand);
 				
-				Command receiveCommand = (Command)inputStream.readObject();
+				CommunicationCommand receiveCommand = (CommunicationCommand)inputStream.readObject();
 				gameInfo = JsonParser.parseToGameInfo(receiveCommand.getMessage());
 				
 				Board board = new Board(gameInfo, outputStream, inputStream);
@@ -103,10 +103,10 @@ public class MultiplayerMenuControler implements ActionListener{
             	ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
         		
     			String message = username;
-    			Command sendCommand = new Command(14, message);
+    			CommunicationCommand sendCommand = new CommunicationCommand(14, message);
     			outputStream.writeObject(sendCommand);
     			
-    			Command receiveCommand = (Command)inputStream.readObject();
+    			CommunicationCommand receiveCommand = (CommunicationCommand)inputStream.readObject();
     			GameInfo gameInfo = JsonParser.parseToGameInfo(receiveCommand.getMessage());
     			
     			Board board = new Board(gameInfo, outputStream, inputStream);
@@ -134,10 +134,10 @@ public class MultiplayerMenuControler implements ActionListener{
 			outputStream = new ObjectOutputStream(socket.getOutputStream());
 			inputStream = new ObjectInputStream(socket.getInputStream());
     		
-    		Command sendCommand = new Command(15, null);
+    		CommunicationCommand sendCommand = new CommunicationCommand(15, null);
 			outputStream.writeObject(sendCommand);
 			
-			Command receiveCommand = (Command)inputStream.readObject();
+			CommunicationCommand receiveCommand = (CommunicationCommand)inputStream.readObject();
 			List<GameInfo> games = JsonParser.parseToGameInfoList(receiveCommand.getMessage());
 
 			for (int i = 0; i < games.size(); i++) {

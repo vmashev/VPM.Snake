@@ -110,4 +110,30 @@ public class Snake implements Serializable{
 	
 		}	
 	}
+	
+	public static Snake createSnake(int playerNo, int boardWidth) {
+		Dot tempDot = null;
+		Snake snake = new Snake();
+			
+		switch (playerNo) {
+		case 1:
+			for(int j = 0 ; j < 3 ; j++) {
+				tempDot = new Dot(j * Constants.SIZE, 1 * Constants.SIZE);
+				snake.getList().add(tempDot) ;
+			}
+			break;
+
+		case 2:
+			for(int j = 0 ; j < 3 ; j++) {
+				tempDot = new Dot(j * Constants.SIZE, boardWidth - (2 * Constants.SIZE));
+				snake.getList().add(tempDot) ;
+			}
+			break;
+		}
+		
+		snake.setHead(tempDot);
+		snake.setDirection(Direction.DOWN);
+		
+		return snake;
+	}
 }

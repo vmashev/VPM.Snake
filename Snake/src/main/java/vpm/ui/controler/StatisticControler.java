@@ -9,7 +9,7 @@ import java.net.Socket;
 import java.util.List;
 
 import vpm.helper.ClientSetup;
-import vpm.helper.Command;
+import vpm.helper.CommunicationCommand;
 import vpm.helper.Constants;
 import vpm.helper.JsonParser;
 import vpm.model.GameInfo;
@@ -49,10 +49,10 @@ public class StatisticControler implements ActionListener{
 			UserEntity user = new UserEntity(username);
 			String message = JsonParser.parseFromUserEntity(user);
 			
-			Command sendCommand = new Command(6, message);
+			CommunicationCommand sendCommand = new CommunicationCommand(6, message);
 			outputStream.writeObject(sendCommand);
 			
-			Command receiveCommand = (Command)inputStream.readObject();
+			CommunicationCommand receiveCommand = (CommunicationCommand)inputStream.readObject();
 			List<GameInfo> games = JsonParser.parseToGameInfoList(receiveCommand.getMessage());
 
 			for (int i = 0; i < statistic.model.getRowCount(); i++) {
@@ -70,10 +70,10 @@ public class StatisticControler implements ActionListener{
 			}	
 			
 			
-			sendCommand = new Command(1, message);
+			sendCommand = new CommunicationCommand(1, message);
 			outputStream.writeObject(sendCommand);
 			
-			receiveCommand = (Command)inputStream.readObject();
+			receiveCommand = (CommunicationCommand)inputStream.readObject();
 			user = JsonParser.parseToUserEntity(receiveCommand.getMessage());
 			
 			statistic.usernameFld.setText(user.getUsername());

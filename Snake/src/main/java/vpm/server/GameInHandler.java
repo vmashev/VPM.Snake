@@ -5,16 +5,16 @@ import java.io.ObjectInputStream;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import vpm.helper.ClientConnection;
-import vpm.helper.Command;
+import vpm.helper.CommunicationCommand;
 
 public class GameInHandler implements Runnable {
 
 	private ClientConnection clientConnection;
-	private ArrayBlockingQueue<Command> inputCommands;
-	private Command command;
+	private ArrayBlockingQueue<CommunicationCommand> inputCommands;
+	private CommunicationCommand command;
 	private ObjectInputStream objectInput ;
 	
-	public GameInHandler(ClientConnection clientConnection, ArrayBlockingQueue<Command> inputCommands) throws IOException {
+	public GameInHandler(ClientConnection clientConnection, ArrayBlockingQueue<CommunicationCommand> inputCommands) throws IOException {
 		this.clientConnection = clientConnection;
 		this.inputCommands = inputCommands;
 	}
@@ -26,7 +26,7 @@ public class GameInHandler implements Runnable {
 			objectInput = clientConnection.getObjectInput();
 			while(true) {
 				
-				command = (Command)objectInput.readObject();
+				command = (CommunicationCommand)objectInput.readObject();
 				inputCommands.add(command);
 				
 				System.out.println("Received Command from: " + clientConnection.getUsername() + 

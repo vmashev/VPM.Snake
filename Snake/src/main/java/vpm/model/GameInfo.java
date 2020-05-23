@@ -123,35 +123,6 @@ public class GameInfo implements Serializable{
 				", Board Height: " + getHeight();
 	}
 	
-	public void createSnake(String username[]) {
-		Dot tempDot = null;
-		Snake snake ;
-		
-		for (int i = 1; i <= username.length; i++) {
-			snake = new Snake();
-			
-			switch (i) {
-			case 1:
-				for(int j = 0 ; j < 3 ; j++) {
-					tempDot = new Dot(j * Constants.SIZE, 1 * Constants.SIZE);
-					snake.getList().add(tempDot) ;
-				}
-				break;
-
-			case 2:
-				for(int j = 0 ; j < 3 ; j++) {
-					tempDot = new Dot(j * Constants.SIZE, getWidth() - (2 * Constants.SIZE));
-					snake.getList().add(tempDot) ;
-				}
-				break;
-			}
-			
-			snake.setHead(tempDot);
-			
-			snakes.put(username[i-1], snake);
-		}
-
-	}
 	
 	public Dot generateApple() {
 		Dot randomAppleDot = null;
@@ -206,7 +177,6 @@ public class GameInfo implements Serializable{
 		return false;
 	}
 	
-	//Return false if has collison 
 	public boolean updateSnake(String username, Direction direction) {
 		Snake snake;
 		if((snake = snakes.get(username)) != null) {

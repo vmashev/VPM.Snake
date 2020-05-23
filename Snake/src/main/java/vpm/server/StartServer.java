@@ -13,9 +13,7 @@ import vpm.helper.ServerSetup;
 
 public class StartServer {
 
-	private ExecutorService pool = Executors.newFixedThreadPool(1000);
 	private ArrayList<GameHandler> gameHandlers = new ArrayList<GameHandler>();
-	private ArrayList<ClientConnection> clientConnections = new ArrayList<ClientConnection>();
 	
 	public static void main(String[] args) throws Exception {
 		
@@ -31,9 +29,9 @@ public class StartServer {
 			System.out.println("Server is running on port " + Constants.PORT);
 			Socket socket = serverSocket.accept(); 
 			
-			StartServerHandler clientThread = new StartServerHandler(socket,gameHandlers);
+			GameManager clientThread = new GameManager(socket,gameHandlers);
 			new Thread(clientThread).start();
-			//pool.execute(clientThread);
+
 		}
 		
 	}

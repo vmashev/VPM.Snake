@@ -10,7 +10,7 @@ import java.net.Socket;
 import javax.swing.JOptionPane;
 
 import vpm.helper.ClientSetup;
-import vpm.helper.Command;
+import vpm.helper.CommunicationCommand;
 import vpm.helper.Constants;
 import vpm.helper.EncryptionUtils;
 import vpm.helper.JsonParser;
@@ -83,10 +83,10 @@ public class SignUpControler implements ActionListener{
 			
 			String jsonMessage = JsonParser.parseFromUserEntity(user);
 			
-			Command sendCommand = new Command(2, jsonMessage);
+			CommunicationCommand sendCommand = new CommunicationCommand(2, jsonMessage);
 			outputStream.writeObject(sendCommand);
 			
-			Command receiveCommand = (Command)inputStream.readObject();
+			CommunicationCommand receiveCommand = (CommunicationCommand)inputStream.readObject();
 			user = JsonParser.parseToUserEntity(receiveCommand.getMessage());
 			
 			if(user == null) {

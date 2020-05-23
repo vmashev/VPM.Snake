@@ -5,7 +5,7 @@ import java.io.ObjectInputStream;
 import java.net.Socket;
 
 import vpm.helper.ClientSetup;
-import vpm.helper.Command;
+import vpm.helper.CommunicationCommand;
 import vpm.helper.GameStatus;
 import vpm.helper.JsonParser;
 import vpm.model.GameInfo;
@@ -30,13 +30,14 @@ public class ServerConnection implements Runnable{
 		try {
 			while (running) {
 				
-				Command receiveCommand = (Command)objectInput.readObject();
+				CommunicationCommand receiveCommand = (CommunicationCommand)objectInput.readObject();
 				gameInfo = JsonParser.parseToGameInfo(receiveCommand.getMessage());
 				
 				switch (receiveCommand.getNumber()) {
 				case 1: // Start game
 					board.setGameInfo(gameInfo);
 					board.getSnakeMove().setStatus(gameInfo.getStatus());
+					board.requestRender();
 					break;
 				case 2: // Update move
 					GameInfo boardGameInfo = board.getGameInfo();
@@ -44,10 +45,9 @@ public class ServerConnection implements Runnable{
 					boardGameInfo.setApple(gameInfo.getApple());
 					boardGameInfo.setStatus(gameInfo.getStatus());
 					board.getSnakeMove().setStatus(gameInfo.getStatus());
+					board.requestRender();
 					break;
 				}
-				
-				board.requestRender();
 							
 				if(gameInfo.getStatus() == GameStatus.GameOver) {
 					running = false;
