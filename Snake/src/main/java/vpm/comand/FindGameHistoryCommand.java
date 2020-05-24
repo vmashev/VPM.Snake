@@ -16,7 +16,7 @@ public class FindGameHistoryCommand extends Command{
 		UserEntity requestUserEntity = JsonParser.parseToUserEntity(requestCommand.getMessage());
 
 		GameInfoService gameInfoService = new GameInfoServiceImpl();
-		List<GameInfo> games = gameInfoService.findGameHistoryByUsername(requestUserEntity.getUsername());
+		List<GameInfo> games = gameInfoService.findGameHistoryByUsername(requestUserEntity);
         
 		String jsonMessage = JsonParser.parseFromGameInfoList(games);	
 		CommunicationCommand responseCommand = new CommunicationCommand(0, jsonMessage);

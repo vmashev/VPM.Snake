@@ -16,7 +16,7 @@ public class FindSavedGamesCommand extends Command{
 		UserEntity requestUserEntity = JsonParser.parseToUserEntity(requestCommand.getMessage());
 
 		GameInfoService gameInfoService = new GameInfoServiceImpl();
-		List<GameInfo> games = gameInfoService.findSavedGamesByUsername(requestUserEntity.getUsername());
+		List<GameInfo> games = gameInfoService.findSavedGamesByUsername(requestUserEntity);
         
 		String jsonMessage = JsonParser.parseFromGameInfoList(games);	
 		CommunicationCommand responseCommand = new CommunicationCommand(0, jsonMessage);

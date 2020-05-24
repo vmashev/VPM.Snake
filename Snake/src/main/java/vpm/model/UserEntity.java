@@ -1,12 +1,12 @@
 package vpm.model;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
-
 import javax.persistence.Id;
 
 @Entity
@@ -80,5 +80,19 @@ public class UserEntity implements Serializable{
 	public void setMaxScore(int maxScore) {
 		this.maxScore = maxScore;
 	}
-	
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		
+		if (!(obj instanceof UserEntity)) {
+			return false;
+		}
+		
+		UserEntity other = (UserEntity) obj;
+		
+		return Objects.equals(this.getUsername() , other.getUsername()) ;
+	}
 }

@@ -3,23 +3,25 @@ package vpm.helper;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+import vpm.model.UserEntity;
+
 public class ClientConnection {
 
-	private String username;
+	private UserEntity username;
 	private ObjectOutputStream objectOutput ;
 	private ObjectInputStream objectInput ;
 	
-	public ClientConnection(String username , ObjectOutputStream objectOutput, ObjectInputStream objectInput) {
+	public ClientConnection(UserEntity username , ObjectOutputStream objectOutput, ObjectInputStream objectInput) {
 		this.username = username;
 		this.objectOutput = objectOutput;
 		this.objectInput = objectInput;
 	}
 
-	public String getUsername() {
+	public UserEntity getUsername() {
 		return username;
 	}
 
-	public void setUsername(String username) {
+	public void setUsername(UserEntity username) {
 		this.username = username;
 	}
 

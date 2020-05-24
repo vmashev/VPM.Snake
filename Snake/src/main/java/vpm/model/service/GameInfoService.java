@@ -7,11 +7,12 @@ import javax.validation.ValidationException;
 
 
 import vpm.model.GameInfo;
+import vpm.model.UserEntity;
 
 public interface GameInfoService {
 
-	List<GameInfo> findSavedGamesByUsername(String username);
-	List<GameInfo> findGameHistoryByUsername(String username);
+	List<GameInfo> findSavedGamesByUsername(UserEntity user);
+	List<GameInfo> findGameHistoryByUsername(UserEntity user);
 	GameInfo findById(Long id);
 	GameInfo findByDateTime(LocalDateTime dateTime);
 	

@@ -10,7 +10,6 @@ import java.util.List;
 
 import vpm.helper.ClientSetup;
 import vpm.helper.CommunicationCommand;
-import vpm.helper.ConnectionSetup;
 import vpm.helper.JsonParser;
 import vpm.model.GameInfo;
 import vpm.model.UserEntity;
@@ -30,7 +29,7 @@ public class StatisticControler implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		switch (e.getActionCommand()) {
 		case "Search":
-			getStatistics(statistic.usernameFld.getText());
+			getStatistics(new UserEntity(statistic.usernameFld.getText()));
 			break;
 		case "Close":
 			statistic.dispose();
@@ -38,7 +37,7 @@ public class StatisticControler implements ActionListener{
 		}
 	}
 	
-	public void getStatistics(String username) {
+	public void getStatistics(UserEntity user) {
 		
 		ObjectOutputStream objectOutput = null;
 		ObjectInputStream objectinput = null;
@@ -50,7 +49,6 @@ public class StatisticControler implements ActionListener{
 			objectinput = new ObjectInputStream(socket.getInputStream());
 			
 			
-			UserEntity user = new UserEntity(username);
 			String message = JsonParser.parseFromUserEntity(user);
 			
 			CommunicationCommand sendCommand = new CommunicationCommand(6, message);
@@ -65,8 +63,11 @@ public class StatisticControler implements ActionListener{
 			
 			for (int i = 0; i < games.size(); i++) {
 				statistic.model.addRow(new Object[]{ i+1 , 
-											games.get(i).getHostUsername(), 
-											games.get(i).getHostSnake().getScore(),
+											games.get(i).getPlayerOne(),
+											games.get(i).getPlayerOneScore(),
+											games.get(i).getPlayerTwo(),
+											games.get(i).getPlayerTwoScore(),
+											games.get(i).getWinnerPlayer(),
 											games.get(i).getDateTime(),
 											games.get(i).getHeight(), 
 											games.get(i).getWidth(), 

@@ -19,7 +19,7 @@ public class SingleplayerNewGameCommand extends GameCommand{
 	@Override
 	public CommunicationCommand execute(CommunicationCommand requestCommand) {
 		gameInfo = JsonParser.parseToGameInfo(requestCommand.getMessage());
-		gameInfo.getSnakes().put(requestCommand.getUsername(), Snake.createSnake(1, gameInfo.getWidth()));
+		gameInfo.getSnakes().put(requestCommand.getUsername().getUsername(), Snake.createSnake(1, gameInfo.getWidth()));
 		gameInfo.setApple(gameInfo.generateApple());
 		gameInfo.setStatus(GameStatus.Ready);
 		gameInfo.setPlayerOne(requestCommand.getUsername());

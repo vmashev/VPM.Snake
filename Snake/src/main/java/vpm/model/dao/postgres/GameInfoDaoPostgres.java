@@ -9,6 +9,7 @@ import javax.persistence.Query;
 
 import vpm.helper.GameStatus;
 import vpm.model.GameInfo;
+import vpm.model.UserEntity;
 import vpm.model.dao.GameInfoDao;
 
 public class GameInfoDaoPostgres extends GenericDAOPostgreSQL<GameInfo, Long> implements GameInfoDao{
@@ -18,9 +19,9 @@ public class GameInfoDaoPostgres extends GenericDAOPostgreSQL<GameInfo, Long> im
 	}
 
 	@Override
-	public List<GameInfo> findSavedGameInfoByUsername(String username) {
+	public List<GameInfo> findSavedGameInfoByUsername(UserEntity user) {
 		Query query = getEntityManager().createNamedQuery("findGameInfoByUsernameAndStatus");
-		query.setParameter("username", username)
+		query.setParameter("user", user)
 			.setParameter("status", GameStatus.Save);
 		
 		try {

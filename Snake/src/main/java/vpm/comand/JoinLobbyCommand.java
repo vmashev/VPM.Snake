@@ -21,7 +21,7 @@ public class JoinLobbyCommand extends GameCommand {
 		
 		for (int i = 0; i < getGameManager().getGameHandlers().size(); i++) {
 			GameHandler gHandler = getGameManager().getGameHandlers().get(i);
-			if(gHandler.getGameInfo().getHostUsername().equals(requestCommand.getMessage())) {
+			if(gHandler.getGameInfo().getPlayerOne().equals(requestCommand.getMessage())) {
 				
 				GameInfo gameInfo = gHandler.getGameInfo();
 				gameInfo.setStatus(GameStatus.Ready);
@@ -33,7 +33,7 @@ public class JoinLobbyCommand extends GameCommand {
 				
 				getGameManager().getGameHandlers().remove(i);
 				gHandler.getClients().add(new ClientConnection(requestCommand.getUsername(), getGameManager().getObjectOutput(), getGameManager().getObjectInput()));
-				gHandler.getGameInfo().getSnakes().put(requestCommand.getUsername(), Snake.createSnake(2, gameInfo.getWidth()));
+				gHandler.getGameInfo().getSnakes().put(requestCommand.getUsername().getUsername(), Snake.createSnake(2, gameInfo.getWidth()));
 				gHandler.getGameInfo().setPlayerTwo(requestCommand.getUsername());
 				new Thread(gHandler).start();
 				

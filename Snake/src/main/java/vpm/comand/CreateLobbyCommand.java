@@ -20,7 +20,7 @@ public class CreateLobbyCommand extends GameCommand{
 		gameInfo = JsonParser.parseToGameInfo(requestCommand.getMessage());
 		gameInfo.setStatus(GameStatus.WaitingForOpponent);
 		gameInfo.setApple(gameInfo.generateApple());
-		gameInfo.getSnakes().put(requestCommand.getUsername(), Snake.createSnake(1, gameInfo.getWidth()));
+		gameInfo.getSnakes().put(requestCommand.getUsername().getUsername(), Snake.createSnake(1, gameInfo.getWidth()));
 		gameInfo.setPlayerOne(requestCommand.getUsername());
 		
 		String jsonMessage = JsonParser.parseFromGameInfo(gameInfo);	

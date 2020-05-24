@@ -11,7 +11,6 @@ import java.util.List;
 
 import vpm.helper.ClientSetup;
 import vpm.helper.CommunicationCommand;
-import vpm.helper.ConnectionSetup;
 import vpm.helper.JsonParser;
 import vpm.model.GameInfo;
 import vpm.model.UserEntity;
@@ -124,7 +123,7 @@ public class SingleplayerMenuControler implements ActionListener{
 			objectOutput = new ObjectOutputStream(socket.getOutputStream());
 			objectinput = new ObjectInputStream(socket.getInputStream());
 			
-			UserEntity user = new UserEntity(clientSetup.getUsername());
+			UserEntity user = clientSetup.getUsername();
 			String message = JsonParser.parseFromUserEntity(user);
 			
 			CommunicationCommand sendCommand = new CommunicationCommand(4, message);
@@ -135,7 +134,7 @@ public class SingleplayerMenuControler implements ActionListener{
 
 			for (int i = 0; i < games.size(); i++) {
 				singleplayerMenu.model.addRow(new Object[]{ i+1 , 
-											games.get(i).getHostUsername(), 
+											games.get(i).getPlayerOne(), 
 											games.get(i).getDateTime(),
 											games.get(i).getHeight(), 
 											games.get(i).getWidth(), 

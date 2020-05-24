@@ -2,12 +2,12 @@ package vpm.helper;
 
 import java.io.Serializable;
 
-import vpm.comand.Command;
+import vpm.model.UserEntity;
 
 public class CommunicationCommand implements Serializable{
 
 	private int number;
-	private String username;
+	private UserEntity username;
 	private String message;
 	private String errorMessage;
 	
@@ -43,7 +43,7 @@ public class CommunicationCommand implements Serializable{
 		this.errorMessage = errorMessage;
 	}
 	
-	public String getUsername() {
+	public UserEntity getUsername() {
 		return username;
 	}
 

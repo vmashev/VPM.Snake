@@ -12,7 +12,6 @@ import vpm.model.GameInfo;
 import vpm.model.UserEntity;
 import vpm.model.dao.GameInfoDao;
 import vpm.model.dao.postgres.GameInfoDaoPostgres;
-import vpm.model.dao.postgres.UserDaoPostgres;
 import vpm.model.service.GameInfoService;
 
 public class GameInfoServiceImpl implements GameInfoService{
@@ -70,11 +69,11 @@ public class GameInfoServiceImpl implements GameInfoService{
 	}
 	
 	@Override
-	public List<GameInfo> findSavedGamesByUsername(String username) {
+	public List<GameInfo> findSavedGamesByUsername(UserEntity user) {
 		entityManager = serverSetup.getEntityManager();
 		gameInfoDao = new GameInfoDaoPostgres(entityManager);
 		
-		List<GameInfo> result = gameInfoDao.findSavedGameInfoByUsername(username);
+		List<GameInfo> result = gameInfoDao.findSavedGameInfoByUsername(user);
 		entityManager.close();
 		
 		return result;
@@ -103,11 +102,11 @@ public class GameInfoServiceImpl implements GameInfoService{
 	}
 
 	@Override
-	public List<GameInfo> findGameHistoryByUsername(String username) {
+	public List<GameInfo> findGameHistoryByUsername(UserEntity user) {
 		entityManager = serverSetup.getEntityManager();
 		gameInfoDao = new GameInfoDaoPostgres(entityManager);
 		
-		List<GameInfo> result = gameInfoDao.findGameInfoHistoryByUsername(username);
+		List<GameInfo> result = gameInfoDao.findGameInfoHistoryByUsername(user.getUsername());
 		entityManager.close();
 		
 		return result;

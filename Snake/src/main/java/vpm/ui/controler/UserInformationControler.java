@@ -105,7 +105,7 @@ public class UserInformationControler implements ActionListener{
 			objectOutput = new ObjectOutputStream(socket.getOutputStream());
 			objectinput = new ObjectInputStream(socket.getInputStream());
 			
-			user = new UserEntity(clientSetup.getUsername());
+			user = clientSetup.getUsername();
 			String message = JsonParser.parseFromUserEntity(user);
 			
 			CommunicationCommand sendCommand = new CommunicationCommand(1, message);

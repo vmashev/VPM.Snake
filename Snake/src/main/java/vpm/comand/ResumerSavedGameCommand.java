@@ -24,7 +24,7 @@ public class ResumerSavedGameCommand extends GameCommand{
 		
 		gameInfo = gameInfoService.findByDateTime(requestGameInfo.getDateTime());
 		gameInfo.setStatus(GameStatus.Ready);
-		gameInfo.getSnakes().put(gameInfo.getHostUsername(), gameInfo.getHostSnake());
+		gameInfo.getSnakes().put(gameInfo.getPlayerOne().getUsername(), gameInfo.getPlayerOneSnake());
 		
 		String jsonMessage = JsonParser.parseFromGameInfo(gameInfo);	
 		CommunicationCommand responseCommand = new CommunicationCommand(0, jsonMessage);

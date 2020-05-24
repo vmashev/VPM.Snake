@@ -41,7 +41,7 @@ public class MoveCommand extends Command{
 					
 					//Set winner if it is multiplayer
 					if(gameInfo.getSnakes().size() > 1) {
-						String winner = requestSnakeMove.getUsername()==gameInfo.getPlayerOne() ? gameInfo.getPlayerTwo():gameInfo.getPlayerOne();
+						UserEntity winner = requestSnakeMove.getUsername().equals(gameInfo.getPlayerOne().getUsername()) ? gameInfo.getPlayerTwo():gameInfo.getPlayerOne();
 						gameInfo.setWinnerPlayer(winner);
 					}
 					
@@ -79,7 +79,7 @@ public class MoveCommand extends Command{
 	
 	//Save the game on Quit or when the game is over
 	private void saveGame(GameInfo gameInfo) {
-		gameInfo.setHostSnake(gameInfo.getSnakes().get(gameInfo.getHostUsername()));
+		gameInfo.setPlayerOneSnake(gameInfo.getSnakes().get(gameInfo.getPlayerOne()));
 		
 		GameInfoService gameInfoService = new GameInfoServiceImpl();
 		gameInfoService.create(gameInfo);

@@ -27,15 +27,17 @@ public class GameInfo implements Serializable{
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	
-	private String hostUsername;
-	private Snake hostSnake;
+	private UserEntity winnerPlayer;
+	private UserEntity playerOne;
+	private UserEntity playerTwo;
+	private Integer playerOneScore;
+	private Integer playerTwoScore;
+	private Snake playerOneSnake;
 	private LocalDateTime dateTime;
 	private Integer width;
 	private Integer height;
 	private Integer speed;
-	private String winnerPlayer;
-	private String playerOne;
-	private String playerTwo;
+
 	
 	@Transient
 	private Map<String,Snake> snakes = new HashMap<String, Snake>();
@@ -51,8 +53,8 @@ public class GameInfo implements Serializable{
 	
 	public GameInfo() {	}
 	
-	public GameInfo(String username, int width, int height, int speed) {
-		this.hostUsername = username;
+	public GameInfo(UserEntity username, int width, int height, int speed) {
+		this.playerOne = username;
 		this.width = width;
 		this.height = height;
 		this.speed = speed;
@@ -68,12 +70,28 @@ public class GameInfo implements Serializable{
 		this.id = id;
 	}
 	
-	public Snake getHostSnake() {
-		return hostSnake;
+	public Integer getPlayerOneScore() {
+		return playerOneScore;
 	}
 
-	public void setHostSnake(Snake hostSnake) {
-		this.hostSnake = hostSnake;
+	public void setPlayerOneScore(Integer playerOneScore) {
+		this.playerOneScore = playerOneScore;
+	}
+
+	public Integer getPlayerTwoScore() {
+		return playerTwoScore;
+	}
+
+	public void setPlayerTwoScore(Integer playerTwoScore) {
+		this.playerTwoScore = playerTwoScore;
+	}
+
+	public Snake getPlayerOneSnake() {
+		return playerOneSnake;
+	}
+
+	public void setPlayerOneSnake(Snake playerOneSnake) {
+		this.playerOneSnake = playerOneSnake;
 	}
 
 	public LocalDateTime getDateTime() {
@@ -84,9 +102,6 @@ public class GameInfo implements Serializable{
 		this.dateTime = dateTime;
 	}
 
-	public String getHostUsername() {
-		return hostUsername;
-	}
 	public int getWidth() {
 		return width;
 	}
@@ -115,33 +130,33 @@ public class GameInfo implements Serializable{
 	public void setSnakes(Map<String, Snake> snakes) {
 		this.snakes = snakes;
 	}
-	public String getWinnerPlayer() {
+	public UserEntity getWinnerPlayer() {
 		return winnerPlayer;
 	}
 
-	public void setWinnerPlayer(String winnerPlayer) {
+	public void setWinnerPlayer(UserEntity winnerPlayer) {
 		this.winnerPlayer = winnerPlayer;
 	}
 
-	public String getPlayerOne() {
+	public UserEntity getPlayerOne() {
 		return playerOne;
 	}
 
-	public void setPlayerOne(String playerOne) {
+	public void setPlayerOne(UserEntity playerOne) {
 		this.playerOne = playerOne;
 	}
 
-	public String getPlayerTwo() {
+	public UserEntity getPlayerTwo() {
 		return playerTwo;
 	}
 
-	public void setPlayerTwo(String playerTwo) {
+	public void setPlayerTwo(UserEntity playerTwo) {
 		this.playerTwo = playerTwo;
 	}
 
 	@Override
 	public String toString() {
-		return "Username: " + getHostUsername() + 
+		return "Username: " + getPlayerOne() + 
 				", Speed: " + getSpeed()+ 
 				", Board Width: " + getWidth() + 
 				", Board Height: " + getHeight();

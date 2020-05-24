@@ -72,8 +72,28 @@ public class Statistic extends JDialog {
 		scrollPane.setBounds(10, 42, 674, 145);
 		contentPanel.add(scrollPane);
 		
-		model = new DefaultTableModel( new Object[][] {}, new String[] { "Line No.", "Username", "Score", "DateTime", "Board Height", "Board Width", "Game Speed" } ) {
-			boolean[] columnEditables = new boolean[] { false, false, false, false, false, false, false	};
+		model = new DefaultTableModel( new Object[][] {}, new String[] { "Line No.", 
+																			"Host Username", 
+																			"Player 1", 
+																			"Score Player 1",
+																			"Player 2", 
+																			"Score Player 2",
+																			"Winner",
+																			"DateTime", 
+																			"Board Height", 
+																			"Board Width", 
+																			"Game Speed" } ) {
+			boolean[] columnEditables = new boolean[] { false, 
+														false, 
+														false, 
+														false, 
+														false, 
+														false,
+														false,
+														false,
+														false,
+														false, 
+														false	};
 			public boolean isCellEditable(int row, int column) {
 				return columnEditables[column];
 			}

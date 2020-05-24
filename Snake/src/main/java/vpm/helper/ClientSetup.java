@@ -4,13 +4,15 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+import vpm.model.UserEntity;
+
 public class ClientSetup {
 
 	private String serverIp ;
 	private int serverPort ;
 	
 	private static ClientSetup instance = new ClientSetup();
-	private String username = null;
+	private UserEntity username = null;
 	
 	private ClientSetup() {
 		setServerInfo();
@@ -20,11 +22,11 @@ public class ClientSetup {
 		return instance;
 	}
 
-	public String getUsername() {
+	public UserEntity getUsername() {
 		return username;
 	}
 
-	public void setUsername(String username) {
+	public void setUsername(UserEntity username) {
 		this.username = username;
 	}
 

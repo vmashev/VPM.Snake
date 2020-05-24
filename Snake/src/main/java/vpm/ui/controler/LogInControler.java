@@ -73,7 +73,7 @@ public class LogInControler implements ActionListener{
 				return;			
 			}
 			
-			clientSetup.setUsername(nickname);
+			clientSetup.setUsername(user);
 	
 			logInPage.dispose();
 			

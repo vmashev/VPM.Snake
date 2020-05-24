@@ -51,7 +51,7 @@ public class Board extends JPanel implements Runnable, KeyListener {
 		this.gameInfo = gameInfo;
 		this.objectOutput = objectOutput;
 		this.objectInput = objectInput;
-		this.snakeMove = new SnakeMoveInfo(clientSetup.getUsername() , GameStatus.Ready , Direction.DOWN);
+		this.snakeMove = new SnakeMoveInfo(clientSetup.getUsername().getUsername() , GameStatus.Ready , Direction.DOWN);
 		
 		setPreferredSize(new Dimension(gameInfo.getWidth(), gameInfo.getHeight()));
 		setFocusable(true);
@@ -76,7 +76,8 @@ public class Board extends JPanel implements Runnable, KeyListener {
 		int k = e.getKeyCode();
 		
 		//If you are not host username you can't make firs move.
-		if(!clientSetup.getUsername().equals(gameInfo.getHostUsername()) && (snakeMove.getStatus() == GameStatus.Ready)) {
+		System.out.println(clientSetup.getUsername().equals(gameInfo.getPlayerOne()));
+		if(!(clientSetup.getUsername().equals(gameInfo.getPlayerOne())) && (snakeMove.getStatus() == GameStatus.Ready)) {
 			return;
 		}
 		
@@ -241,7 +242,7 @@ public class Board extends JPanel implements Runnable, KeyListener {
 
 			String playerInfo = "Score: " + snakeEntry.getValue().getScore();
 			
-			if(snakeEntry.getKey().equals(gameInfo.getPlayerOne())) {
+			if(snakeEntry.getKey().equals(gameInfo.getPlayerOne().getUsername())) {
 				graphics2D.setColor(Color.WHITE);
 				graphics2D.drawString(playerInfo, 10, 10);
 				
