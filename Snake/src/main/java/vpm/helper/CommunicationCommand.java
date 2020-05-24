@@ -16,7 +16,7 @@ public class CommunicationCommand implements Serializable{
 		this.message = message;
 		
 		ClientSetup setup = ClientSetup.createInstance();
-		this.username = setup.getUserName();
+		this.username = setup.getUsername();
 	}
 
 	public int getNumber() {

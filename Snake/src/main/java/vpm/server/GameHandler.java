@@ -76,14 +76,22 @@ public class GameHandler implements Runnable{
 		} 
 	}	
 	
-	public void joinGame(ClientConnection client) {
-		clients.add(client);
-		gameInfo.getSnakes().put(client.getUsername(), Snake.createSnake(2, gameInfo.getWidth()));
-	}
-
 	public GameInfo getGameInfo() {
 		return gameInfo;
 	}
+
+	public ArrayList<ClientConnection> getClients() {
+		return clients;
+	}
+
+	public void setClients(ArrayList<ClientConnection> clients) {
+		this.clients = clients;
+	}
+
+	public void setGameInfo(GameInfo gameInfo) {
+		this.gameInfo = gameInfo;
+	}
+	
 	
 }
 

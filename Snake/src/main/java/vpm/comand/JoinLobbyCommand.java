@@ -5,6 +5,7 @@ import vpm.helper.CommunicationCommand;
 import vpm.helper.GameStatus;
 import vpm.helper.JsonParser;
 import vpm.model.GameInfo;
+import vpm.model.Snake;
 import vpm.server.GameHandler;
 import vpm.server.GameManager;
 
@@ -31,7 +32,9 @@ public class JoinLobbyCommand extends GameCommand {
 				getGameManager().setRunnable(false);
 				
 				getGameManager().getGameHandlers().remove(i);
-				gHandler.joinGame(new ClientConnection(requestCommand.getUsername(), getGameManager().getObjectOutput(), getGameManager().getObjectInput()));
+				gHandler.getClients().add(new ClientConnection(requestCommand.getUsername(), getGameManager().getObjectOutput(), getGameManager().getObjectInput()));
+				gHandler.getGameInfo().getSnakes().put(requestCommand.getUsername(), Snake.createSnake(2, gameInfo.getWidth()));
+				gHandler.getGameInfo().setPlayerTwo(requestCommand.getUsername());
 				new Thread(gHandler).start();
 				
 				break;

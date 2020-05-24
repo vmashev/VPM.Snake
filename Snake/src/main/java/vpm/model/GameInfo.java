@@ -30,11 +30,14 @@ public class GameInfo implements Serializable{
 	
 	private String hostUsername;
 	private Snake hostSnake;
-	private LocalDateTime dateTime ;
+	private LocalDateTime dateTime;
 	private Integer width;
 	private Integer height;
 	private Integer speed;
-		
+	private String winnerPlayer;
+	private String playerOne;
+	private String playerTwo;
+	
 	@Transient
 	private Map<String,Snake> snakes = new HashMap<String, Snake>();
 	
@@ -65,7 +68,6 @@ public class GameInfo implements Serializable{
 	public void setId(Long id) {
 		this.id = id;
 	}
-
 	
 	public Snake getHostSnake() {
 		return hostSnake;
@@ -113,6 +115,29 @@ public class GameInfo implements Serializable{
 	}
 	public void setSnakes(Map<String, Snake> snakes) {
 		this.snakes = snakes;
+	}
+	public String getWinnerPlayer() {
+		return winnerPlayer;
+	}
+
+	public void setWinnerPlayer(String winnerPlayer) {
+		this.winnerPlayer = winnerPlayer;
+	}
+
+	public String getPlayerOne() {
+		return playerOne;
+	}
+
+	public void setPlayerOne(String playerOne) {
+		this.playerOne = playerOne;
+	}
+
+	public String getPlayerTwo() {
+		return playerTwo;
+	}
+
+	public void setPlayerTwo(String playerTwo) {
+		this.playerTwo = playerTwo;
 	}
 
 	@Override

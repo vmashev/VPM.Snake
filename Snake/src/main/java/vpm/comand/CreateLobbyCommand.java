@@ -21,6 +21,7 @@ public class CreateLobbyCommand extends GameCommand{
 		gameInfo.setStatus(GameStatus.WaitingForOpponent);
 		gameInfo.setApple(gameInfo.generateApple());
 		gameInfo.getSnakes().put(requestCommand.getUsername(), Snake.createSnake(1, gameInfo.getWidth()));
+		gameInfo.setPlayerOne(requestCommand.getUsername());
 		
 		String jsonMessage = JsonParser.parseFromGameInfo(gameInfo);	
 		CommunicationCommand responseCommand = new CommunicationCommand(1, jsonMessage);

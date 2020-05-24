@@ -83,7 +83,7 @@ public class Statistic extends JDialog {
 		scrollPane.setViewportView(table);
 		
 		ClientSetup clientSetup = ClientSetup.createInstance();
-		controler.getStatistics(clientSetup.getUserName());
+		controler.getStatistics(clientSetup.getUsername());
 	}
 	
 	public void showMessage(String msg) {

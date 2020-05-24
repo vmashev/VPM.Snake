@@ -51,7 +51,7 @@ public class Board extends JPanel implements Runnable, KeyListener {
 		this.gameInfo = gameInfo;
 		this.objectOutput = objectOutput;
 		this.objectInput = objectInput;
-		this.snakeMove = new SnakeMoveInfo(clientSetup.getUserName() , GameStatus.Ready , Direction.DOWN);
+		this.snakeMove = new SnakeMoveInfo(clientSetup.getUsername() , GameStatus.Ready , Direction.DOWN);
 		
 		setPreferredSize(new Dimension(gameInfo.getWidth(), gameInfo.getHeight()));
 		setFocusable(true);
@@ -128,7 +128,7 @@ public class Board extends JPanel implements Runnable, KeyListener {
 				if(snakeMove.getStatus() != null) {
 					switch (snakeMove.getStatus()) {
 					case GameOver:
-						JOptionPane.showMessageDialog(this, "GameOver! Max Score: ???");// + snake.getScore());
+						JOptionPane.showMessageDialog(this, "GameOver! Max Score: " + gameInfo.getSnakes().get(clientSetup.getUsername()).getScore());
 						win.dispose();
 						thread.interrupt();
 						break;
@@ -269,7 +269,7 @@ public class Board extends JPanel implements Runnable, KeyListener {
 				graphics2D.drawString("Waiting for opponent.", (gameInfo.getWidth() / 2) -40, (gameInfo.getHeight() / 2));
 				break;				
 			case GameOver:
-				int score = gameInfo.getSnakes().get(clientSetup.getUserName()).getScore();
+				int score = gameInfo.getSnakes().get(clientSetup.getUsername()).getScore();
 				graphics2D.drawString("GameOver! Score: " + score, (gameInfo.getWidth() / 2) -40, (gameInfo.getHeight() / 2));
 				break;
 			}
