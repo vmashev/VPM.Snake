@@ -28,6 +28,7 @@ public class PauseMenu extends JDialog{
 		setTitle("Pause");
 		setModal(true);
 		setResizable(false);
+		setLocationRelativeTo(null);
 		
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));

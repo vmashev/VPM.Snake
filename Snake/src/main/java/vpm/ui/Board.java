@@ -57,6 +57,7 @@ public class Board extends JPanel implements Runnable, KeyListener {
 		setFocusable(true);
 		requestFocus();
 		addKeyListener(this);
+		
 	}
 	
 	@Override

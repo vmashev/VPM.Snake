@@ -29,7 +29,8 @@ public class Statistic extends JDialog {
     
 	public Statistic() {
 		this.controler = new StatisticControler(this);
-		
+		setLocationRelativeTo(null);
+		setResizable(false);
 		setBounds(100, 100, 950, 270);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));

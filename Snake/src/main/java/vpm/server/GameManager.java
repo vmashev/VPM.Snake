@@ -8,6 +8,8 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.TransientObjectException;
+
 import vpm.comand.CommandFactory;
 import vpm.comand.Command;
 import vpm.helper.ClientConnection;
@@ -56,7 +58,13 @@ public class GameManager implements Runnable{
 									
 			}
 			
-		} catch (IOException | ClassNotFoundException e) {
+		} catch (Exception e) {
+			outCommand = new CommunicationCommand(0, null);
+			try {
+				objectOutput.writeObject(outCommand);
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
 			e.printStackTrace();
 		} 
 	}

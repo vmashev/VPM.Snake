@@ -21,7 +21,7 @@ public class JoinLobbyCommand extends GameCommand {
 		
 		for (int i = 0; i < getGameManager().getGameHandlers().size(); i++) {
 			GameHandler gHandler = getGameManager().getGameHandlers().get(i);
-			if(gHandler.getGameInfo().getPlayerOne().equals(requestCommand.getMessage())) {
+			if(gHandler.getGameInfo().getPlayerOne().getUsername().equals(requestCommand.getMessage())) {
 				
 				GameInfo gameInfo = gHandler.getGameInfo();
 				gameInfo.setStatus(GameStatus.Ready);

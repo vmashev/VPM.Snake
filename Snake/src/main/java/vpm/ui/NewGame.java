@@ -27,6 +27,7 @@ public class NewGame extends JDialog{
 		setBounds(100, 100, 250, 190);
 		setTitle("New singleplayer game");
 		setModal(true);
+		setLocationRelativeTo(null);
 		
 		setResizable(false);
 		contentPane = new JPanel();

@@ -29,6 +29,8 @@ public class LogIn extends JDialog {
 		setBounds(100, 100, 250, 160);
 		setTitle("Login");
 		setModal(true);
+		setLocationRelativeTo(null);
+		
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);

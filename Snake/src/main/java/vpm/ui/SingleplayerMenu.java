@@ -30,6 +30,7 @@ public class SingleplayerMenu extends JDialog{
 		setBounds(100, 100, 710, 240);
 		setTitle("Singleplayer Menu");
 		setResizable(false);
+		setLocationRelativeTo(null);
 		
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));

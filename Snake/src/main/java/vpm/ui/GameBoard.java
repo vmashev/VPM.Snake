@@ -7,6 +7,7 @@ import java.io.ObjectOutputStream;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import vpm.model.Dot;
 import vpm.model.GameInfo;
 
 public class GameBoard extends JFrame {
@@ -19,7 +20,8 @@ public class GameBoard extends JFrame {
 		this.contentPane = board;
 		
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, gameInfo.getWidth(), gameInfo.getHeight());
+		setBounds(100, 100, gameInfo.getWidth()+ (2*Dot.RENDER_SIZE), gameInfo.getHeight()+(4*Dot.RENDER_SIZE));
+		
 		setResizable(false);
 		setLocationRelativeTo(null);
 		setTitle("Play");

@@ -22,6 +22,8 @@ public class MultiplayerMenu extends JDialog {
 		setBounds(100, 100, 710, 240);
 		getContentPane().setLayout(null);
 		setTitle("Multiplayer menu");
+		setLocationRelativeTo(null);
+		setResizable(false);
 		
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(10, 11, 674, 143);

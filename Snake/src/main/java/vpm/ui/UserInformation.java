@@ -31,6 +31,9 @@ public class UserInformation extends JDialog {
 		setBounds(100, 100, 590, 190);
 		setTitle("User Information");
 		setModal(true);
+		setLocationRelativeTo(null);
+		setResizable(false);
+		
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);

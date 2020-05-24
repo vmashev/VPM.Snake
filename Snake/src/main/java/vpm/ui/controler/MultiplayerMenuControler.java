@@ -121,7 +121,7 @@ public class MultiplayerMenuControler implements ActionListener{
 
 			for (int i = 0; i < games.size(); i++) {
 				multiplayerMenu.model.addRow(new Object[]{ i+1 , 
-											games.get(i).getPlayerOne(), 
+											games.get(i).getPlayerOne().getUsername(), 
 											games.get(i).getHeight(), 
 											games.get(i).getWidth(), 
 											games.get(i).getSpeed()});

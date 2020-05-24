@@ -28,6 +28,7 @@ public class MainFrame extends JFrame implements ActionListener{
 		
 		super("Snake");
 		setLayout(new GridLayout(8,1));
+		setLocationRelativeTo(null);
 		
 		logInButton = new JButton("LogIn");
 		logInButton.addActionListener(this);

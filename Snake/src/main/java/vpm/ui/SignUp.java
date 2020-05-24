@@ -36,6 +36,8 @@ public class SignUp extends JDialog {
 		setBounds(100, 100, 310, 310);
 		setTitle("SignUp");
 		setModal(true);
+		setLocationRelativeTo(null);
+		setResizable(false);
 		
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(10, 10, 10, 10));

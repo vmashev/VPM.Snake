@@ -95,6 +95,13 @@ public class SignUpControler implements ActionListener{
 				return;
 			}
 			
+			jsonMessage = JsonParser.parseFromUserEntity(user);
+			sendCommand = new CommunicationCommand(1, jsonMessage);
+			objectOutput.writeObject(sendCommand);
+			
+			receiveCommand = (CommunicationCommand)objectinput.readObject();
+			user = JsonParser.parseToUserEntity(receiveCommand.getMessage());
+			
 			ClientSetup clientSetup = ClientSetup.createInstance();
 			clientSetup.setUser(user);
 
