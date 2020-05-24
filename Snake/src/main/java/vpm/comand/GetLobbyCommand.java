@@ -6,14 +6,14 @@ import java.util.List;
 import vpm.helper.CommunicationCommand;
 import vpm.model.GameInfo;
 import vpm.server.GameHandler;
-import vpm.server.GameManager;
+import vpm.server.ServerConectionManager;
 
 //Processed on the server for finding created lobbies
 //Input: null
 //Output: List of GameInfo
 public class GetLobbyCommand extends GameCommand {
 
-	public GetLobbyCommand(GameManager gameManager) {
+	public GetLobbyCommand(ServerConectionManager gameManager) {
 		super(gameManager);
 	}
 
@@ -22,7 +22,7 @@ public class GetLobbyCommand extends GameCommand {
 		CommunicationCommand responseCommand;
 		
 		List<GameInfo> games = new ArrayList<GameInfo>();
-		for (GameHandler gameHandler : getGameManager().getGameHandlers()) {
+		for (GameHandler gameHandler : getServerConectionManager().getGameHandlers()) {
 			games.add(gameHandler.getGameInfo());
 		}
 		String message = GameInfo.parseGameInfoListToJson(games);

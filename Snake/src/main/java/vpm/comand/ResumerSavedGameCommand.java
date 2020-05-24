@@ -7,7 +7,7 @@ import vpm.model.GameInfo;
 import vpm.model.service.GameInfoService;
 import vpm.model.service.impl.GameInfoServiceImpl;
 import vpm.server.GameHandler;
-import vpm.server.GameManager;
+import vpm.server.ServerConectionManager;
 
 //Processed on the server resuming saved game
 //Start new GameHandler
@@ -15,7 +15,7 @@ import vpm.server.GameManager;
 //Output: GameInfo
 public class ResumerSavedGameCommand extends GameCommand{
 
-	public ResumerSavedGameCommand(GameManager gameManager) {
+	public ResumerSavedGameCommand(ServerConectionManager gameManager) {
 		super(gameManager);
 	}
 
@@ -33,10 +33,10 @@ public class ResumerSavedGameCommand extends GameCommand{
 		CommunicationCommand responseCommand = new CommunicationCommand(0, jsonMessage);
 		
 		GameHandler gHandler = new GameHandler(new ClientConnection(requestCommand.getUsername(), 
-																	getGameManager().getObjectOutput(), 
-																	getGameManager().getObjectInput()),gameInfo);
+																	getServerConectionManager().getObjectOutput(), 
+																	getServerConectionManager().getObjectInput()),gameInfo);
 		new Thread(gHandler).start(); 
-		getGameManager().setRunnable(false);	
+		getServerConectionManager().setRunnable(false);	
 		
 		return responseCommand;
 	}

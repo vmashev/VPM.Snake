@@ -6,7 +6,7 @@ import vpm.helper.GameStatus;
 import vpm.model.GameInfo;
 import vpm.model.Snake;
 import vpm.server.GameHandler;
-import vpm.server.GameManager;
+import vpm.server.ServerConectionManager;
 
 //Processed on the server creating new singleplayer game
 //Create game with received parameters
@@ -14,7 +14,7 @@ import vpm.server.GameManager;
 //Output: GameInfo 
 public class SingleplayerNewGameCommand extends GameCommand{
 
-	public SingleplayerNewGameCommand(GameManager gameManager) {
+	public SingleplayerNewGameCommand(ServerConectionManager gameManager) {
 		super(gameManager);
 	}
 
@@ -30,10 +30,10 @@ public class SingleplayerNewGameCommand extends GameCommand{
 		CommunicationCommand responseCommand = new CommunicationCommand(0, jsonMessage);
 		
 		GameHandler gHandler = new GameHandler(new ClientConnection(requestCommand.getUsername(), 
-																	getGameManager().getObjectOutput(), 
-																	getGameManager().getObjectInput()),gameInfo);
+																	getServerConectionManager().getObjectOutput(), 
+																	getServerConectionManager().getObjectInput()),gameInfo);
 		new Thread(gHandler).start(); 
-		getGameManager().setRunnable(false);
+		getServerConectionManager().setRunnable(false);
 		
 		return responseCommand;
 	}

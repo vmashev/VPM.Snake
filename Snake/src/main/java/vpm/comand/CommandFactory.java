@@ -1,11 +1,11 @@
 package vpm.comand;
 
 import vpm.model.GameInfo;
-import vpm.server.GameManager;
+import vpm.server.ServerConectionManager;
 
 public class CommandFactory {
 
-	public static Command createCommand(int commandNumber, GameInfo gameInfo, GameManager gameManager) {
+	public static Command createCommand(int commandNumber, GameInfo gameInfo, ServerConectionManager gameManager) {
 		
 		switch (commandNumber) {
 		case 1: // Find User by Nickname

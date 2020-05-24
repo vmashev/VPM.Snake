@@ -1,17 +1,21 @@
 package vpm.comand;
 
-import vpm.server.GameManager;
+import vpm.server.ServerConectionManager;
 
 public abstract class GameCommand extends Command{
 
-	private GameManager gameManager;
+	private ServerConectionManager serverConectionManager;
+
+	public GameCommand(ServerConectionManager serverConectionManager) {
+		this.serverConectionManager = serverConectionManager;
+	}
 	
-	public GameCommand(GameManager gameManager) {
-		this.gameManager = gameManager;
+	public ServerConectionManager getServerConectionManager() {
+		return serverConectionManager;
 	}
 
-	public GameManager getGameManager() {
-		return gameManager;
+	public void setServerConectionManager(ServerConectionManager serverConectionManager) {
+		this.serverConectionManager = serverConectionManager;
 	}
-
+	
 }

@@ -13,7 +13,7 @@ import vpm.model.GameInfo;
 
 //Thread which manage every client connection to the server before the game is started
 //Started on the server
-public class GameManager implements Runnable{
+public class ServerConectionManager implements Runnable{
 
 	private Socket socket ;
 	private GameInfo gameInfo;
@@ -27,7 +27,7 @@ public class GameManager implements Runnable{
 	private ObjectInputStream objectInput ;
 	private boolean runnable;
 	
-	public GameManager(Socket socket, ArrayList<GameHandler> gameHandlers) {
+	public ServerConectionManager(Socket socket, ArrayList<GameHandler> gameHandlers) {
 		this.socket = socket;
 		this.gameHandlers = gameHandlers;	
 		this.gameInfo = new GameInfo();

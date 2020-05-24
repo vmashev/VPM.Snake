@@ -24,7 +24,7 @@ public class StartServer {
 		while (true) {
 			Socket socket = serverSocket.accept(); 
 			
-			GameManager clientThread = new GameManager(socket,gameHandlers);
+			ServerConectionManager clientThread = new ServerConectionManager(socket,gameHandlers);
 			new Thread(clientThread).start();
 
 		}

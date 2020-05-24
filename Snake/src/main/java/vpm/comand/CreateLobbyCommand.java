@@ -10,12 +10,12 @@ import vpm.helper.GameStatus;
 import vpm.model.GameInfo;
 import vpm.model.Snake;
 import vpm.server.GameHandler;
-import vpm.server.GameManager;
+import vpm.server.ServerConectionManager;
 
 public class CreateLobbyCommand extends GameCommand{
 
-	public CreateLobbyCommand(GameManager gameManager) {
-		super(gameManager);
+	public CreateLobbyCommand(ServerConectionManager serverConectionManager) {
+		super(serverConectionManager);
 	}
 
 	@Override
@@ -30,10 +30,10 @@ public class CreateLobbyCommand extends GameCommand{
 		CommunicationCommand responseCommand = new CommunicationCommand(1, jsonMessage);
 		
 		GameHandler gHandler = new GameHandler(new ClientConnection(requestCommand.getUsername(), 
-																	getGameManager().getObjectOutput(), 
-																	getGameManager().getObjectInput()),gameInfo);
-		getGameManager().getGameHandlers().add(gHandler);
-		getGameManager().setRunnable(false);
+																	getServerConectionManager().getObjectOutput(), 
+																	getServerConectionManager().getObjectInput()),gameInfo);
+		getServerConectionManager().getGameHandlers().add(gHandler);
+		getServerConectionManager().setRunnable(false);
 		
 		return responseCommand;
 	}

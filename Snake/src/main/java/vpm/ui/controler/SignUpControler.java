@@ -11,7 +11,6 @@ import vpm.helper.ClientSetup;
 import vpm.helper.CommunicationCommand;
 import vpm.helper.EncryptionUtils;
 import vpm.model.UserEntity;
-import vpm.model.service.UserService;
 import vpm.ui.SignUp;
 
 public class SignUpControler implements ActionListener{
@@ -37,7 +36,6 @@ public class SignUpControler implements ActionListener{
 	}
 
 	private void signUp() {
-		UserService userService;
 		UserEntity user;
 		
 		String nickname = signUpPage.userFld.getText();

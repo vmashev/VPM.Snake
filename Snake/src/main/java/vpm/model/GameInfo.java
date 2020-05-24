@@ -29,6 +29,7 @@ import com.google.gson.reflect.TypeToken;
 import vpm.helper.Direction;
 import vpm.helper.GameStatus;
 
+
 @Entity
 public class GameInfo implements Serializable{
 	
@@ -174,7 +175,7 @@ public class GameInfo implements Serializable{
 				", Board Height: " + getHeight();
 	}
 	
-	
+	//Generate new random apple possition
 	public Dot generateApple() {
 		Dot randomAppleDot = null;
 		boolean collison = true;
@@ -197,6 +198,7 @@ public class GameInfo implements Serializable{
 		return randomAppleDot;
 	}
 	
+	//Check for collison between snakes
 	private boolean hasSnakeCollison(Snake snake , Dot dot) {
 		if(snake == null) {
 			return false;
@@ -212,6 +214,7 @@ public class GameInfo implements Serializable{
 		return false;
 	}
 	
+	//Check for collison
 	public boolean hasCollison(Dot headDot) {
 		
 		if((headDot.getRow() < 0) || (headDot.getRow() == height) ||
@@ -228,6 +231,7 @@ public class GameInfo implements Serializable{
 		return false;
 	}
 	
+	//Check for collison and update snake possition
 	public boolean updateSnake(String username, Direction direction) {
 		Snake snake;
 		if((snake = snakes.get(username)) != null) {
