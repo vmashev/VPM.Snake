@@ -9,6 +9,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import com.google.gson.Gson;
+
 @Entity
 public class UserEntity implements Serializable{
 
@@ -83,6 +85,7 @@ public class UserEntity implements Serializable{
 
 	@Override
 	public boolean equals(Object obj) {
+
 		if (this == obj) {
 			return true;
 		}
@@ -94,5 +97,24 @@ public class UserEntity implements Serializable{
 		UserEntity other = (UserEntity) obj;
 		
 		return Objects.equals(this.getUsername() , other.getUsername()) ;
+	}
+	
+	public static UserEntity parseJsonToUserEntity(String jsonString) {
+		if(jsonString == null) {
+			return null;
+		}
+		
+		Gson gson = new Gson();
+		UserEntity userEntity = gson.fromJson(jsonString, UserEntity.class);
+
+		return userEntity;
+	}
+	
+	public String parseToJson() {
+		
+		Gson gson = new Gson();
+		String jsonString = gson.toJson(this);
+		
+		return jsonString;
 	}
 }

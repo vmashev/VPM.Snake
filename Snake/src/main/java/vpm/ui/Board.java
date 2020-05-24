@@ -23,7 +23,6 @@ import vpm.helper.ClientSetup;
 import vpm.helper.CommunicationCommand;
 import vpm.helper.Direction;
 import vpm.helper.GameStatus;
-import vpm.helper.JsonParser;
 import vpm.helper.SnakeMoveInfo;
 import vpm.model.Dot;
 import vpm.model.GameInfo;
@@ -77,7 +76,6 @@ public class Board extends JPanel implements Runnable, KeyListener {
 		int k = e.getKeyCode();
 		
 		//If you are not host username you can't make firs move.
-		System.out.println(clientSetup.getUser().equals(gameInfo.getPlayerOne()));
 		if(!(clientSetup.getUser().equals(gameInfo.getPlayerOne())) && (snakeMove.getStatus() == GameStatus.Ready)) {
 			return;
 		}
@@ -127,7 +125,7 @@ public class Board extends JPanel implements Runnable, KeyListener {
 				
 				if((snakeMove.getDirection() != null) && (snakeMove.getStatus() != GameStatus.Ready) && (snakeMove.getStatus() != GameStatus.Pause)) {
 					
-					String message = JsonParser.parseFromSnakeMoveInfo(snakeMove);
+					String message = snakeMove.parseToJson();
 					CommunicationCommand sendCommand = new CommunicationCommand(11, message);
 					objectOutput.writeObject(sendCommand);
 					

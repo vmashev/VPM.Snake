@@ -10,7 +10,6 @@ import java.util.List;
 
 import vpm.helper.ClientSetup;
 import vpm.helper.CommunicationCommand;
-import vpm.helper.JsonParser;
 import vpm.model.GameInfo;
 import vpm.model.UserEntity;
 import vpm.ui.Statistic;
@@ -53,13 +52,13 @@ public class StatisticControler implements ActionListener{
 			objectinput = new ObjectInputStream(socket.getInputStream());
 
 			user = new UserEntity(statistic.usernameFld.getText());
-			String message = JsonParser.parseFromUserEntity(user);
+			String message = user.parseToJson();
 			
 			CommunicationCommand sendCommand = new CommunicationCommand(1, message);
 			objectOutput.writeObject(sendCommand);
 			
 			CommunicationCommand receiveCommand = (CommunicationCommand)objectinput.readObject();
-			user = JsonParser.parseToUserEntity(receiveCommand.getMessage());
+			user = UserEntity.parseJsonToUserEntity(receiveCommand.getMessage());
 
 		} catch (IOException | ClassNotFoundException e) {
 			statistic.showMessage(e.getMessage());
@@ -93,13 +92,16 @@ public class StatisticControler implements ActionListener{
 			objectOutput = new ObjectOutputStream(socket.getOutputStream());
 			objectinput = new ObjectInputStream(socket.getInputStream());
 			
-			String message = JsonParser.parseFromUserEntity(user);
+			String message = null;
+			if(user != null) {
+				message = user.parseToJson();
+			}
 			
 			CommunicationCommand sendCommand = new CommunicationCommand(6, message);
 			objectOutput.writeObject(sendCommand);
 			
 			CommunicationCommand receiveCommand = (CommunicationCommand)objectinput.readObject();
-			List<GameInfo> games = JsonParser.parseToGameInfoList(receiveCommand.getMessage());
+			List<GameInfo> games = GameInfo.parseJsonToGameInfoList(receiveCommand.getMessage());
 
 			
 			while (statistic.model.getRowCount() != 0) {
@@ -134,7 +136,7 @@ public class StatisticControler implements ActionListener{
 			objectOutput.writeObject(sendCommand);
 			
 			receiveCommand = (CommunicationCommand)objectinput.readObject();
-			user = JsonParser.parseToUserEntity(receiveCommand.getMessage());
+			user = UserEntity.parseJsonToUserEntity(receiveCommand.getMessage());
 			
 			statistic.usernameFld.setText(user.getUsername());
 			statistic.maxScoreFld.setText(String.valueOf(user.getMaxScore()));

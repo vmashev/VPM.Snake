@@ -2,6 +2,8 @@ package vpm.helper;
 
 import java.io.Serializable;
 
+import com.google.gson.Gson;
+
 public class SnakeMoveInfo implements Serializable{
 
 	private String username;
@@ -38,4 +40,22 @@ public class SnakeMoveInfo implements Serializable{
 		this.status = status;
 	}
 	
+	public static SnakeMoveInfo parseJsonToSnakeMoveInfo(String jsonString) {
+		if(jsonString == null) {
+			return null;
+		}
+		
+		Gson gson = new Gson();
+		SnakeMoveInfo snakeMove = gson.fromJson(jsonString, SnakeMoveInfo.class);
+
+		return snakeMove;
+	}
+	
+	public String parseToJson() {
+		
+		Gson gson = new Gson();
+		String jsonString = gson.toJson(this);
+		
+		return jsonString;
+	}
 }

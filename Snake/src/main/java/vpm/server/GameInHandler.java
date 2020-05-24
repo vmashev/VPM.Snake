@@ -7,6 +7,9 @@ import java.util.concurrent.ArrayBlockingQueue;
 import vpm.helper.ClientConnection;
 import vpm.helper.CommunicationCommand;
 
+//Thread for receiving game commands from the client during the game
+//It is started on the server
+//One per client
 public class GameInHandler implements Runnable {
 
 	private ClientConnection clientConnection;
@@ -29,10 +32,6 @@ public class GameInHandler implements Runnable {
 				command = (CommunicationCommand)objectInput.readObject();
 				inputCommands.add(command);
 				
-				System.out.println("Received Command from: " + clientConnection.getUsername() + 
-									", Number: " + command.getNumber() + 
-									", Message: " + command.getMessage());
-
 			}
 					
 		} catch (Exception e) {

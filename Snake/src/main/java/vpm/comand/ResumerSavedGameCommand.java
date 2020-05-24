@@ -3,13 +3,16 @@ package vpm.comand;
 import vpm.helper.ClientConnection;
 import vpm.helper.CommunicationCommand;
 import vpm.helper.GameStatus;
-import vpm.helper.JsonParser;
 import vpm.model.GameInfo;
 import vpm.model.service.GameInfoService;
 import vpm.model.service.impl.GameInfoServiceImpl;
 import vpm.server.GameHandler;
 import vpm.server.GameManager;
 
+//Processed on the server resuming saved game
+//Start new GameHandler
+//Input: GameInfo
+//Output: GameInfo
 public class ResumerSavedGameCommand extends GameCommand{
 
 	public ResumerSavedGameCommand(GameManager gameManager) {
@@ -18,7 +21,7 @@ public class ResumerSavedGameCommand extends GameCommand{
 
 	@Override
 	public CommunicationCommand execute(CommunicationCommand requestCommand) {
-		GameInfo requestGameInfo = JsonParser.parseToGameInfo(requestCommand.getMessage());
+		GameInfo requestGameInfo = GameInfo.parseJsonToGameInfo(requestCommand.getMessage());
 
 		GameInfoService gameInfoService = new GameInfoServiceImpl();
 		
@@ -26,7 +29,7 @@ public class ResumerSavedGameCommand extends GameCommand{
 		gameInfo.setStatus(GameStatus.Ready);
 		gameInfo.getSnakes().put(gameInfo.getPlayerOne().getUsername(), gameInfo.getPlayerOneSnake());
 		
-		String jsonMessage = JsonParser.parseFromGameInfo(gameInfo);	
+		String jsonMessage = gameInfo.parseToJson();	
 		CommunicationCommand responseCommand = new CommunicationCommand(0, jsonMessage);
 		
 		GameHandler gHandler = new GameHandler(new ClientConnection(requestCommand.getUsername(), 

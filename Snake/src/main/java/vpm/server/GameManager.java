@@ -3,21 +3,16 @@ package vpm.server;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.lang.annotation.Documented;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.List;
 
-import org.hibernate.TransientObjectException;
-
-import vpm.comand.CommandFactory;
 import vpm.comand.Command;
-import vpm.helper.ClientConnection;
+import vpm.comand.CommandFactory;
 import vpm.helper.CommunicationCommand;
-import vpm.helper.GameStatus;
-import vpm.helper.JsonParser;
 import vpm.model.GameInfo;
 
+//Thread which manage every client connection to the server before the game is started
+//Started on the server
 public class GameManager implements Runnable{
 
 	private Socket socket ;

@@ -5,7 +5,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
-import vpm.helper.ConnectionSetup;
 import vpm.helper.ServerSetup;
 
 public class StartServer {

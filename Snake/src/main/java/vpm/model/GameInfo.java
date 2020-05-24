@@ -1,8 +1,11 @@
 package vpm.model;
 
+import java.io.FileNotFoundException;
 import java.io.Serializable;
+import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -17,6 +20,11 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 
 import vpm.helper.Direction;
 import vpm.helper.GameStatus;
@@ -240,5 +248,49 @@ public class GameInfo implements Serializable{
 		}
 		
 		return true;
+	}
+	
+	public static GameInfo parseJsonToGameInfo(String jsonString) {
+		if(jsonString == null) {
+			return null;
+		}
+		
+		Gson gson = new Gson();
+		GameInfo gameInfo = gson.fromJson(jsonString, GameInfo.class);
+
+		return gameInfo;
+	}
+	
+	public static List<GameInfo> parseJsonToGameInfoList(String jsonString) throws JsonSyntaxException, JsonIOException, FileNotFoundException {
+		if(jsonString == null) {
+			return null;
+		}
+		
+		Gson gson = new Gson();
+		Type type = new TypeToken<List<GameInfo>>(){}.getType();
+	    
+		List<GameInfo> games = gson.fromJson(jsonString, type);
+		
+		return games;
+	}
+	
+	public String parseToJson() {
+		
+		Gson gson = new Gson();
+		String jsonString = gson.toJson(this);
+		
+		return jsonString;
+	}
+	
+	public static String parseGameInfoListToJson(List<GameInfo> games) {
+		
+		if(games == null) {
+			return null;
+		}
+		
+		Gson gson = new Gson();
+		String jsonString = gson.toJson(games);
+		
+		return jsonString;
 	}
 }

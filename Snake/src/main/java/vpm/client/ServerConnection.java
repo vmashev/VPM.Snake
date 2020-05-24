@@ -6,10 +6,12 @@ import java.io.ObjectInputStream;
 import vpm.helper.ClientSetup;
 import vpm.helper.CommunicationCommand;
 import vpm.helper.GameStatus;
-import vpm.helper.JsonParser;
 import vpm.model.GameInfo;
 import vpm.ui.Board;
 
+//Thread which handle incoming communication with the server during the game.
+//It is started on the client
+//Process incoming commands and update the board
 public class ServerConnection implements Runnable{
 
 	private Board board;
@@ -30,7 +32,7 @@ public class ServerConnection implements Runnable{
 			while (running) {
 				
 				CommunicationCommand receiveCommand = (CommunicationCommand)objectInput.readObject();
-				gameInfo = JsonParser.parseToGameInfo(receiveCommand.getMessage());
+				gameInfo = GameInfo.parseJsonToGameInfo(receiveCommand.getMessage());
 				
 				switch (receiveCommand.getNumber()) {
 				case 1: // Start game

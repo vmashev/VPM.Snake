@@ -4,7 +4,6 @@ import java.util.Map;
 
 import vpm.helper.CommunicationCommand;
 import vpm.helper.GameStatus;
-import vpm.helper.JsonParser;
 import vpm.helper.SnakeMoveInfo;
 import vpm.model.GameInfo;
 import vpm.model.Snake;
@@ -14,7 +13,9 @@ import vpm.model.service.UserService;
 import vpm.model.service.impl.GameInfoServiceImpl;
 import vpm.model.service.impl.UserServiceImpl;
 
-//Command which is send from a client about snake movement
+//The command contains SnakeMoveInfo for one snake move during the game
+//Return GameInfo with position of the snakes, apple and game status
+//Processed on the server
 public class MoveCommand extends Command{
 
 	public MoveCommand(GameInfo gameInfo) {
@@ -24,7 +25,7 @@ public class MoveCommand extends Command{
 	@Override
 	public CommunicationCommand execute(CommunicationCommand requestCommand) {
 		CommunicationCommand responseCommand;
-		SnakeMoveInfo requestSnakeMove = JsonParser.parseToSnakeMoveInfo(requestCommand.getMessage());
+		SnakeMoveInfo requestSnakeMove = SnakeMoveInfo.parseJsonToSnakeMoveInfo(requestCommand.getMessage());
 		
 		//If the game is not started or it is in pause mode
 		if((requestSnakeMove.getStatus() == null) || (requestSnakeMove.getStatus() == GameStatus.Pause)){
@@ -62,7 +63,7 @@ public class MoveCommand extends Command{
 			break;
 		}
 		
-		String jsonMessage = JsonParser.parseFromGameInfo(createDeltaGameInfo());	
+		String jsonMessage = createDeltaGameInfo().parseToJson();	
 		responseCommand = new CommunicationCommand(2, jsonMessage);
 		
 		return responseCommand;
@@ -85,9 +86,7 @@ public class MoveCommand extends Command{
 		
 		GameInfoService gameInfoService = new GameInfoServiceImpl();
 		gameInfoService.create(gameInfo);
-		
-		
-		
+
 	}
 
 	//Update max score in UserEntity when the game is saved

@@ -9,9 +9,7 @@ import java.net.Socket;
 
 import vpm.helper.ClientSetup;
 import vpm.helper.CommunicationCommand;
-import vpm.helper.ConnectionSetup;
 import vpm.helper.EncryptionUtils;
-import vpm.helper.JsonParser;
 import vpm.model.UserEntity;
 import vpm.model.service.UserService;
 import vpm.ui.SignUp;
@@ -82,25 +80,25 @@ public class SignUpControler implements ActionListener{
 			objectOutput = new ObjectOutputStream(socket.getOutputStream());
     		objectinput = new ObjectInputStream(socket.getInputStream());
 			
-			String jsonMessage = JsonParser.parseFromUserEntity(user);
+			String jsonMessage = user.parseToJson();
 			
 			CommunicationCommand sendCommand = new CommunicationCommand(2, jsonMessage);
 			objectOutput.writeObject(sendCommand);
 			
 			CommunicationCommand receiveCommand = (CommunicationCommand)objectinput.readObject();
-			user = JsonParser.parseToUserEntity(receiveCommand.getMessage());
+			user = UserEntity.parseJsonToUserEntity(receiveCommand.getMessage());
 			
 			if(user == null) {
 				signUpPage.showMessage(receiveCommand.getErrorMessage());
 				return;
 			}
 			
-			jsonMessage = JsonParser.parseFromUserEntity(user);
+			jsonMessage = user.parseToJson();;
 			sendCommand = new CommunicationCommand(1, jsonMessage);
 			objectOutput.writeObject(sendCommand);
 			
 			receiveCommand = (CommunicationCommand)objectinput.readObject();
-			user = JsonParser.parseToUserEntity(receiveCommand.getMessage());
+			user = UserEntity.parseJsonToUserEntity(receiveCommand.getMessage());
 			
 			ClientSetup clientSetup = ClientSetup.createInstance();
 			clientSetup.setUser(user);

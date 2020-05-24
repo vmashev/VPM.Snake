@@ -30,9 +30,6 @@ public class CommandFactory {
 			return new JoinLobbyCommand(gameManager);
 		case 15: // Get Lobbies 
 			return new GetLobbyCommand(gameManager);
-		case 16: // Create lobby
-			return new WaitingForOpponentCommand();
-
 		}
 		
 		return null;

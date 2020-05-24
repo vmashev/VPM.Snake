@@ -3,12 +3,15 @@ package vpm.comand;
 import vpm.helper.ClientConnection;
 import vpm.helper.CommunicationCommand;
 import vpm.helper.GameStatus;
-import vpm.helper.JsonParser;
 import vpm.model.GameInfo;
 import vpm.model.Snake;
 import vpm.server.GameHandler;
 import vpm.server.GameManager;
 
+//Processed on the server for joining lobby
+//Star GameHandler thread which was created from player one
+//Input: username
+//Output: GameInfo
 public class JoinLobbyCommand extends GameCommand {
 
 	public JoinLobbyCommand(GameManager gameManager) {
@@ -26,7 +29,7 @@ public class JoinLobbyCommand extends GameCommand {
 				GameInfo gameInfo = gHandler.getGameInfo();
 				gameInfo.setStatus(GameStatus.Ready);
 				
-				String message = JsonParser.parseFromGameInfo(gameInfo);
+				String message = gameInfo.parseToJson();
 				responseCommand = new CommunicationCommand(0, message);
 				
 				getGameManager().setRunnable(false);

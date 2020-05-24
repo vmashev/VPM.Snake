@@ -10,6 +10,10 @@ import vpm.helper.ClientConnection;
 import vpm.helper.CommunicationCommand;
 import vpm.model.GameInfo;
 
+
+//Thread for sending response commands to a client during the game
+//It is started on the server
+//One per client
 public class GameOutHandler implements Runnable {
 
 	private ClientConnection clientConnection;
@@ -33,9 +37,6 @@ public class GameOutHandler implements Runnable {
 				
 				if(command != null) {						
 					objectOutput.writeObject(command);
-					System.out.println("Send Json to: " + clientConnection.getUsername() + 
-									 	", Command: " + command.getNumber() + 
-									 	", Message: " + command.getMessage());
 				}
 			}
 					

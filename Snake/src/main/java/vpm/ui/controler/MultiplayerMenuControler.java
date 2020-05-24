@@ -10,7 +10,6 @@ import java.util.List;
 
 import vpm.helper.ClientSetup;
 import vpm.helper.CommunicationCommand;
-import vpm.helper.JsonParser;
 import vpm.model.GameInfo;
 import vpm.ui.GameBoard;
 import vpm.ui.MultiplayerMenu;
@@ -59,13 +58,13 @@ public class MultiplayerMenuControler implements ActionListener{
 	    		
 	    		GameInfo gameInfo = new GameInfo(clientSetup.getUser(), width , height , speed);
 	    		
-				String message = JsonParser.parseFromGameInfo(gameInfo);
+				String message = gameInfo.parseToJson();
 				CommunicationCommand sendCommand = new CommunicationCommand(13, message);
 
 				objectOutput.writeObject(sendCommand);
 				
 				CommunicationCommand receiveCommand = (CommunicationCommand)objectinput.readObject();
-				gameInfo = JsonParser.parseToGameInfo(receiveCommand.getMessage());
+				gameInfo = GameInfo.parseJsonToGameInfo(receiveCommand.getMessage());
 				
 				GameBoard gameBoard = new GameBoard(gameInfo, objectOutput, objectinput);
 				gameBoard.setVisible(true);
@@ -92,7 +91,7 @@ public class MultiplayerMenuControler implements ActionListener{
     			objectOutput.writeObject(sendCommand);
     			
     			CommunicationCommand receiveCommand = (CommunicationCommand)objectinput.readObject();
-    			GameInfo gameInfo = JsonParser.parseToGameInfo(receiveCommand.getMessage());
+    			GameInfo gameInfo = GameInfo.parseJsonToGameInfo(receiveCommand.getMessage());
     			
 				GameBoard gameBoard = new GameBoard(gameInfo, objectOutput, objectinput);
 				gameBoard.setVisible(true);
@@ -117,7 +116,7 @@ public class MultiplayerMenuControler implements ActionListener{
     		objectOutput.writeObject(sendCommand);
 			
 			CommunicationCommand receiveCommand = (CommunicationCommand)objectinput.readObject();
-			List<GameInfo> games = JsonParser.parseToGameInfoList(receiveCommand.getMessage());
+			List<GameInfo> games = GameInfo.parseJsonToGameInfoList(receiveCommand.getMessage());
 
 			for (int i = 0; i < games.size(); i++) {
 				multiplayerMenu.model.addRow(new Object[]{ i+1 , 

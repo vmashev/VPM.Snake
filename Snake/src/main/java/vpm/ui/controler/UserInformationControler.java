@@ -9,7 +9,6 @@ import java.net.Socket;
 
 import vpm.helper.ClientSetup;
 import vpm.helper.CommunicationCommand;
-import vpm.helper.JsonParser;
 import vpm.model.UserEntity;
 import vpm.ui.ChangePassword;
 import vpm.ui.UserInformation;
@@ -70,13 +69,13 @@ public class UserInformationControler implements ActionListener{
 			objectOutput = new ObjectOutputStream(socket.getOutputStream());
 			objectinput = new ObjectInputStream(socket.getInputStream());
 			
-			String message = JsonParser.parseFromUserEntity(user);
+			String message = user.parseToJson();
 			
 			CommunicationCommand sendCommand = new CommunicationCommand(3, message);
 			objectOutput.writeObject(sendCommand);
 			
 			CommunicationCommand receiveCommand = (CommunicationCommand)objectinput.readObject();
-			user = JsonParser.parseToUserEntity(receiveCommand.getMessage());
+			user = UserEntity.parseJsonToUserEntity(receiveCommand.getMessage());
 			
 		} catch (IOException | ClassNotFoundException e) {
 			userInformation.showMessage(e.getMessage());
@@ -106,13 +105,16 @@ public class UserInformationControler implements ActionListener{
 			objectinput = new ObjectInputStream(socket.getInputStream());
 			
 			user = clientSetup.getUser();
-			String message = JsonParser.parseFromUserEntity(user);
+			String message = null;
+			if(user != null) {
+				message = user.parseToJson();
+			}
 			
 			CommunicationCommand sendCommand = new CommunicationCommand(1, message);
 			objectOutput.writeObject(sendCommand);
 			
 			CommunicationCommand receiveCommand = (CommunicationCommand)objectinput.readObject();
-			user = JsonParser.parseToUserEntity(receiveCommand.getMessage());
+			user = UserEntity.parseJsonToUserEntity(receiveCommand.getMessage());
 			
 			if(user == null) {
 				userInformation.showMessage("The username does not exist.");

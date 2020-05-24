@@ -1,9 +1,12 @@
 package vpm.comand;
 
+//Processed on the server for creating new multiplayer game
+//Create GameHandler thread and wait for opponent
+//Input: GameInfo 
+//Output: GameInfo - position of the snake and apple, and game status = WaitingForOpponent
 import vpm.helper.ClientConnection;
 import vpm.helper.CommunicationCommand;
 import vpm.helper.GameStatus;
-import vpm.helper.JsonParser;
 import vpm.model.GameInfo;
 import vpm.model.Snake;
 import vpm.server.GameHandler;
@@ -17,13 +20,13 @@ public class CreateLobbyCommand extends GameCommand{
 
 	@Override
 	public CommunicationCommand execute(CommunicationCommand requestCommand) {
-		gameInfo = JsonParser.parseToGameInfo(requestCommand.getMessage());
+		gameInfo = GameInfo.parseJsonToGameInfo(requestCommand.getMessage());
 		gameInfo.setStatus(GameStatus.WaitingForOpponent);
 		gameInfo.setApple(gameInfo.generateApple());
 		gameInfo.getSnakes().put(requestCommand.getUsername().getUsername(), Snake.createSnake(1, gameInfo.getWidth()));
 		gameInfo.setPlayerOne(requestCommand.getUsername());
 		
-		String jsonMessage = JsonParser.parseFromGameInfo(gameInfo);	
+		String jsonMessage = gameInfo.parseToJson();	
 		CommunicationCommand responseCommand = new CommunicationCommand(1, jsonMessage);
 		
 		GameHandler gHandler = new GameHandler(new ClientConnection(requestCommand.getUsername(), 

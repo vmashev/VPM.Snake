@@ -9,9 +9,7 @@ import java.net.Socket;
 
 import vpm.helper.ClientSetup;
 import vpm.helper.CommunicationCommand;
-import vpm.helper.ConnectionSetup;
 import vpm.helper.EncryptionUtils;
-import vpm.helper.JsonParser;
 import vpm.model.UserEntity;
 import vpm.ui.LogIn;
 
@@ -55,13 +53,13 @@ public class LogInControler implements ActionListener{
 			objectinput = new ObjectInputStream(socket.getInputStream());
 
 			UserEntity user = new UserEntity(nickname);
-			String message = JsonParser.parseFromUserEntity(user);
+			String jsonMessage = user.parseToJson();
 			
-			CommunicationCommand sendCommand = new CommunicationCommand(1, message);
+			CommunicationCommand sendCommand = new CommunicationCommand(1, jsonMessage);
 			objectOutput.writeObject(sendCommand);
 			
 			CommunicationCommand receiveCommand = (CommunicationCommand)objectinput.readObject();
-			user = JsonParser.parseToUserEntity(receiveCommand.getMessage());
+			user = UserEntity.parseJsonToUserEntity(receiveCommand.getMessage());
 			
 			if(user == null) {
 				logInPage.showMessage("The username does not exist.");

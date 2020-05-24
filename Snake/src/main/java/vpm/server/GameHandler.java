@@ -4,15 +4,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import vpm.comand.CommandFactory;
 import vpm.comand.Command;
+import vpm.comand.CommandFactory;
 import vpm.helper.ClientConnection;
 import vpm.helper.CommunicationCommand;
-import vpm.helper.GameStatus;
-import vpm.helper.JsonParser;
 import vpm.model.GameInfo;
-import vpm.model.Snake;
 
+//Thread which handle the communication with the client during the game
+//It is started on the server
+//Create one thread for send-GameOutHandler and receive-GameInHandler messages for every client
+//Process incoming commands from GameInHandlers who add received commands in ArrayBlockingQueue - inCommands
+//Add response commands in every GameOutHandler
 public class GameHandler implements Runnable{
 
 	private ArrayList<ClientConnection> clients;
@@ -40,8 +42,10 @@ public class GameHandler implements Runnable{
 	public void run() {
 
 		try {
-			
-			String message = JsonParser.parseFromGameInfo(gameInfo);
+			String message = null;
+			if(gameInfo != null) {
+				message = gameInfo.parseToJson();
+			}
 			outCommand = new CommunicationCommand(1, message);
 			
 			for (ClientConnection clientConnection : clients) {

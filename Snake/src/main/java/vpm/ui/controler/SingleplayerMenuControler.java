@@ -11,7 +11,6 @@ import java.util.List;
 
 import vpm.helper.ClientSetup;
 import vpm.helper.CommunicationCommand;
-import vpm.helper.JsonParser;
 import vpm.model.GameInfo;
 import vpm.model.UserEntity;
 import vpm.ui.GameBoard;
@@ -62,12 +61,12 @@ public class SingleplayerMenuControler implements ActionListener{
 
 	    		GameInfo gameInfo = new GameInfo(clientSetup.getUser(), width , height , speed);
 	    		
-				String message = JsonParser.parseFromGameInfo(gameInfo);
+				String message = gameInfo.parseToJson();
 				CommunicationCommand sendCommand = new CommunicationCommand(10, message);
 				objectOutput.writeObject(sendCommand);
 				
 				CommunicationCommand receiveCommand = (CommunicationCommand)objectinput.readObject();
-				gameInfo = JsonParser.parseToGameInfo(receiveCommand.getMessage());
+				gameInfo = GameInfo.parseJsonToGameInfo(receiveCommand.getMessage());
 				
 				GameBoard gameBoard = new GameBoard(gameInfo, objectOutput, objectinput);
 				gameBoard.setVisible(true);
@@ -93,12 +92,12 @@ public class SingleplayerMenuControler implements ActionListener{
         		GameInfo gameInfo = new GameInfo();
     			gameInfo.setDateTime(dateTime);
     			
-    			String message = JsonParser.parseFromGameInfo(gameInfo);
+    			String message = gameInfo.parseToJson();
     			CommunicationCommand sendCommand = new CommunicationCommand(5, message);
     			objectOutput.writeObject(sendCommand);
     			
     			CommunicationCommand receiveCommand = (CommunicationCommand)objectinput.readObject();
-    			gameInfo = JsonParser.parseToGameInfo(receiveCommand.getMessage());
+    			gameInfo = GameInfo.parseJsonToGameInfo(receiveCommand.getMessage());
     			
 				GameBoard gameBoard = new GameBoard(gameInfo, objectOutput, objectinput);
 				gameBoard.setVisible(true);
@@ -124,13 +123,16 @@ public class SingleplayerMenuControler implements ActionListener{
 			objectinput = new ObjectInputStream(socket.getInputStream());
 			
 			UserEntity user = clientSetup.getUser();
-			String message = JsonParser.parseFromUserEntity(user);
+			String message = null; 
+			if(user != null) {	
+				message = user.parseToJson();
+			}
 			
 			CommunicationCommand sendCommand = new CommunicationCommand(4, message);
 			objectOutput.writeObject(sendCommand);
 			
 			CommunicationCommand receiveCommand = (CommunicationCommand)objectinput.readObject();
-			List<GameInfo> games = JsonParser.parseToGameInfoList(receiveCommand.getMessage());
+			List<GameInfo> games = GameInfo.parseJsonToGameInfoList(receiveCommand.getMessage());
 
 			for (int i = 0; i < games.size(); i++) {
 				singleplayerMenu.model.addRow(new Object[]{ i+1 , 

@@ -47,7 +47,7 @@ public class ServerSetup {
 
 			appProps.load(new FileInputStream(appConfigPath));
 		    serverPort = Integer.valueOf(appProps.getProperty("SERVER_PORT"));
-			System.out.println(serverPort);
+			
 		} catch (IOException e) {
 		    e.printStackTrace();
 		}
