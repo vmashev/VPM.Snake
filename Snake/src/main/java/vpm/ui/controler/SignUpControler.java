@@ -7,11 +7,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-import javax.swing.JOptionPane;
-
 import vpm.helper.ClientSetup;
 import vpm.helper.CommunicationCommand;
-import vpm.helper.Constants;
+import vpm.helper.ConnectionSetup;
 import vpm.helper.EncryptionUtils;
 import vpm.helper.JsonParser;
 import vpm.model.UserEntity;
@@ -21,9 +19,6 @@ import vpm.ui.SignUp;
 public class SignUpControler implements ActionListener{
 
 	private SignUp signUpPage;
-	private Socket socket ;
-	private ObjectOutputStream outputStream ;
-	private ObjectInputStream inputStream ;
 
 	public SignUpControler(SignUp signUp) {
 		this.signUpPage = signUp;
@@ -75,18 +70,22 @@ public class SignUpControler implements ActionListener{
 		user.setFirstName(firstName);
 		user.setLastName(lastName);
 		user.setEmail(email);
-				
+			
+		ObjectOutputStream objectOutput = null;
+		ObjectInputStream objectinput = null;
+
 		try {
-			socket = new Socket(Constants.SERVER_IP , Constants.PORT);
-			outputStream = new ObjectOutputStream(socket.getOutputStream());
-			inputStream = new ObjectInputStream(socket.getInputStream());
+			
+			Socket socket = new Socket(ConnectionSetup.SERVER_IP, ConnectionSetup.PORT);
+			objectOutput = new ObjectOutputStream(socket.getOutputStream());
+    		objectinput = new ObjectInputStream(socket.getInputStream());
 			
 			String jsonMessage = JsonParser.parseFromUserEntity(user);
 			
 			CommunicationCommand sendCommand = new CommunicationCommand(2, jsonMessage);
-			outputStream.writeObject(sendCommand);
+			objectOutput.writeObject(sendCommand);
 			
-			CommunicationCommand receiveCommand = (CommunicationCommand)inputStream.readObject();
+			CommunicationCommand receiveCommand = (CommunicationCommand)objectinput.readObject();
 			user = JsonParser.parseToUserEntity(receiveCommand.getMessage());
 			
 			if(user == null) {
@@ -103,8 +102,12 @@ public class SignUpControler implements ActionListener{
 			signUpPage.showMessage(e.getMessage());
 		} finally {
 			try {
-				outputStream.close();
-				inputStream.close();
+				if(objectOutput != null) {
+					objectOutput.close();
+				}
+				if(objectinput != null) {
+					objectinput.close();
+				}
 			} catch (IOException e) {
 				signUpPage.showMessage(e.getMessage());
 			}

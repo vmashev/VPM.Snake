@@ -17,7 +17,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Transient;
 
-import vpm.helper.Constants;
 import vpm.helper.Direction;
 import vpm.helper.GameStatus;
 
@@ -155,9 +154,9 @@ public class GameInfo implements Serializable{
 		
 		while(collison) {
 
-			int randomRow = ThreadLocalRandom.current().nextInt(0, height / Constants.SIZE );
-			int randomCol = ThreadLocalRandom.current().nextInt(0, width / Constants.SIZE );
-			randomAppleDot = new Dot(randomRow * Constants.SIZE, randomCol * Constants.SIZE);
+			int randomRow = ThreadLocalRandom.current().nextInt(0, height / Dot.RENDER_SIZE );
+			int randomCol = ThreadLocalRandom.current().nextInt(0, width / Dot.RENDER_SIZE );
+			randomAppleDot = new Dot(randomRow * Dot.RENDER_SIZE, randomCol * Dot.RENDER_SIZE);
 			
 			collison = false;
 			for (Snake snake : getSnakes().values()) {

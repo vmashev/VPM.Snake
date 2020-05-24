@@ -2,7 +2,6 @@ package vpm.client;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.net.Socket;
 
 import vpm.helper.ClientSetup;
 import vpm.helper.CommunicationCommand;

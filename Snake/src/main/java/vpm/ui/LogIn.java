@@ -1,12 +1,6 @@
 package vpm.ui;
 
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -17,12 +11,6 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
-import vpm.helper.ClientSetup;
-import vpm.helper.CommunicationCommand;
-import vpm.helper.Constants;
-import vpm.helper.EncryptionUtils;
-import vpm.helper.JsonParser;
-import vpm.model.UserEntity;
 import vpm.ui.controler.LogInControler;
 
 public class LogIn extends JDialog {

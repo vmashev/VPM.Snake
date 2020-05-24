@@ -9,7 +9,7 @@ import java.net.Socket;
 
 import vpm.helper.ClientSetup;
 import vpm.helper.CommunicationCommand;
-import vpm.helper.Constants;
+import vpm.helper.ConnectionSetup;
 import vpm.helper.EncryptionUtils;
 import vpm.helper.JsonParser;
 import vpm.model.UserEntity;
@@ -17,9 +17,6 @@ import vpm.ui.LogIn;
 
 public class LogInControler implements ActionListener{
 
-	private Socket socket;
-	private ObjectOutputStream objectOutput ;
-	private ObjectInputStream objectinput ;
 	private LogIn logInPage;
 	
 	public LogInControler(LogIn logIn) {
@@ -48,11 +45,14 @@ public class LogInControler implements ActionListener{
 			return;
 		}
 		
+		ObjectOutputStream objectOutput = null;
+		ObjectInputStream objectinput = null;
+		
 		try {
-			socket = new Socket(Constants.SERVER_IP , Constants.PORT);
+			Socket socket = new Socket(ConnectionSetup.SERVER_IP, ConnectionSetup.PORT);
 			objectOutput = new ObjectOutputStream(socket.getOutputStream());
 			objectinput = new ObjectInputStream(socket.getInputStream());
-			
+
 			UserEntity user = new UserEntity(nickname);
 			String message = JsonParser.parseFromUserEntity(user);
 			
@@ -82,8 +82,12 @@ public class LogInControler implements ActionListener{
 			logInPage.showMessage(e.getMessage());
 		} finally {
 			try {
-				objectOutput.close();
-				objectinput.close();
+				if(objectOutput != null) {
+					objectOutput.close();
+				}
+				if(objectinput != null) {
+					objectinput.close();
+				}
 			} catch (IOException e) {
 				logInPage.showMessage(e.getMessage());
 			}

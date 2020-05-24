@@ -10,13 +10,10 @@ import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Embeddable;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.OrderColumn;
 import javax.persistence.Transient;
 
-import vpm.helper.Constants;
 import vpm.helper.Direction;
 
 @Embeddable
@@ -84,20 +81,20 @@ public class Snake implements Serializable{
 	public void move() {
 		
 		if(getDirection() == Direction.UP && rowChange == null) {
-			rowChange = -Constants.SIZE;
+			rowChange = -Dot.RENDER_SIZE;
 			colChange = null;
 		}
 		if(getDirection() == Direction.DOWN && rowChange == null) {
-			rowChange = Constants.SIZE;
+			rowChange = Dot.RENDER_SIZE;
 			colChange = null;
 		}	
 		if(getDirection() == Direction.LEFT && colChange == null) {
 			rowChange = null;
-			colChange = -Constants.SIZE;
+			colChange = -Dot.RENDER_SIZE;
 		}
 		if(getDirection() == Direction.RIGHT && colChange == null) {
 			rowChange = null;
-			colChange = Constants.SIZE;
+			colChange = Dot.RENDER_SIZE;
 		}
 		
 		
@@ -118,14 +115,14 @@ public class Snake implements Serializable{
 		switch (playerNo) {
 		case 1:
 			for(int j = 0 ; j < 3 ; j++) {
-				tempDot = new Dot(j * Constants.SIZE, 1 * Constants.SIZE);
+				tempDot = new Dot(j * Dot.RENDER_SIZE, 1 * Dot.RENDER_SIZE);
 				snake.getList().add(tempDot) ;
 			}
 			break;
 
 		case 2:
 			for(int j = 0 ; j < 3 ; j++) {
-				tempDot = new Dot(j * Constants.SIZE, boardWidth - (2 * Constants.SIZE));
+				tempDot = new Dot(j * Dot.RENDER_SIZE, boardWidth - (2 * Dot.RENDER_SIZE));
 				snake.getList().add(tempDot) ;
 			}
 			break;

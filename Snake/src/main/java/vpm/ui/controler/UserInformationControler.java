@@ -7,14 +7,11 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-import javax.swing.JOptionPane;
-
 import vpm.helper.ClientSetup;
 import vpm.helper.CommunicationCommand;
-import vpm.helper.Constants;
+import vpm.helper.ConnectionSetup;
 import vpm.helper.JsonParser;
 import vpm.model.UserEntity;
-import vpm.model.service.UserService;
 import vpm.ui.ChangePassword;
 import vpm.ui.UserInformation;
 
@@ -22,10 +19,6 @@ public class UserInformationControler implements ActionListener{
 
 	private UserInformation userInformation;
 	private UserEntity user;
-	Socket socket ;
-	ObjectOutputStream outputStream ;
-	ObjectInputStream inputStream ;
-
 	
 	public UserInformationControler(UserInformation userInformation) {
 		this.userInformation = userInformation;
@@ -67,26 +60,33 @@ public class UserInformationControler implements ActionListener{
 			user.setEncryptedPassword(userInformation.getNewPassword());
 		}
 		
+		ObjectOutputStream objectOutput = null;
+		ObjectInputStream objectinput = null;
 		
 		try {
-			socket = new Socket(Constants.SERVER_IP , Constants.PORT);
-			outputStream = new ObjectOutputStream(socket.getOutputStream());
-			inputStream = new ObjectInputStream(socket.getInputStream());
+			
+			Socket socket = new Socket(ConnectionSetup.SERVER_IP, ConnectionSetup.PORT);
+			objectOutput = new ObjectOutputStream(socket.getOutputStream());
+			objectinput = new ObjectInputStream(socket.getInputStream());
 			
 			String message = JsonParser.parseFromUserEntity(user);
 			
 			CommunicationCommand sendCommand = new CommunicationCommand(3, message);
-			outputStream.writeObject(sendCommand);
+			objectOutput.writeObject(sendCommand);
 			
-			CommunicationCommand receiveCommand = (CommunicationCommand)inputStream.readObject();
+			CommunicationCommand receiveCommand = (CommunicationCommand)objectinput.readObject();
 			user = JsonParser.parseToUserEntity(receiveCommand.getMessage());
 			
 		} catch (IOException | ClassNotFoundException e) {
 			userInformation.showMessage(e.getMessage());
 		} finally {
 			try {
-				outputStream.close();
-				inputStream.close();
+				if(objectOutput != null) {
+					objectOutput.close();
+				}
+				if(objectinput != null) {
+					objectinput.close();
+				}
 			} catch (IOException e) {
 				userInformation.showMessage(e.getMessage());
 			}
@@ -96,18 +96,22 @@ public class UserInformationControler implements ActionListener{
 	public void getUserInfo() {
 		ClientSetup clientSetup = ClientSetup.createInstance();
 		
+		ObjectOutputStream objectOutput = null;
+		ObjectInputStream objectinput = null;
+		
 		try {
-			socket = new Socket(Constants.SERVER_IP , Constants.PORT);
-			outputStream = new ObjectOutputStream(socket.getOutputStream());
-			inputStream = new ObjectInputStream(socket.getInputStream());
+			
+			Socket socket = new Socket(ConnectionSetup.SERVER_IP, ConnectionSetup.PORT);
+			objectOutput = new ObjectOutputStream(socket.getOutputStream());
+			objectinput = new ObjectInputStream(socket.getInputStream());
 			
 			user = new UserEntity(clientSetup.getUsername());
 			String message = JsonParser.parseFromUserEntity(user);
 			
 			CommunicationCommand sendCommand = new CommunicationCommand(1, message);
-			outputStream.writeObject(sendCommand);
+			objectOutput.writeObject(sendCommand);
 			
-			CommunicationCommand receiveCommand = (CommunicationCommand)inputStream.readObject();
+			CommunicationCommand receiveCommand = (CommunicationCommand)objectinput.readObject();
 			user = JsonParser.parseToUserEntity(receiveCommand.getMessage());
 			
 			if(user == null) {
@@ -125,8 +129,12 @@ public class UserInformationControler implements ActionListener{
 			userInformation.showMessage(e.getMessage());
 		} finally {
 			try {
-				outputStream.close();
-				inputStream.close();
+				if(objectOutput != null) {
+					objectOutput.close();
+				}
+				if(objectinput != null) {
+					objectinput.close();
+				}
 			} catch (IOException e) {
 				userInformation.showMessage(e.getMessage());
 			}

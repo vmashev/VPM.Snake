@@ -8,9 +8,8 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.List;
 
-import vpm.helper.ClientSetup;
 import vpm.helper.CommunicationCommand;
-import vpm.helper.Constants;
+import vpm.helper.ConnectionSetup;
 import vpm.helper.JsonParser;
 import vpm.model.GameInfo;
 import vpm.model.UserEntity;
@@ -18,9 +17,6 @@ import vpm.ui.Statistic;
 
 public class StatisticControler implements ActionListener{
 
-	private Socket socket;
-	private ObjectOutputStream outputStream;
-	private ObjectInputStream inputStream;
 	private Statistic statistic;
 	
 	public StatisticControler(Statistic statistic) {
@@ -41,18 +37,23 @@ public class StatisticControler implements ActionListener{
 	
 	public void getStatistics(String username) {
 		
+		ObjectOutputStream objectOutput = null;
+		ObjectInputStream objectinput = null;
+		
 		try {
-			socket = new Socket(Constants.SERVER_IP , Constants.PORT);
-    		outputStream = new ObjectOutputStream(socket.getOutputStream());
-    		inputStream = new ObjectInputStream(socket.getInputStream());
-    		
+			
+			Socket socket = new Socket(ConnectionSetup.SERVER_IP, ConnectionSetup.PORT);
+			objectOutput = new ObjectOutputStream(socket.getOutputStream());
+			objectinput = new ObjectInputStream(socket.getInputStream());
+			
+			
 			UserEntity user = new UserEntity(username);
 			String message = JsonParser.parseFromUserEntity(user);
 			
 			CommunicationCommand sendCommand = new CommunicationCommand(6, message);
-			outputStream.writeObject(sendCommand);
+			objectOutput.writeObject(sendCommand);
 			
-			CommunicationCommand receiveCommand = (CommunicationCommand)inputStream.readObject();
+			CommunicationCommand receiveCommand = (CommunicationCommand)objectinput.readObject();
 			List<GameInfo> games = JsonParser.parseToGameInfoList(receiveCommand.getMessage());
 
 			for (int i = 0; i < statistic.model.getRowCount(); i++) {
@@ -71,9 +72,9 @@ public class StatisticControler implements ActionListener{
 			
 			
 			sendCommand = new CommunicationCommand(1, message);
-			outputStream.writeObject(sendCommand);
+			objectOutput.writeObject(sendCommand);
 			
-			receiveCommand = (CommunicationCommand)inputStream.readObject();
+			receiveCommand = (CommunicationCommand)objectinput.readObject();
 			user = JsonParser.parseToUserEntity(receiveCommand.getMessage());
 			
 			statistic.usernameFld.setText(user.getUsername());
@@ -83,8 +84,12 @@ public class StatisticControler implements ActionListener{
 			statistic.showMessage(e.getMessage());
 		} finally {
 			try {
-				outputStream.close();
-				inputStream.close();
+				if(objectOutput != null) {
+					objectOutput.close();
+				}
+				if(objectinput != null) {
+					objectinput.close();
+				}
 			} catch (IOException e) {
 				statistic.showMessage(e.getMessage());
 			}

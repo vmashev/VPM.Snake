@@ -3,14 +3,15 @@ package vpm.model;
 import java.awt.Graphics2D;
 
 import javax.persistence.Embeddable;
-
-import vpm.helper.Constants;
+import javax.persistence.Transient;
 
 @Embeddable
 public class Dot {
 	
 	private int row;
 	private int col;
+	@Transient
+	public static final int RENDER_SIZE = 10;
 	
 	public Dot() {}
 	
@@ -47,6 +48,6 @@ public class Dot {
 	}
 	
 	public void render(Graphics2D graphics2d) {
-		graphics2d.fillRect(col + 1, row + 1, Constants.SIZE - 2, Constants.SIZE - 2);
+		graphics2d.fillRect(col + 1, row + 1, RENDER_SIZE - 2, RENDER_SIZE - 2);
 	}
 }

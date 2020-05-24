@@ -4,11 +4,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-import vpm.helper.ClientConnection;
-import vpm.helper.Constants;
+import vpm.helper.ConnectionSetup;
 import vpm.helper.ServerSetup;
 
 public class StartServer {
@@ -23,10 +20,10 @@ public class StartServer {
 	public StartServer() throws IOException, ClassNotFoundException {
 		
 		ServerSetup serverSetup = ServerSetup.createInstance();
-		ServerSocket serverSocket = new ServerSocket(Constants.PORT);
+		ServerSocket serverSocket = new ServerSocket(ConnectionSetup.PORT);
 		
 		while (true) {
-			System.out.println("Server is running on port " + Constants.PORT);
+			System.out.println("Server is running on port " + ConnectionSetup.PORT);
 			Socket socket = serverSocket.accept(); 
 			
 			GameManager clientThread = new GameManager(socket,gameHandlers);

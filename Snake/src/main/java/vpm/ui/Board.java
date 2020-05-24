@@ -74,6 +74,12 @@ public class Board extends JPanel implements Runnable, KeyListener {
 	@Override
 	public void keyPressed(KeyEvent e) {
 		int k = e.getKeyCode();
+		
+		//If you are not host username you can't make firs move.
+		if(!clientSetup.getUsername().equals(gameInfo.getHostUsername()) && (snakeMove.getStatus() == GameStatus.Ready)) {
+			return;
+		}
+		
 		if( k == KeyEvent.VK_W) {
 			snakeMove.setDirection(Direction.UP);
 			snakeMove.setStatus(GameStatus.Run);
@@ -193,10 +199,12 @@ public class Board extends JPanel implements Runnable, KeyListener {
 		this.snakeMove = snakeMove;
 	}
 	
+	//Init board once on open
 	private void init() throws IOException {
 		targetTime = 1000 / gameInfo.getSpeed();
 		image = new BufferedImage(gameInfo.getWidth(), gameInfo.getHeight(), BufferedImage.TYPE_INT_ARGB);
 		
+		//Need to sleep to set properly image on graphics2D 
 		try {
 			Thread.sleep(200);
 		} catch (InterruptedException e) {
@@ -221,42 +229,37 @@ public class Board extends JPanel implements Runnable, KeyListener {
 		graphics.dispose();
 	}
 	
+	
 	private void render(Graphics2D graphics) {
 		graphics2D.clearRect(0, 0, gameInfo.getWidth() , gameInfo.getHeight() );
-		graphics2D.setColor(Color.BLUE);
-		
-		for (Snake snake : gameInfo.getSnakes().values()) {
+	
+		graphics2D.setColor(Color.GREEN);
+		gameInfo.getApple().render(graphics2D);
+
+		//Render snakes and score on the board
+		for (Map.Entry<String,Snake> snakeEntry : gameInfo.getSnakes().entrySet()) {
+
+			String playerInfo = "Score: " + snakeEntry.getValue().getScore();
+			
+			if(snakeEntry.getKey().equals(gameInfo.getPlayerOne())) {
+				graphics2D.setColor(Color.WHITE);
+				graphics2D.drawString(playerInfo, 10, 10);
+				
+				graphics2D.setColor(Color.BLUE);
+			} else {
+				graphics2D.setColor(Color.WHITE);
+				graphics2D.drawString(playerInfo, getWidth() - 100 , 10);
+				graphics2D.setColor(Color.RED);
+			}
+			
+			Snake snake = snakeEntry.getValue();
 			for (Dot dot : snake.getList()) {
 				dot.render(graphics2D);
 			}
-			
-			graphics2D.setColor(Color.RED);
 		}
 
-		graphics2D.setColor(Color.GREEN);
-		gameInfo.getApple().render(graphics2D);
-		
+		//Render game status on the board
 		graphics2D.setColor(Color.WHITE);
-		
-		int i = 0;
-		for (Map.Entry<String,Snake> snakeEntry : gameInfo.getSnakes().entrySet()) {
-			
-			i++;
-			
-			String playerInfo = snakeEntry.getKey() + " score: " + snakeEntry.getValue().getScore();
-			
-			switch (i) {
-			case 1:
-				graphics2D.drawString(playerInfo, 10, 10);
-				break;
-			case 2:
-				graphics2D.drawString(playerInfo, getWidth() - 100 , 10);
-				break;
-			default:
-				break;
-			}			
-		}
-		
 		if(gameInfo.getStatus() != null) {
 			switch (gameInfo.getStatus()) {
 			case Pause:
@@ -270,7 +273,12 @@ public class Board extends JPanel implements Runnable, KeyListener {
 				break;				
 			case GameOver:
 				int score = gameInfo.getSnakes().get(clientSetup.getUsername()).getScore();
-				graphics2D.drawString("GameOver! Score: " + score, (gameInfo.getWidth() / 2) -40, (gameInfo.getHeight() / 2));
+				if(gameInfo.getWinnerPlayer() == clientSetup.getUsername()) {					
+					graphics2D.drawString("Winner! Score: " + score, (gameInfo.getWidth() / 2) -40, (gameInfo.getHeight() / 2));
+				} else {
+					graphics2D.drawString("GameOver! Score: " + score, (gameInfo.getWidth() / 2) -40, (gameInfo.getHeight() / 2));
+				}
+				
 				break;
 			}
 		}

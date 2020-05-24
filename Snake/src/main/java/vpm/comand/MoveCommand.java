@@ -14,6 +14,7 @@ import vpm.model.service.UserService;
 import vpm.model.service.impl.GameInfoServiceImpl;
 import vpm.model.service.impl.UserServiceImpl;
 
+//Command which is send from a client about snake movement
 public class MoveCommand extends Command{
 
 	public MoveCommand(GameInfo gameInfo) {
@@ -25,6 +26,7 @@ public class MoveCommand extends Command{
 		CommunicationCommand responseCommand;
 		SnakeMoveInfo requestSnakeMove = JsonParser.parseToSnakeMoveInfo(requestCommand.getMessage());
 		
+		//If the game is not started or it is in pause mode
 		if((requestSnakeMove.getStatus() == null) || (requestSnakeMove.getStatus() == GameStatus.Pause)){
 			responseCommand = new CommunicationCommand(0, null);
 			return responseCommand;
@@ -34,7 +36,14 @@ public class MoveCommand extends Command{
 		case Run:
 			if(requestSnakeMove.getDirection() != null) {
 				gameInfo.setStatus(GameStatus.Run);
+				//Move snake or return false if has collison
 				if(!gameInfo.updateSnake(requestSnakeMove.getUsername(), requestSnakeMove.getDirection())) {
+					
+					//Set winner if it is multiplayer
+					if(gameInfo.getSnakes().size() > 1) {
+						String winner = requestSnakeMove.getUsername()==gameInfo.getPlayerOne() ? gameInfo.getPlayerTwo():gameInfo.getPlayerOne();
+						gameInfo.setWinnerPlayer(winner);
+					}
 					
 					gameInfo.setStatus(GameStatus.GameOver);
 					saveGame(gameInfo);	
@@ -68,6 +77,7 @@ public class MoveCommand extends Command{
 		return deltaGameInfo;
 	}
 	
+	//Save the game on Quit or when the game is over
 	private void saveGame(GameInfo gameInfo) {
 		gameInfo.setHostSnake(gameInfo.getSnakes().get(gameInfo.getHostUsername()));
 		
@@ -78,6 +88,7 @@ public class MoveCommand extends Command{
 		
 	}
 
+	//Update max score in UserEntity when the game is saved
 	private void updateMaxScore(GameInfo gameInfo) {
 		
 		for (Map.Entry<String,Snake> snakeEntry : gameInfo.getSnakes().entrySet()) {

@@ -1,26 +1,19 @@
 package vpm.ui.controler;
 
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.time.LocalDateTime;
 import java.util.List;
-
-import javax.swing.JFrame;
-import javax.swing.WindowConstants;
 
 import vpm.helper.ClientSetup;
 import vpm.helper.CommunicationCommand;
-import vpm.helper.Constants;
-import vpm.helper.GameStatus;
+import vpm.helper.ConnectionSetup;
 import vpm.helper.JsonParser;
 import vpm.model.GameInfo;
-import vpm.model.UserEntity;
-import vpm.ui.Board;
+import vpm.ui.GameBoard;
 import vpm.ui.MultiplayerMenu;
 import vpm.ui.NewGame;
 
@@ -60,30 +53,22 @@ public class MultiplayerMenuControler implements ActionListener{
 		
 			clientSetup = ClientSetup.createInstance();
 	        try {
-	        	Socket socket = new Socket(Constants.SERVER_IP , Constants.PORT);
-	        	ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
-	    		ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
+	        	Socket socket = new Socket(ConnectionSetup.SERVER_IP, ConnectionSetup.PORT);
+				ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
+	    		ObjectInputStream objectinput = new ObjectInputStream(socket.getInputStream());
 	    		
 	    		GameInfo gameInfo = new GameInfo(clientSetup.getUsername(), width , height , speed);
 	    		
 				String message = JsonParser.parseFromGameInfo(gameInfo);
 				CommunicationCommand sendCommand = new CommunicationCommand(13, message);
 
-				outputStream.writeObject(sendCommand);
+				objectOutput.writeObject(sendCommand);
 				
-				CommunicationCommand receiveCommand = (CommunicationCommand)inputStream.readObject();
+				CommunicationCommand receiveCommand = (CommunicationCommand)objectinput.readObject();
 				gameInfo = JsonParser.parseToGameInfo(receiveCommand.getMessage());
 				
-				Board board = new Board(gameInfo, outputStream, inputStream);
-	    		
-	    		JFrame frame = new JFrame("Play");
-	    		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-	    		frame.setContentPane(board);
-	    		frame.setResizable(false);
-	    		frame.pack();
-	    		frame.setPreferredSize(new Dimension(gameInfo.getWidth(), gameInfo.getHeight()));
-	    		frame.setLocationRelativeTo(null);
-	    		frame.setVisible(true);	
+				GameBoard gameBoard = new GameBoard(gameInfo, objectOutput, objectinput);
+				gameBoard.setVisible(true);
 				
 			} catch (IOException | ClassNotFoundException e) {
 				multiplayerMenu.showMessage(e.getMessage());
@@ -98,28 +83,20 @@ public class MultiplayerMenuControler implements ActionListener{
             String username = (String) multiplayerMenu.table.getValueAt(selectedRow, 1);
             
             try {
-            	Socket socket = new Socket(Constants.SERVER_IP , Constants.PORT);
-            	ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
-            	ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
-        		
+            	Socket socket = new Socket(ConnectionSetup.SERVER_IP, ConnectionSetup.PORT);
+				ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
+	    		ObjectInputStream objectinput = new ObjectInputStream(socket.getInputStream());
+	    		
     			String message = username;
     			CommunicationCommand sendCommand = new CommunicationCommand(14, message);
-    			outputStream.writeObject(sendCommand);
+    			objectOutput.writeObject(sendCommand);
     			
-    			CommunicationCommand receiveCommand = (CommunicationCommand)inputStream.readObject();
+    			CommunicationCommand receiveCommand = (CommunicationCommand)objectinput.readObject();
     			GameInfo gameInfo = JsonParser.parseToGameInfo(receiveCommand.getMessage());
     			
-    			Board board = new Board(gameInfo, outputStream, inputStream);
+				GameBoard gameBoard = new GameBoard(gameInfo, objectOutput, objectinput);
+				gameBoard.setVisible(true);
         		
-        		JFrame frame = new JFrame("Play");
-        		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        		frame.setContentPane(board);
-        		frame.setResizable(false);
-        		frame.pack();
-        		frame.setPreferredSize(new Dimension(gameInfo.getWidth(), gameInfo.getHeight()));
-        		frame.setLocationRelativeTo(null);
-        		frame.setVisible(true);	
-    			
     		} catch (IOException | ClassNotFoundException e) {
     			multiplayerMenu.showMessage(e.getMessage());
     		} 
@@ -127,17 +104,17 @@ public class MultiplayerMenuControler implements ActionListener{
 	}
 	
 	public void getLobbies() {
-		ObjectOutputStream outputStream = null;
-		ObjectInputStream inputStream = null;
+		ObjectOutputStream objectOutput = null;
+		ObjectInputStream objectinput = null;
 		try {
-			Socket socket = new Socket(Constants.SERVER_IP , Constants.PORT);
-			outputStream = new ObjectOutputStream(socket.getOutputStream());
-			inputStream = new ObjectInputStream(socket.getInputStream());
+			Socket socket = new Socket(ConnectionSetup.SERVER_IP, ConnectionSetup.PORT);
+			objectOutput = new ObjectOutputStream(socket.getOutputStream());
+    		objectinput = new ObjectInputStream(socket.getInputStream());
     		
     		CommunicationCommand sendCommand = new CommunicationCommand(15, null);
-			outputStream.writeObject(sendCommand);
+    		objectOutput.writeObject(sendCommand);
 			
-			CommunicationCommand receiveCommand = (CommunicationCommand)inputStream.readObject();
+			CommunicationCommand receiveCommand = (CommunicationCommand)objectinput.readObject();
 			List<GameInfo> games = JsonParser.parseToGameInfoList(receiveCommand.getMessage());
 
 			for (int i = 0; i < games.size(); i++) {
@@ -151,11 +128,11 @@ public class MultiplayerMenuControler implements ActionListener{
 			multiplayerMenu.showMessage(e.getMessage());
 		} finally {
 			try {
-				if(outputStream != null) {
-					outputStream.close();
+				if(objectOutput != null) {
+					objectOutput.close();
 				}
-				if(inputStream != null) {
-					inputStream.close();
+				if(objectinput != null) {
+					objectinput.close();
 				}
 			} catch (IOException e) {
 				multiplayerMenu.showMessage(e.getMessage());
