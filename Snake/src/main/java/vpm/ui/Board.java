@@ -51,7 +51,7 @@ public class Board extends JPanel implements Runnable, KeyListener {
 		this.gameInfo = gameInfo;
 		this.objectOutput = objectOutput;
 		this.objectInput = objectInput;
-		this.snakeMove = new SnakeMoveInfo(clientSetup.getUsername().getUsername() , GameStatus.Ready , Direction.DOWN);
+		this.snakeMove = new SnakeMoveInfo(clientSetup.getUser().getUsername() , GameStatus.Ready , Direction.DOWN);
 		
 		setPreferredSize(new Dimension(gameInfo.getWidth(), gameInfo.getHeight()));
 		setFocusable(true);
@@ -76,8 +76,8 @@ public class Board extends JPanel implements Runnable, KeyListener {
 		int k = e.getKeyCode();
 		
 		//If you are not host username you can't make firs move.
-		System.out.println(clientSetup.getUsername().equals(gameInfo.getPlayerOne()));
-		if(!(clientSetup.getUsername().equals(gameInfo.getPlayerOne())) && (snakeMove.getStatus() == GameStatus.Ready)) {
+		System.out.println(clientSetup.getUser().equals(gameInfo.getPlayerOne()));
+		if(!(clientSetup.getUser().equals(gameInfo.getPlayerOne())) && (snakeMove.getStatus() == GameStatus.Ready)) {
 			return;
 		}
 		
@@ -135,7 +135,7 @@ public class Board extends JPanel implements Runnable, KeyListener {
 				if(snakeMove.getStatus() != null) {
 					switch (snakeMove.getStatus()) {
 					case GameOver:
-						JOptionPane.showMessageDialog(this, "GameOver! Max Score: " + gameInfo.getSnakes().get(clientSetup.getUsername()).getScore());
+						JOptionPane.showMessageDialog(this, "GameOver! Max Score: " + gameInfo.getSnakes().get(clientSetup.getUser()).getScore());
 						win.dispose();
 						thread.interrupt();
 						break;
@@ -273,8 +273,8 @@ public class Board extends JPanel implements Runnable, KeyListener {
 				graphics2D.drawString("Waiting for opponent.", (gameInfo.getWidth() / 2) -40, (gameInfo.getHeight() / 2));
 				break;				
 			case GameOver:
-				int score = gameInfo.getSnakes().get(clientSetup.getUsername()).getScore();
-				if(gameInfo.getWinnerPlayer() == clientSetup.getUsername()) {					
+				int score = gameInfo.getSnakes().get(clientSetup.getUser().getUsername()).getScore();
+				if(gameInfo.getWinnerPlayer() == clientSetup.getUser()) {					
 					graphics2D.drawString("Winner! Score: " + score, (gameInfo.getWidth() / 2) -40, (gameInfo.getHeight() / 2));
 				} else {
 					graphics2D.drawString("GameOver! Score: " + score, (gameInfo.getWidth() / 2) -40, (gameInfo.getHeight() / 2));
@@ -290,6 +290,7 @@ public class Board extends JPanel implements Runnable, KeyListener {
 		PauseMenu pauseMenu = new PauseMenu(this);
 		pauseMenu.setModalExclusionType(ModalExclusionType.NO_EXCLUDE);
 		pauseMenu.setVisible(true);
+		
 	}
 	
 }

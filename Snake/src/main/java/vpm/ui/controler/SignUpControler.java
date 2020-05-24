@@ -96,7 +96,7 @@ public class SignUpControler implements ActionListener{
 			}
 			
 			ClientSetup clientSetup = ClientSetup.createInstance();
-			clientSetup.setUsername(user);
+			clientSetup.setUser(user);
 
 			signUpPage.dispose();		
 			

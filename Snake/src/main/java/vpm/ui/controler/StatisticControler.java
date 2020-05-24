@@ -29,11 +29,56 @@ public class StatisticControler implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		switch (e.getActionCommand()) {
 		case "Search":
-			getStatistics(new UserEntity(statistic.usernameFld.getText()));
+			if(!statistic.usernameFld.getText().equals("")) {
+				search();
+			}
 			break;
 		case "Close":
 			statistic.dispose();
 			break;		
+		}
+	}
+	
+	private void search() {
+		
+		ClientSetup clientSetup = ClientSetup.createInstance();
+		ObjectOutputStream objectOutput = null;
+		ObjectInputStream objectinput = null;
+		UserEntity user = null;
+		
+		try {
+
+			Socket socket = new Socket(clientSetup.getServerIp(), clientSetup.getServerPort());
+			objectOutput = new ObjectOutputStream(socket.getOutputStream());
+			objectinput = new ObjectInputStream(socket.getInputStream());
+
+			user = new UserEntity(statistic.usernameFld.getText());
+			String message = JsonParser.parseFromUserEntity(user);
+			
+			CommunicationCommand sendCommand = new CommunicationCommand(1, message);
+			objectOutput.writeObject(sendCommand);
+			
+			CommunicationCommand receiveCommand = (CommunicationCommand)objectinput.readObject();
+			user = JsonParser.parseToUserEntity(receiveCommand.getMessage());
+
+		} catch (IOException | ClassNotFoundException e) {
+			statistic.showMessage(e.getMessage());
+		} finally {
+			try {
+				if(objectOutput != null) {
+					objectOutput.close();
+				}
+				if(objectinput != null) {
+					objectinput.close();
+				}
+			} catch (IOException e) {
+				statistic.showMessage(e.getMessage());
+			}
+		}	
+		if(user != null) {
+			getStatistics(user);
+		} else {
+			statistic.showMessage("User not found.");
 		}
 	}
 	
@@ -48,7 +93,6 @@ public class StatisticControler implements ActionListener{
 			objectOutput = new ObjectOutputStream(socket.getOutputStream());
 			objectinput = new ObjectInputStream(socket.getInputStream());
 			
-			
 			String message = JsonParser.parseFromUserEntity(user);
 			
 			CommunicationCommand sendCommand = new CommunicationCommand(6, message);
@@ -57,17 +101,28 @@ public class StatisticControler implements ActionListener{
 			CommunicationCommand receiveCommand = (CommunicationCommand)objectinput.readObject();
 			List<GameInfo> games = JsonParser.parseToGameInfoList(receiveCommand.getMessage());
 
-			for (int i = 0; i < statistic.model.getRowCount(); i++) {
-				statistic.model.removeRow(i);	
+			
+			while (statistic.model.getRowCount() != 0) {
+				statistic.model.removeRow(0);	
 			}
 			
 			for (int i = 0; i < games.size(); i++) {
+				
+				UserEntity playerOne = games.get(i).getPlayerOne();
+				UserEntity playerTwo = games.get(i).getPlayerTwo();
+				if(playerTwo == null) {
+					playerTwo = new UserEntity("");
+				}
+				UserEntity winner = games.get(i).getWinnerPlayer();
+				if(winner == null) {
+					winner = new UserEntity("");
+				}				
 				statistic.model.addRow(new Object[]{ i+1 , 
-											games.get(i).getPlayerOne(),
+											playerOne.getUsername(),
 											games.get(i).getPlayerOneScore(),
-											games.get(i).getPlayerTwo(),
+											playerTwo.getUsername(),
 											games.get(i).getPlayerTwoScore(),
-											games.get(i).getWinnerPlayer(),
+											winner.getUsername(),
 											games.get(i).getDateTime(),
 											games.get(i).getHeight(), 
 											games.get(i).getWidth(), 

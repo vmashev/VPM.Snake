@@ -15,6 +15,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
 import vpm.helper.Direction;
@@ -27,8 +28,11 @@ public class GameInfo implements Serializable{
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	
+	@ManyToOne
 	private UserEntity winnerPlayer;
+	@ManyToOne
 	private UserEntity playerOne;
+	@ManyToOne
 	private UserEntity playerTwo;
 	private Integer playerOneScore;
 	private Integer playerTwoScore;

@@ -2,6 +2,7 @@ package vpm.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Font;
+import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -25,11 +26,11 @@ public class Statistic extends JDialog {
 	public JTable table;
 	public DefaultTableModel model;
 	private StatisticControler controler;
-	
+    
 	public Statistic() {
 		this.controler = new StatisticControler(this);
 		
-		setBounds(100, 100, 710, 270);
+		setBounds(100, 100, 950, 270);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
@@ -58,22 +59,21 @@ public class Statistic extends JDialog {
 		
 		JButton searchBtn = new JButton("Search");
 		searchBtn.setFont(new Font("Times New Roman", Font.PLAIN, 12));
-		searchBtn.setBounds(496, 197, 89, 23);
+		searchBtn.setBounds(736, 197, 89, 23);
 		searchBtn.addActionListener(controler);
 		contentPanel.add(searchBtn);
 		
 		JButton btnClose = new JButton("Close");
 		btnClose.setFont(new Font("Times New Roman", Font.PLAIN, 12));
-		btnClose.setBounds(595, 197, 89, 23);
+		btnClose.setBounds(835, 197, 89, 23);
 		btnClose.addActionListener(controler);
 		contentPanel.add(btnClose);
 		
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(10, 42, 674, 145);
+		scrollPane.setBounds(10, 42, 914, 145);
 		contentPanel.add(scrollPane);
 		
 		model = new DefaultTableModel( new Object[][] {}, new String[] { "Line No.", 
-																			"Host Username", 
 																			"Player 1", 
 																			"Score Player 1",
 																			"Player 2", 
@@ -84,7 +84,6 @@ public class Statistic extends JDialog {
 																			"Board Width", 
 																			"Game Speed" } ) {
 			boolean[] columnEditables = new boolean[] { false, 
-														false, 
 														false, 
 														false, 
 														false, 
@@ -103,7 +102,7 @@ public class Statistic extends JDialog {
 		scrollPane.setViewportView(table);
 		
 		ClientSetup clientSetup = ClientSetup.createInstance();
-		controler.getStatistics(clientSetup.getUsername());
+		controler.getStatistics(clientSetup.getUser());
 	}
 	
 	public void showMessage(String msg) {

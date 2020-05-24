@@ -57,7 +57,7 @@ public class MultiplayerMenuControler implements ActionListener{
 				ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
 	    		ObjectInputStream objectinput = new ObjectInputStream(socket.getInputStream());
 	    		
-	    		GameInfo gameInfo = new GameInfo(clientSetup.getUsername(), width , height , speed);
+	    		GameInfo gameInfo = new GameInfo(clientSetup.getUser(), width , height , speed);
 	    		
 				String message = JsonParser.parseFromGameInfo(gameInfo);
 				CommunicationCommand sendCommand = new CommunicationCommand(13, message);

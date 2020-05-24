@@ -79,12 +79,14 @@ public class MoveCommand extends Command{
 	
 	//Save the game on Quit or when the game is over
 	private void saveGame(GameInfo gameInfo) {
-		gameInfo.setPlayerOneSnake(gameInfo.getSnakes().get(gameInfo.getPlayerOne()));
+		gameInfo.setPlayerOneSnake(gameInfo.getSnakes().get(gameInfo.getPlayerOne().getUsername()));
+		
+		updateMaxScore(gameInfo);
 		
 		GameInfoService gameInfoService = new GameInfoServiceImpl();
 		gameInfoService.create(gameInfo);
 		
-		updateMaxScore(gameInfo);
+		
 		
 	}
 
@@ -101,6 +103,12 @@ public class MoveCommand extends Command{
 					user.setMaxScore(snakeEntry.getValue().getScore());
 					userService.update(user);
 				}
+			}
+			
+			if(snakeEntry.getKey().equals(gameInfo.getPlayerOne().getUsername())) {
+				gameInfo.setPlayerOneScore(snakeEntry.getValue().getScore());
+			} else {
+				gameInfo.setPlayerTwoScore(snakeEntry.getValue().getScore());
 			}
 		}
 		

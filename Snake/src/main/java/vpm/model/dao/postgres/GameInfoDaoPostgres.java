@@ -44,9 +44,9 @@ public class GameInfoDaoPostgres extends GenericDAOPostgreSQL<GameInfo, Long> im
 	}
 
 	@Override
-	public List<GameInfo> findGameInfoHistoryByUsername(String username) {
+	public List<GameInfo> findGameInfoHistoryByUsername(UserEntity user) {
 		Query query = getEntityManager().createNamedQuery("findGameInfoByUsernameAndStatus");
-		query.setParameter("username", username)
+		query.setParameter("user", user)
 			.setParameter("status", GameStatus.GameOver);
 		
 		try {

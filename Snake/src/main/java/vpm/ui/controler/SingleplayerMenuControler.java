@@ -60,7 +60,7 @@ public class SingleplayerMenuControler implements ActionListener{
 				ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
 				ObjectInputStream objectinput = new ObjectInputStream(socket.getInputStream());
 
-	    		GameInfo gameInfo = new GameInfo(clientSetup.getUsername(), width , height , speed);
+	    		GameInfo gameInfo = new GameInfo(clientSetup.getUser(), width , height , speed);
 	    		
 				String message = JsonParser.parseFromGameInfo(gameInfo);
 				CommunicationCommand sendCommand = new CommunicationCommand(10, message);
@@ -123,7 +123,7 @@ public class SingleplayerMenuControler implements ActionListener{
 			objectOutput = new ObjectOutputStream(socket.getOutputStream());
 			objectinput = new ObjectInputStream(socket.getInputStream());
 			
-			UserEntity user = clientSetup.getUsername();
+			UserEntity user = clientSetup.getUser();
 			String message = JsonParser.parseFromUserEntity(user);
 			
 			CommunicationCommand sendCommand = new CommunicationCommand(4, message);
@@ -134,7 +134,7 @@ public class SingleplayerMenuControler implements ActionListener{
 
 			for (int i = 0; i < games.size(); i++) {
 				singleplayerMenu.model.addRow(new Object[]{ i+1 , 
-											games.get(i).getPlayerOne(), 
+											games.get(i).getPlayerOne().getUsername(), 
 											games.get(i).getDateTime(),
 											games.get(i).getHeight(), 
 											games.get(i).getWidth(), 

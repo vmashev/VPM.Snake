@@ -9,6 +9,6 @@ import vpm.model.UserEntity;
 public interface GameInfoDao extends GenericDao<GameInfo, Long> {
 
 	List<GameInfo> findSavedGameInfoByUsername(UserEntity user);
-	List<GameInfo> findGameInfoHistoryByUsername(String username);
+	List<GameInfo> findGameInfoHistoryByUsername(UserEntity user);
 	GameInfo findByDateTime(LocalDateTime dateTime);
 }

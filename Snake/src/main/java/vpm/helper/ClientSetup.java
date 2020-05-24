@@ -12,7 +12,7 @@ public class ClientSetup {
 	private int serverPort ;
 	
 	private static ClientSetup instance = new ClientSetup();
-	private UserEntity username = null;
+	private UserEntity user = null;
 	
 	private ClientSetup() {
 		setServerInfo();
@@ -22,12 +22,12 @@ public class ClientSetup {
 		return instance;
 	}
 
-	public UserEntity getUsername() {
-		return username;
+	public UserEntity getUser() {
+		return user;
 	}
 
-	public void setUsername(UserEntity username) {
-		this.username = username;
+	public void setUser(UserEntity user) {
+		this.user = user;
 	}
 
 	private void setServerInfo() {

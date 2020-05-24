@@ -106,7 +106,7 @@ public class GameInfoServiceImpl implements GameInfoService{
 		entityManager = serverSetup.getEntityManager();
 		gameInfoDao = new GameInfoDaoPostgres(entityManager);
 		
-		List<GameInfo> result = gameInfoDao.findGameInfoHistoryByUsername(user.getUsername());
+		List<GameInfo> result = gameInfoDao.findGameInfoHistoryByUsername(user);
 		entityManager.close();
 		
 		return result;

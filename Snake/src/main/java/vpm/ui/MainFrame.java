@@ -80,15 +80,16 @@ public class MainFrame extends JFrame implements ActionListener{
 			logIn.setVisible(true);
 			
 			clientSetup = clientSetup.createInstance();
-			userIsLogged = clientSetup.getUsername() != null;
+			userIsLogged = clientSetup.getUser() != null;
 
 			updateButtonEnabled();
 			
 			break;
 		case "LogOut": 
 			clientSetup = clientSetup.createInstance();
-			clientSetup.setUsername(null);
-			
+			clientSetup.setUser(null);
+			userIsLogged = false;
+
 			updateButtonEnabled();
 			
 			break;			
@@ -97,7 +98,7 @@ public class MainFrame extends JFrame implements ActionListener{
 			signUp.setVisible(true);
 			
 			clientSetup = clientSetup.createInstance();
-			userIsLogged = clientSetup.getUsername() != null;
+			userIsLogged = clientSetup.getUser() != null;
 			
 			updateButtonEnabled();
 			
