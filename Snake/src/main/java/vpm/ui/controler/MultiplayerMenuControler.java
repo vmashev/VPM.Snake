@@ -10,7 +10,6 @@ import java.util.List;
 
 import vpm.helper.ClientSetup;
 import vpm.helper.CommunicationCommand;
-import vpm.helper.ConnectionSetup;
 import vpm.helper.JsonParser;
 import vpm.model.GameInfo;
 import vpm.ui.GameBoard;
@@ -25,6 +24,8 @@ public class MultiplayerMenuControler implements ActionListener{
 	
 	public MultiplayerMenuControler(MultiplayerMenu multiplayerMenu) {
 		this.multiplayerMenu = multiplayerMenu;
+		this.clientSetup = ClientSetup.createInstance();
+     
 	}
 	
 	@Override
@@ -51,9 +52,8 @@ public class MultiplayerMenuControler implements ActionListener{
 			int height = Integer.valueOf(newGame.heightFld.getText());
 			int speed = Integer.valueOf(newGame.speedFld.getText());
 		
-			clientSetup = ClientSetup.createInstance();
-	        try {
-	        	Socket socket = new Socket(ConnectionSetup.SERVER_IP, ConnectionSetup.PORT);
+			try {
+	        	Socket socket = new Socket(clientSetup.getServerIp(), clientSetup.getServerPort());
 				ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
 	    		ObjectInputStream objectinput = new ObjectInputStream(socket.getInputStream());
 	    		
@@ -83,7 +83,7 @@ public class MultiplayerMenuControler implements ActionListener{
             String username = (String) multiplayerMenu.table.getValueAt(selectedRow, 1);
             
             try {
-            	Socket socket = new Socket(ConnectionSetup.SERVER_IP, ConnectionSetup.PORT);
+            	Socket socket = new Socket(clientSetup.getServerIp(), clientSetup.getServerPort());
 				ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
 	    		ObjectInputStream objectinput = new ObjectInputStream(socket.getInputStream());
 	    		
@@ -106,8 +106,10 @@ public class MultiplayerMenuControler implements ActionListener{
 	public void getLobbies() {
 		ObjectOutputStream objectOutput = null;
 		ObjectInputStream objectinput = null;
+		
 		try {
-			Socket socket = new Socket(ConnectionSetup.SERVER_IP, ConnectionSetup.PORT);
+			
+			Socket socket = new Socket(clientSetup.getServerIp(), clientSetup.getServerPort());
 			objectOutput = new ObjectOutputStream(socket.getOutputStream());
     		objectinput = new ObjectInputStream(socket.getInputStream());
     		

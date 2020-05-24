@@ -20,10 +20,9 @@ public class StartServer {
 	public StartServer() throws IOException, ClassNotFoundException {
 		
 		ServerSetup serverSetup = ServerSetup.createInstance();
-		ServerSocket serverSocket = new ServerSocket(ConnectionSetup.PORT);
+		ServerSocket serverSocket = new ServerSocket(serverSetup.getServerPort());
 		
 		while (true) {
-			System.out.println("Server is running on port " + ConnectionSetup.PORT);
 			Socket socket = serverSocket.accept(); 
 			
 			GameManager clientThread = new GameManager(socket,gameHandlers);

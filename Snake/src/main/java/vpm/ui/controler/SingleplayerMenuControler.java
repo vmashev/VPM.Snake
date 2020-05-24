@@ -26,6 +26,7 @@ public class SingleplayerMenuControler implements ActionListener{
 	
 	public SingleplayerMenuControler(SingleplayerMenu singleplayerMenu) {
 		this.singleplayerMenu = singleplayerMenu;
+		this.clientSetup = ClientSetup.createInstance();
 	}
 	
 	@Override
@@ -53,11 +54,10 @@ public class SingleplayerMenuControler implements ActionListener{
 			int height = Integer.valueOf(newGame.heightFld.getText());
 			int speed = Integer.valueOf(newGame.speedFld.getText());
 		
-			clientSetup = ClientSetup.createInstance();
 			
 	        try {
 				
-	        	Socket socket = new Socket(ConnectionSetup.SERVER_IP, ConnectionSetup.PORT);
+	        	Socket socket = new Socket(clientSetup.getServerIp(), clientSetup.getServerPort());
 				ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
 				ObjectInputStream objectinput = new ObjectInputStream(socket.getInputStream());
 
@@ -87,7 +87,7 @@ public class SingleplayerMenuControler implements ActionListener{
             
             try {
             	
-            	Socket socket = new Socket(ConnectionSetup.SERVER_IP, ConnectionSetup.PORT);
+            	Socket socket = new Socket(clientSetup.getServerIp(), clientSetup.getServerPort());
     			ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
 				ObjectInputStream objectinput = new ObjectInputStream(socket.getInputStream());
 
@@ -120,7 +120,7 @@ public class SingleplayerMenuControler implements ActionListener{
 
 		try {
     		
-			Socket socket = new Socket(ConnectionSetup.SERVER_IP, ConnectionSetup.PORT);
+			Socket socket = new Socket(clientSetup.getServerIp(), clientSetup.getServerPort());
 			objectOutput = new ObjectOutputStream(socket.getOutputStream());
 			objectinput = new ObjectInputStream(socket.getInputStream());
 			

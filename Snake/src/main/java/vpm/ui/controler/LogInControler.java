@@ -45,11 +45,12 @@ public class LogInControler implements ActionListener{
 			return;
 		}
 		
+		ClientSetup clientSetup = ClientSetup.createInstance();
 		ObjectOutputStream objectOutput = null;
 		ObjectInputStream objectinput = null;
 		
 		try {
-			Socket socket = new Socket(ConnectionSetup.SERVER_IP, ConnectionSetup.PORT);
+			Socket socket = new Socket(clientSetup.getServerIp(), clientSetup.getServerPort());
 			objectOutput = new ObjectOutputStream(socket.getOutputStream());
 			objectinput = new ObjectInputStream(socket.getInputStream());
 
@@ -72,7 +73,6 @@ public class LogInControler implements ActionListener{
 				return;			
 			}
 			
-			ClientSetup clientSetup = ClientSetup.createInstance();
 			clientSetup.setUsername(nickname);
 	
 			logInPage.dispose();

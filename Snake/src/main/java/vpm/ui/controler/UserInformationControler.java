@@ -9,7 +9,6 @@ import java.net.Socket;
 
 import vpm.helper.ClientSetup;
 import vpm.helper.CommunicationCommand;
-import vpm.helper.ConnectionSetup;
 import vpm.helper.JsonParser;
 import vpm.model.UserEntity;
 import vpm.ui.ChangePassword;
@@ -19,9 +18,11 @@ public class UserInformationControler implements ActionListener{
 
 	private UserInformation userInformation;
 	private UserEntity user;
+	private ClientSetup clientSetup;
 	
 	public UserInformationControler(UserInformation userInformation) {
 		this.userInformation = userInformation;
+		this.clientSetup = ClientSetup.createInstance();
 	}
 	
 	@Override
@@ -65,7 +66,7 @@ public class UserInformationControler implements ActionListener{
 		
 		try {
 			
-			Socket socket = new Socket(ConnectionSetup.SERVER_IP, ConnectionSetup.PORT);
+			Socket socket = new Socket(clientSetup.getServerIp(), clientSetup.getServerPort());
 			objectOutput = new ObjectOutputStream(socket.getOutputStream());
 			objectinput = new ObjectInputStream(socket.getInputStream());
 			
@@ -94,14 +95,13 @@ public class UserInformationControler implements ActionListener{
 	}
 	
 	public void getUserInfo() {
-		ClientSetup clientSetup = ClientSetup.createInstance();
 		
 		ObjectOutputStream objectOutput = null;
 		ObjectInputStream objectinput = null;
 		
 		try {
 			
-			Socket socket = new Socket(ConnectionSetup.SERVER_IP, ConnectionSetup.PORT);
+			Socket socket = new Socket(clientSetup.getServerIp(), clientSetup.getServerPort());
 			objectOutput = new ObjectOutputStream(socket.getOutputStream());
 			objectinput = new ObjectInputStream(socket.getInputStream());
 			

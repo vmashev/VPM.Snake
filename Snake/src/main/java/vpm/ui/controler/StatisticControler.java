@@ -8,6 +8,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.List;
 
+import vpm.helper.ClientSetup;
 import vpm.helper.CommunicationCommand;
 import vpm.helper.ConnectionSetup;
 import vpm.helper.JsonParser;
@@ -18,9 +19,11 @@ import vpm.ui.Statistic;
 public class StatisticControler implements ActionListener{
 
 	private Statistic statistic;
+	private ClientSetup clientSetup;
 	
 	public StatisticControler(Statistic statistic) {
 		this.statistic = statistic;
+		this.clientSetup = ClientSetup.createInstance();
 	}
 	
 	@Override
@@ -42,7 +45,7 @@ public class StatisticControler implements ActionListener{
 		
 		try {
 			
-			Socket socket = new Socket(ConnectionSetup.SERVER_IP, ConnectionSetup.PORT);
+			Socket socket = new Socket(clientSetup.getServerIp(), clientSetup.getServerPort());
 			objectOutput = new ObjectOutputStream(socket.getOutputStream());
 			objectinput = new ObjectInputStream(socket.getInputStream());
 			

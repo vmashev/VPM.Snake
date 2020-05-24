@@ -19,9 +19,11 @@ import vpm.ui.SignUp;
 public class SignUpControler implements ActionListener{
 
 	private SignUp signUpPage;
+	private ClientSetup clientSetup;
 
 	public SignUpControler(SignUp signUp) {
 		this.signUpPage = signUp;
+		this.clientSetup = ClientSetup.createInstance();
 	}
 	
 	@Override
@@ -76,7 +78,7 @@ public class SignUpControler implements ActionListener{
 
 		try {
 			
-			Socket socket = new Socket(ConnectionSetup.SERVER_IP, ConnectionSetup.PORT);
+			Socket socket = new Socket(clientSetup.getServerIp(), clientSetup.getServerPort());
 			objectOutput = new ObjectOutputStream(socket.getOutputStream());
     		objectinput = new ObjectInputStream(socket.getInputStream());
 			
