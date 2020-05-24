@@ -2,7 +2,8 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>vpm</groupId>
   <artifactId>Snake</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <version>1.0</version>
   
   	<properties>
 		<maven.compiler.target>11</maven.compiler.target>
@@ -56,4 +57,8 @@
 
 	</dependencies>
 		
+	<modules>
+		<module>snake-server</module>
+		<module>snake-client</module>
+	</modules>
 </project>

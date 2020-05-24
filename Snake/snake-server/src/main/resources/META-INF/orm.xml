@@ -1,0 +1,31 @@
+<entity-mappings
+	version="2.1"
+	xmlns="http://xmlns.jcp.org/xml/ns/persistence/orm"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence/orm
+		http://xmlns.jcp.org/xml/ns/persistence/orm_2_1.xsd">
+		
+	<named-query name="findUserByUsername">
+		<query><![CDATA[ select u from UserEntity u 
+			where u.username = :username ]]></query>
+	</named-query>
+	<named-query name="findUserByNicknameAndPassword">
+		<query><![CDATA[ select u from UserEntity u 
+			where u.username = :username and 
+				u.encryptedPassword = :password]]></query>
+	</named-query>
+	<named-query name="findTopUserByWins">
+		<query><![CDATA[ select u from UserEntity u 
+			where u.username like :username ]]></query>
+	</named-query>
+	
+	<named-query name="findGameInfoByUsernameAndStatus">
+		<query><![CDATA[ select g from GameInfo g 
+			where (g.playerOne = :user or g.playerTwo = :user) and 
+				g.status = :status]]></query>
+	</named-query>
+	<named-query name="findGameInfoByDateTime">
+		<query><![CDATA[ select g from GameInfo g 
+			where g.dateTime = :dateTime ]]></query>
+	</named-query>
+</entity-mappings>
