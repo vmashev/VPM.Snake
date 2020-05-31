@@ -9,17 +9,14 @@ import java.util.ArrayList;
 import vpm.command.Command;
 import vpm.command.CommandFactory;
 import vpm.helper.CommunicationCommand;
-import vpm.model.GameInfo;
 
 //Thread which manage every client connection to the server before the game is started
 //Started on the server
 public class ServerConectionManager implements Runnable{
 
 	private Socket socket ;
-	private GameInfo gameInfo;
 	private ArrayList<GameHandler> gameHandlers;
 
-	private GameHandler gHandler;
 	private CommunicationCommand inCommand;
 	private CommunicationCommand outCommand;
 	private Command executeStrategy;
@@ -30,7 +27,6 @@ public class ServerConectionManager implements Runnable{
 	public ServerConectionManager(Socket socket, ArrayList<GameHandler> gameHandlers) {
 		this.socket = socket;
 		this.gameHandlers = gameHandlers;	
-		this.gameInfo = new GameInfo();
 	}
 	
 	@Override

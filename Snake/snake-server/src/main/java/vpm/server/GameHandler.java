@@ -65,9 +65,6 @@ public class GameHandler implements Runnable{
 					executeStrategy = CommandFactory.createCommand(inCommand.getNumber() , gameInfo, null);
 					outCommand = executeStrategy.execute(inCommand);
 					
-					gameInfo = executeStrategy.getGameInfo();
-					
-					
 					for (GameOutHandler gameOutHandler : gameOutHandlers) {
 						gameOutHandler.addCommand(outCommand);
 					}
